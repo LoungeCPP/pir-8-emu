@@ -101,7 +101,7 @@
 <span class="doccomment">/// 101     | B      |</span>
 <span class="doccomment">/// 110     | C      |</span>
 <span class="doccomment">/// 111     | D      |</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GeneralPurposeRegister</span> {
     <span class="ident">data</span>: <span class="ident">u8</span>,
     <span class="doccomment">/// Verified to 3 bits at construction time</span>
@@ -160,7 +160,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">GeneralPurposeRegister</span> {
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">GeneralPurposeRegister</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}({:02X})&quot;</span>, <span class="self">self</span>.<span class="ident">letter</span>, <span class="self">self</span>.<span class="ident">data</span>)
     }
