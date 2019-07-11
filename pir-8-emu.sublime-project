@@ -32,6 +32,16 @@
 		},
 		{
 			"follow_symlinks": true,
+			"name": "Test data",
+			"path": "test-data"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Examples",
+			"path": "examples"
+		},
+		{
+			"follow_symlinks": true,
 			"name": "External data",
 			"path": "ext"
 		},

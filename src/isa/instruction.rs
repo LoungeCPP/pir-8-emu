@@ -100,6 +100,28 @@ pub enum Instruction {
     Halt,
 }
 
+impl Instruction {
+    /// Check if this instruction doesn't use reserved space
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::{AluOperation, Instruction};
+    /// assert!(Instruction::Clrf.is_valid());
+    /// assert!(Instruction::Alu(AluOperation::Or).is_valid());
+    ///
+    /// assert!(!Instruction::Reserved(0).is_valid());
+    /// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());
+    /// ```
+    pub fn is_valid(&self) -> bool {
+        match self {
+            Instruction::Reserved(_) => false,
+            Instruction::Alu(op) => op.is_valid(),
+            _ => true,
+        }
+    }
+}
+
 impl From<u8> for Instruction {
     fn from(raw: u8) -> Instruction {
         match ((raw & 0b1000_0000) != 0,
@@ -216,6 +238,25 @@ pub enum AluOperation {
         d: AluOperationShiftOrRotateDirection,
         tt: AluOperationShiftOrRotateType,
     },
+}
+
+impl AluOperation {
+    /// Check if this operation doesn't use reserved space
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::AluOperation;
+    /// assert!(AluOperation::Or.is_valid());
+    ///
+    /// assert!(!AluOperation::Reserved(0b0011).is_valid());
+    /// ```
+    pub fn is_valid(&self) -> bool {
+        match self {
+            AluOperation::Reserved(_) => false,
+            _ => true,
+        }
+    }
 }
 
 impl TryFrom<u8> for AluOperation {

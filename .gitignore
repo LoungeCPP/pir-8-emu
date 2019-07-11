@@ -9,9 +9,13 @@
 !rustfmt.toml
 !*.sublime-project
 !*.md
-!src
-!src/**
 !ext
 !ext/**
+!src
+!src/**
 !tests
 !tests/**
+!test-data
+!test-data/**
+!examples
+!examples/**
