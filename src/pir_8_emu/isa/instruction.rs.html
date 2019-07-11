@@ -302,6 +302,47 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! An instruction is a single byte, and can include some following imediate values purely for data.</span>
 
@@ -403,6 +444,28 @@
     <span class="ident">Clrf</span>,
     <span class="doccomment">/// Stop the CPU from doing any more execution</span>
     <span class="ident">Halt</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Instruction</span> {
+    <span class="doccomment">/// Check if this instruction doesn&#39;t use reserved space</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{AluOperation, Instruction};</span>
+    <span class="doccomment">/// assert!(Instruction::Clrf.is_valid());</span>
+    <span class="doccomment">/// assert!(Instruction::Alu(AluOperation::Or).is_valid());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!Instruction::Reserved(0).is_valid());</span>
+    <span class="doccomment">/// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instruction</span> {
@@ -521,6 +584,25 @@
         <span class="ident">d</span>: <span class="ident">AluOperationShiftOrRotateDirection</span>,
         <span class="ident">tt</span>: <span class="ident">AluOperationShiftOrRotateType</span>,
     },
+}
+
+<span class="kw">impl</span> <span class="ident">AluOperation</span> {
+    <span class="doccomment">/// Check if this operation doesn&#39;t use reserved space</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::AluOperation;</span>
+    <span class="doccomment">/// assert!(AluOperation::Or.is_valid());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!AluOperation::Reserved(0b0011).is_valid());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperation</span> {
