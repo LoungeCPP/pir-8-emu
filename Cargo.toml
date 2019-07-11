@@ -13,3 +13,7 @@ version = "0.1.0"
 # Remember to also update in pir-8-emu.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
+
+
+[dependencies]
+num-traits = "0.2"
