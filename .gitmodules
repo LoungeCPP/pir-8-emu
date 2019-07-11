@@ -1,0 +1,3 @@
+[submodule "ext/pir-8"]
+	path = ext/pir-8
+	url = https://github.com/thecoshman/pir-8

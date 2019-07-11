@@ -11,5 +11,7 @@
 !*.md
 !src
 !src/**
+!ext
+!ext/**
 !tests
 !tests/**
