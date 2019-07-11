@@ -1,2 +1,2 @@
-# pir-8-emu docs
-Viewable as rendered HTML [here](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/index.html)
+# pir-8-emu manpage
+Viewable as rendered HTML [here](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/man/pir-8-emu.1.html)
