@@ -1,6 +1,10 @@
 //! An instruction is a single byte, and can include some following imediate values purely for data.
 
 
+use self::super::super::util::limit_to_width;
+use std::convert::{TryFrom, From};
+
+
 /// Instructions will increase the PC by one, unless otherwise stated.
 ///
 /// The PC is incremented as the instruction is loaded from RAM.
@@ -67,11 +71,11 @@
 ///
 /// **NB:** I Think I might update this to allow pushing/poping the PC, this would make it very easy (hardware wise) to handle
 /// calling and returning functions
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
-    /// Load the the next byte into register `AAA` (PC will be incremented a second time)
+    /// Jump, see section above
     Jump { xxx: u8, },
     /// Load the the next byte into register `AAA` (PC will be incremented a second time)
     LoadImmediate { aaa: u8, },
@@ -96,6 +100,82 @@ pub enum Instruction {
     Halt,
 }
 
+impl From<u8> for Instruction {
+    fn from(raw: u8) -> Instruction {
+        match ((raw & 0b1000_0000) != 0,
+               (raw & 0b0100_0000) != 0,
+               (raw & 0b0010_0000) != 0,
+               (raw & 0b0001_0000) != 0,
+               (raw & 0b0000_1000) != 0,
+               (raw & 0b0000_0100) != 0,
+               (raw & 0b0000_0010) != 0,
+               (raw & 0b0000_0001) != 0) {
+            (false, false, false, false, _, _, _, _) => Instruction::Reserved(raw),
+            (false, false, false, true, false, _, _, _) => Instruction::Jump { xxx: raw & 0b0000_0111 },
+            (false, false, false, true, true, _, _, _) => Instruction::LoadImmediate { aaa: raw & 0b0000_0111 },
+            (false, false, true, false, false, _, _, _) => Instruction::LoadIndirect { aaa: raw & 0b0000_0111 },
+            (false, false, true, false, true, _, _, _) => Instruction::Save { aaa: raw & 0b0000_0111 },
+            (false, false, true, true, _, _, _, _) => {
+                Instruction::Alu(AluOperation::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for ALU op parse"))
+            }
+            (false, true, _, _, _, _, _, _) => {
+                Instruction::Move {
+                    aaa: (raw & 0b0011_1000) >> 3,
+                    bbb: raw & 0b0000_0111,
+                }
+            }
+            (true, false, _, _, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, false, _, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, true, false, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, true, true, false, _, _, _) => Instruction::Comp { aaa: raw & 0b0000_0111 },
+            (true, true, true, true, true, false, d, r) => {
+                Instruction::Stck {
+                    d: d.into(),
+                    r: r.into(),
+                }
+            }
+            (true, true, true, true, true, true, false, _) => Instruction::Reserved(raw),
+            (true, true, true, true, true, true, true, false) => Instruction::Clrf,
+            (true, true, true, true, true, true, true, true) => Instruction::Halt,
+        }
+    }
+}
+
+
+/// The D bit indicates the direction; 0 for PUSH and 1 for POP.
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionStckDirection {
+    Push = 0,
+    Pop = 1,
+}
+
+impl From<bool> for InstructionStckDirection {
+    fn from(raw: bool) -> InstructionStckDirection {
+        match raw {
+            false => InstructionStckDirection::Push,
+            true => InstructionStckDirection::Pop,
+        }
+    }
+}
+
+
+/// The R bit indicates the register pair; 0 for A & B and 1 for C & D.
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionStckRegisterPair {
+    Ab = 0,
+    Cd = 1,
+}
+
+impl From<bool> for InstructionStckRegisterPair {
+    fn from(raw: bool) -> InstructionStckRegisterPair {
+        match raw {
+            false => InstructionStckRegisterPair::Ab,
+            true => InstructionStckRegisterPair::Cd,
+        }
+    }
+}
+
+
 /// Any CPU instruction of the pattern `0011 FFFF` will invoke some function of the ALU.
 ///
 /// The four bits `FFFF` are the actual operation being performed by the ALU. The registers X and Y are used as inputs to the
@@ -115,7 +195,7 @@ pub enum Instruction {
 /// 0110 | AND  |   1   | Bitwise AND
 /// 0111 |      |   1   | Reserved
 /// 1DTT |      |   8   | Shift or Rotate, see section below
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperation {
     /// Reserved operation, contains the entire nibble
     Reserved(u8),
@@ -134,9 +214,34 @@ pub enum AluOperation {
     /// Shift or Rotate, see member doc
     ShiftOrRotate {
         d: AluOperationShiftOrRotateDirection,
-        tt: AluOperationShiftOrRotate,
+        tt: AluOperationShiftOrRotateType,
     },
 }
+
+impl TryFrom<u8> for AluOperation {
+    type Error = ();
+
+    fn try_from(raw: u8) -> Result<AluOperation, ()> {
+        let nib = limit_to_width(raw, 4).ok_or(())?;
+        Ok(match ((nib & 0b1000) != 0, (nib & 0b0100) != 0, (nib & 0b0010) != 0, (nib & 0b0001) != 0) {
+            (false, false, false, false) => AluOperation::Add,
+            (false, false, false, true) => AluOperation::Sub,
+            (false, false, true, false) => AluOperation::Not,
+            (false, false, true, true) => AluOperation::Reserved(nib),
+            (false, true, false, false) => AluOperation::Or,
+            (false, true, false, true) => AluOperation::Xor,
+            (false, true, true, false) => AluOperation::And,
+            (false, true, true, true) => AluOperation::Reserved(nib),
+            (true, d, _, _) => {
+                AluOperation::ShiftOrRotate {
+                    d: d.into(),
+                    tt: AluOperationShiftOrRotateType::try_from(nib & 0b0011).expect("Wrong raw instruction slicing for ALU Shift or Rotate Type parse"),
+                }
+            }
+        })
+    }
+}
+
 
 /// All shifts can be performed left or right, as designated by the D bit of the instruction.
 ///
@@ -154,8 +259,8 @@ pub enum AluOperation {
 ///
 /// **NB:** An 'Arithmetic shift left' is the same as performing a 'Logcal shift left', they _can_ be used interchagably, but
 /// 'Arithmtic shift left' should be avoided.
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AluOperationShiftOrRotate {
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum AluOperationShiftOrRotateType {
     /// Logical shift - a zero is inserted
     Lsf,
     /// Arithmetic shift - a zero is inserted for left shift, bit-8 is inserted for right shift
@@ -166,24 +271,34 @@ pub enum AluOperationShiftOrRotate {
     Rtw,
 }
 
+impl TryFrom<u8> for AluOperationShiftOrRotateType {
+    type Error = ();
+
+    fn try_from(raw: u8) -> Result<AluOperationShiftOrRotateType, ()> {
+        let nib = limit_to_width(raw, 2).ok_or(())?;
+        Ok(match ((nib & 0b10) != 0, (nib & 0b01) != 0) {
+            (false, false) => AluOperationShiftOrRotateType::Lsf,
+            (false, true) => AluOperationShiftOrRotateType::Asf,
+            (true, false) => AluOperationShiftOrRotateType::Rtc,
+            (true, true) => AluOperationShiftOrRotateType::Rtw,
+        })
+    }
+}
+
+
 /// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it's a right shift, moving bits
 /// to lower values.
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperationShiftOrRotateDirection {
     Left = 1,
     Right = 0,
 }
 
-/// The D bit indicates the direction; 0 for PUSH and 1 for POP.
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InstructionStckDirection {
-    Push = 0,
-    Pop = 1,
-}
-
-/// The R bit indicates the register pair; 0 for A & B and 1 for C & D.
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InstructionStckRegisterPair {
-    Ab = 0,
-    Cd = 1,
+impl From<bool> for AluOperationShiftOrRotateDirection {
+    fn from(raw: bool) -> AluOperationShiftOrRotateDirection {
+        match raw {
+            true => AluOperationShiftOrRotateDirection::Left,
+            false => AluOperationShiftOrRotateDirection::Right,
+        }
+    }
 }

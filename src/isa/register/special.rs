@@ -15,7 +15,7 @@ use std::fmt;
 /// Stack Pointer   | SP    |  16  | Current address of the stack (detailed later)
 /// Memory Address  | ADR   |  16  | Current address of RAM being accessed
 /// Instruction     | INS   |   8  | Instruction currently being executed
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SpecialPurposeRegister<T: Num + Unsigned + PrimInt> {
     data: T,
     name: &'static str,
@@ -71,7 +71,7 @@ impl<T: Num + Unsigned + PrimInt> DerefMut for SpecialPurposeRegister<T> {
     }
 }
 
-impl<T: Num + Unsigned + PrimInt + fmt::Display + fmt::UpperHex> fmt::Debug for SpecialPurposeRegister<T> {
+impl<T: Num + Unsigned + PrimInt + fmt::Display + fmt::UpperHex> fmt::Display for SpecialPurposeRegister<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}({:0w$X})", self.short, self.data, w = size_of::<T>() * 2)
     }

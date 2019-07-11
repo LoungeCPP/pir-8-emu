@@ -17,7 +17,7 @@ use std::fmt;
 /// 101     | B      |
 /// 110     | C      |
 /// 111     | D      |
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GeneralPurposeRegister {
     data: u8,
     /// Verified to 3 bits at construction time
@@ -76,7 +76,7 @@ impl DerefMut for GeneralPurposeRegister {
     }
 }
 
-impl fmt::Debug for GeneralPurposeRegister {
+impl fmt::Display for GeneralPurposeRegister {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}({:02X})", self.letter, self.data)
     }
