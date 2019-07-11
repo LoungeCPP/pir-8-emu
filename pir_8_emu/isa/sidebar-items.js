@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SpecialPurposeRegister",""]]});
+initSidebarItems({"struct":[["GeneralPurposeRegister","There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like 'MOVE' and 'LOAD' can use these addresses."],["SpecialPurposeRegister","There are some special purpose registers that you cannot directly read/write from, these are used by the CPU for its internal state."]]});

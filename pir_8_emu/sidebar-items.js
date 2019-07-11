@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["isa",""]],"struct":[["Cpu",""]]});
+initSidebarItems({"mod":[["isa",""],["util","Module containing various utility functions."]],"struct":[["Cpu",""]]});

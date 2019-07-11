@@ -23,8 +23,20 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">SpecialPurposeRegister</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -37,6 +49,9 @@
     <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Instruction currently being executed</span>
     <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU.</span>
+    <span class="ident">general_purpose</span>: [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>],
 }
 
 <span class="kw">impl</span> <span class="ident">Cpu</span> {
@@ -46,6 +61,15 @@
             <span class="ident">sp</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Stack Pointer&quot;</span>, <span class="string">&quot;SP&quot;</span>),
             <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Memory Address&quot;</span>, <span class="string">&quot;ADR&quot;</span>),
             <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Instruction&quot;</span>, <span class="string">&quot;INS&quot;</span>),
+
+            <span class="ident">general_purpose</span>: [<span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b000</span>, <span class="string">&#39;F&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;F register&quot;</span>), <span class="comment">// Flag register (can also be used to get a zero value)</span>
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b001</span>, <span class="string">&#39;S&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;S register&quot;</span>), <span class="comment">// Output of the ALU - ALU operations will overwrite any value stored</span>
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b010</span>, <span class="string">&#39;X&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;X register&quot;</span>), <span class="comment">// Input to ALU (Only input for unary operations)</span>
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b011</span>, <span class="string">&#39;Y&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;Y register&quot;</span>), <span class="comment">// Second input for ALU</span>
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b100</span>, <span class="string">&#39;A&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;A register&quot;</span>),
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b101</span>, <span class="string">&#39;B&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;B register&quot;</span>),
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b110</span>, <span class="string">&#39;C&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;C register&quot;</span>),
+                              <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b111</span>, <span class="string">&#39;D&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;D register&quot;</span>)],
         }
     }
 }
