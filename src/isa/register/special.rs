@@ -1,12 +1,23 @@
 use num_traits::{Unsigned, PrimInt, Num};
+use std::ops::{DerefMut, Deref};
 use std::mem::size_of;
 use std::fmt;
 
 
+/// There are some special purpose registers that you cannot directly read/write from, these are used by the CPU for its
+/// internal state.
+///
+/// There are three 16 bit registers for holding significant memory addresses and a single 8 bit register.
+///
+/// Name            | Short | Bits | Description
+/// ----------------|-------|------|------------
+/// Program Counter | PC    |  16  | Address of the next instruction to be fetched
+/// Stack Pointer   | SP    |  16  | Current address of the stack (detailed later)
+/// Memory Address  | ADR   |  16  | Current address of RAM being accessed
+/// Instruction     | INS   |   8  | Instruction currently being executed
 #[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SpecialPurposeRegister<T: Num + Unsigned + PrimInt> {
-    pub data: T,
-
+    data: T,
     name: &'static str,
     short: &'static str,
 }
@@ -19,7 +30,7 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     /// ```
     /// # use pir_8_emu::isa::SpecialPurposeRegister;
     /// let pc = SpecialPurposeRegister::<u16>::new("Program Counter", "PC");
-    /// assert_eq!(pc.data, 0);
+    /// assert_eq!(*pc, 0);
     /// assert_eq!(pc.name(), "Program Counter");
     /// assert_eq!(pc.short_name(), "PC");
     /// ```
@@ -30,9 +41,7 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
             short: short,
         }
     }
-}
 
-impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     /// The full name of this register
     ///
     /// E.g. "Program Counter"
@@ -45,6 +54,20 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     /// E.g. "PC"
     pub fn short_name(&self) -> &'static str {
         self.short
+    }
+}
+
+impl<T: Num + Unsigned + PrimInt> Deref for SpecialPurposeRegister<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+
+impl<T: Num + Unsigned + PrimInt> DerefMut for SpecialPurposeRegister<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.data
     }
 }
 

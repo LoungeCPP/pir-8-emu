@@ -1,3 +1,3 @@
 mod register;
 
-pub use self::register::SpecialPurposeRegister;
+pub use self::register::{GeneralPurposeRegister, SpecialPurposeRegister};
