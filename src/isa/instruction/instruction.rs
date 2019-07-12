@@ -123,6 +123,27 @@ impl Instruction {
         }
     }
 
+    /// Get the amount of data bytes following this instruction
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::{AluOperation, Instruction};
+    /// assert_eq!(Instruction::Clrf.data_length(), 0);
+    /// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);
+    ///
+    /// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);
+    /// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);
+    /// ```
+    pub fn data_length(&self) -> usize {
+        match self {
+            Instruction::LoadImmediate { .. } => 1,
+            Instruction::LoadIndirect { .. } |
+            Instruction::Save { .. } => 2,
+            _ => 0,
+        }
+    }
+
     /// Get proxy object implementing `Display` for printing instructions in assembly format
     ///
     /// # Examples

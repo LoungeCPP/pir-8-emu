@@ -93,16 +93,19 @@ fn stck() {
                    d: InstructionStckDirection::Push,
                    r: InstructionStckRegisterPair::Ab,
                });
+
     assert_eq!(Instruction::from(0b1111_1001),
                Instruction::Stck {
                    d: InstructionStckDirection::Push,
                    r: InstructionStckRegisterPair::Cd,
                });
+
     assert_eq!(Instruction::from(0b1111_1010),
                Instruction::Stck {
                    d: InstructionStckDirection::Pop,
                    r: InstructionStckRegisterPair::Ab,
                });
+
     assert_eq!(Instruction::from(0b1111_1011),
                Instruction::Stck {
                    d: InstructionStckDirection::Pop,
