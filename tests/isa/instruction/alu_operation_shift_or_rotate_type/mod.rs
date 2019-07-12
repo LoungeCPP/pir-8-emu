@@ -2,6 +2,7 @@ use pir_8_emu::isa::instruction::AluOperationShiftOrRotateType;
 use std::convert::TryFrom;
 
 
+mod serialise;
 mod parse_ok;
 // mod display;
 

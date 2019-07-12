@@ -163,12 +163,33 @@ impl From<u8> for Instruction {
     }
 }
 
+impl Into<u8> for Instruction {
+    fn into(self) -> u8 {
+        match self {
+            Instruction::Reserved(raw) => raw,
+            Instruction::Jump { xxx } => 0b0001_0000 | xxx,
+            Instruction::LoadImmediate { aaa } => 0b0001_1000 | aaa,
+            Instruction::LoadIndirect { aaa } => 0b0010_0000 | aaa,
+            Instruction::Save { aaa } => 0b0010_1000 | aaa,
+            Instruction::Alu(op) => {
+                let op_b: u8 = op.into();
+                0b0011_0000u8 | op_b
+            }
+            Instruction::Move { aaa, bbb } => 0b0100_0000 | (aaa << 3) | bbb,
+            Instruction::Comp { aaa } => 0b1111_0000 | aaa,
+            Instruction::Stck { d, r } => 0b1111_1000 | (d as u8) | (r as u8),
+            Instruction::Clrf => 0b1111_1110,
+            Instruction::Halt => 0b1111_1111,
+        }
+    }
+}
+
 
 /// The D bit indicates the direction; 0 for PUSH and 1 for POP.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InstructionStckDirection {
-    Push = 0,
-    Pop = 1,
+    Push = 0b00,
+    Pop = 0b10,
 }
 
 impl From<bool> for InstructionStckDirection {
@@ -184,8 +205,8 @@ impl From<bool> for InstructionStckDirection {
 /// The R bit indicates the register pair; 0 for A & B and 1 for C & D.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InstructionStckRegisterPair {
-    Ab = 0,
-    Cd = 1,
+    Ab = 0b0,
+    Cd = 0b1,
 }
 
 impl From<bool> for InstructionStckRegisterPair {
@@ -283,6 +304,24 @@ impl TryFrom<u8> for AluOperation {
     }
 }
 
+impl Into<u8> for AluOperation {
+    fn into(self) -> u8 {
+        match self {
+            AluOperation::Reserved(raw) => raw,
+            AluOperation::Add => 0b0000,
+            AluOperation::Sub => 0b0001,
+            AluOperation::Not => 0b0010,
+            AluOperation::Or => 0b0100,
+            AluOperation::Xor => 0b0101,
+            AluOperation::And => 0b0110,
+            AluOperation::ShiftOrRotate { d, tt } => {
+                let tt_b: u8 = tt.into();
+                0b1000 | (d as u8) | tt_b
+            }
+        }
+    }
+}
+
 
 /// All shifts can be performed left or right, as designated by the D bit of the instruction.
 ///
@@ -326,13 +365,24 @@ impl TryFrom<u8> for AluOperationShiftOrRotateType {
     }
 }
 
+impl Into<u8> for AluOperationShiftOrRotateType {
+    fn into(self) -> u8 {
+        match self {
+            AluOperationShiftOrRotateType::Lsf => 0b00,
+            AluOperationShiftOrRotateType::Asf => 0b01,
+            AluOperationShiftOrRotateType::Rtc => 0b10,
+            AluOperationShiftOrRotateType::Rtw => 0b11,
+        }
+    }
+}
+
 
 /// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it's a right shift, moving bits
 /// to lower values.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperationShiftOrRotateDirection {
-    Left = 1,
-    Right = 0,
+    Left = 0b100,
+    Right = 0b000,
 }
 
 impl From<bool> for AluOperationShiftOrRotateDirection {

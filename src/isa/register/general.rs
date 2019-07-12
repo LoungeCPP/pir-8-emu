@@ -3,9 +3,11 @@ use std::ops::{DerefMut, Deref};
 use std::fmt;
 
 
-/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like 'MOVE' and 'LOAD' can use these addresses.
+/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
+/// 'MOVE' and 'LOAD' can use these addresses.
 ///
-/// The first four registers have some special functionality, as described, the second four have no special functionality but can be used with the stack.
+/// The first four registers have some special functionality, as described, the second four have no special functionality but
+/// can be used with the stack.
 ///
 /// Address | Letter | Description
 /// --------|--------|------------
