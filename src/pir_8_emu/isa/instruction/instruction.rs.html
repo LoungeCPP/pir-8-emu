@@ -423,6 +423,27 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! An instruction is a single byte, and can include some following immediate values purely for data.</span>
 
@@ -546,6 +567,27 @@
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+        }
+    }
+
+    <span class="doccomment">/// Get the amount of data bytes following this instruction</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{AluOperation, Instruction};</span>
+    <span class="doccomment">/// assert_eq!(Instruction::Clrf.data_length(), 0);</span>
+    <span class="doccomment">/// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);</span>
+    <span class="doccomment">/// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=&gt;</span> <span class="number">1</span>,
+            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { .. } <span class="op">|</span>
+            <span class="ident">Instruction</span>::<span class="ident">Save</span> { .. } <span class="op">=&gt;</span> <span class="number">2</span>,
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="number">0</span>,
         }
     }
 
