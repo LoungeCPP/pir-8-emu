@@ -19,6 +19,24 @@ use std::fmt;
 /// 101     | B      |
 /// 110     | C      |
 /// 111     | D      |
+///
+/// ## Flag register
+///
+/// The flag register can be be read and written to as a general purpose register, though keep in mind that ALU and Compare
+/// instructions can effect the value of the flags. Not all of the bits have a specified role (yet), though the CLRF operation
+/// will still clear them. A value of `1` denotes the flag as 'set', whilst a value of `0` denotes  the flag is 'unset'. Below
+/// is a description of what each bit in the flag register denotes.
+///
+/// Bit | Letter | Description
+/// ----|--------|------------
+/// 0   | Z      | Zero flag
+/// 1   | C      | Carry flag
+/// 2   | P      | Parity (even number of set bits)
+/// 3   | E      | Equals flag
+/// 4   | G      | Greater than
+/// 5   |        |
+/// 6   |        |
+/// 7   |        |
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GeneralPurposeRegister {
     data: u8,
