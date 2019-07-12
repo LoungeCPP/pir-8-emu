@@ -105,6 +105,7 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">DerefMut</span>, <span class="ident">Deref</span>};
@@ -114,8 +115,9 @@
 <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like</span>
 <span class="doccomment">/// &#39;MOVE&#39; and &#39;LOAD&#39; can use these addresses.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The first four registers have some special functionality, as described, the second four have no special functionality but</span>
-<span class="doccomment">/// can be used with the stack.</span>
+<span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like</span>
+<span class="doccomment">/// &#39;MOVE&#39; and &#39;LOAD&#39; can use these addresses. The first five registers have some special functionality, as described, the last</span>
+<span class="doccomment">/// three have no special functionality. The last four registers can also be used with the stack.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Address | Letter | Description</span>
 <span class="doccomment">/// --------|--------|------------</span>
@@ -123,7 +125,7 @@
 <span class="doccomment">/// 001     | S      | Output of the ALU - ALU operations will overwrite any value stored</span>
 <span class="doccomment">/// 010     | X      | Input to ALU (Only input for unary operations)</span>
 <span class="doccomment">/// 011     | Y      | Second input for ALU</span>
-<span class="doccomment">/// 100     | A      |</span>
+<span class="doccomment">/// 100     | A      | Port number for PORT instruction</span>
 <span class="doccomment">/// 101     | B      |</span>
 <span class="doccomment">/// 110     | C      |</span>
 <span class="doccomment">/// 111     | D      |</span>

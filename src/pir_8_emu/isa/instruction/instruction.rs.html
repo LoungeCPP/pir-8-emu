@@ -494,6 +494,43 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! An instruction is a single byte, and can include some following immediate values purely for data.</span>
 
@@ -530,12 +567,20 @@
 <span class="doccomment">/// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`</span>
 <span class="doccomment">/// 10XX XXXX |      |    64 | Reserved</span>
 <span class="doccomment">/// 110X XXXX |      |    32 | Reserved</span>
-<span class="doccomment">/// 1110 XXXX |      |    16 | Reserved</span>
+<span class="doccomment">/// 1110 XXXX | PORT |    16 | Perform I/O, see section below</span>
 <span class="doccomment">/// 1111 0AAA | COMP |     8 | Compare register S with register `AAA`, see section below</span>
 <span class="doccomment">/// 1111 10XX | STCK |     4 | Stack manipulation, see section below</span>
 <span class="doccomment">/// 1111 110X |      |     2 | Reserved</span>
 <span class="doccomment">/// 1111 1110 | CLRF |     1 | Clear the &#39;F&#39; register, by setting it to `0000 0000`</span>
 <span class="doccomment">/// 1111 1111 | HALT |     1 | Stop the CPU from doing any more execution</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## PORT - I/O</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The PORT instruction in the form 1110 DAAA will perform I/O on the port specified in register A.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `D` bit specifies the direction - `1` for reading in from the port (`PORT IN`) and `0` for writing out to the port</span>
+<span class="doccomment">/// (`PORT OUT`).</span>
+<span class="doccomment">/// The `AAA` bits specify the register to write to (D=1) or read from (D=0).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## COMP - Compare</span>
 <span class="doccomment">///</span>
@@ -586,6 +631,11 @@
     <span class="ident">Alu</span>(<span class="ident">AluOperation</span>),
     <span class="doccomment">/// Move a value from register `AAA` to register `BBB`</span>
     <span class="ident">Move</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, <span class="ident">bbb</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Perform I/O, see section above</span>
+    <span class="ident">Port</span> {
+        <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>,
+        <span class="ident">aaa</span>: <span class="ident">u8</span>,
+    },
     <span class="doccomment">/// Compare register S with register `AAA`, see section above</span>
     <span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Stack manipulation, see member doc</span>
@@ -698,7 +748,12 @@
             }
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+                <span class="ident">Instruction</span>::<span class="ident">Port</span> {
+                    <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
+                    <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
+                }
+            }
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="ident">r</span>) <span class="op">=&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Stck</span> {
@@ -726,6 +781,7 @@
                 <span class="number">0b0011_0000u8</span> <span class="op">|</span> <span class="ident">op_b</span>
             }
             <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">aaa</span>, <span class="ident">bbb</span> } <span class="op">=&gt;</span> <span class="number">0b0100_0000</span> <span class="op">|</span> (<span class="ident">aaa</span> <span class="op">&lt;&lt;</span> <span class="number">3</span>) <span class="op">|</span> <span class="ident">bbb</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>, <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b1110_0000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">aaa</span>,
             <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b1111_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
             <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=&gt;</span> <span class="number">0b1111_1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=&gt;</span> <span class="number">0b1111_1110</span>,
@@ -779,6 +835,24 @@
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpl</span>,
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jump</span>,
         })
+    }
+}
+
+
+<span class="doccomment">/// The `D` bit specifies the direction - `1` for reading in from the port (`PORT IN`) and `0` for writing out to the port</span>
+<span class="doccomment">/// (`PORT OUT`).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionPortDirection</span> {
+    <span class="ident">In</span> <span class="op">=</span> <span class="number">0b1000</span>,
+    <span class="ident">Out</span> <span class="op">=</span> <span class="number">0b0000</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionPortDirection</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">InstructionPortDirection</span> {
+        <span class="kw">match</span> <span class="ident">raw</span> {
+            <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>,
+            <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>,
+        }
     }
 }
 
