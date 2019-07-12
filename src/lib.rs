@@ -1,8 +1,10 @@
 extern crate num_traits;
 
 mod cpu;
+mod memory;
 
 pub mod isa;
 pub mod util;
 
 pub use self::cpu::Cpu;
+pub use self::memory::Memory;
