@@ -77,8 +77,8 @@ use std::convert::{TryFrom, From};
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
-    /// Jump, see section above
-    Jump { xxx: u8, },
+    /// Jump, see member doc
+    Jump(InstructionJumpCondition),
     /// Load the the next byte into register `AAA` (PC will be incremented a second time)
     LoadImmediate { aaa: u8, },
     /// Load value in address indicated by the next two bytes into register `AAA` (PC will be incremented two more times)
@@ -184,7 +184,9 @@ impl From<u8> for Instruction {
                (raw & 0b0000_0010) != 0,
                (raw & 0b0000_0001) != 0) {
             (false, false, false, false, _, _, _, _) => Instruction::Reserved(raw),
-            (false, false, false, true, false, _, _, _) => Instruction::Jump { xxx: raw & 0b0000_0111 },
+            (false, false, false, true, false, _, _, _) => {
+                Instruction::Jump(InstructionJumpCondition::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for JUMP condition parse"))
+            }
             (false, false, false, true, true, _, _, _) => Instruction::LoadImmediate { aaa: raw & 0b0000_0111 },
             (false, false, true, false, false, _, _, _) => Instruction::LoadIndirect { aaa: raw & 0b0000_0111 },
             (false, false, true, false, true, _, _, _) => Instruction::Save { aaa: raw & 0b0000_0111 },
@@ -218,7 +220,7 @@ impl Into<u8> for Instruction {
     fn into(self) -> u8 {
         match self {
             Instruction::Reserved(raw) => raw,
-            Instruction::Jump { xxx } => 0b0001_0000 | xxx,
+            Instruction::Jump(cond) => 0b0001_0000 | (cond as u8),
             Instruction::LoadImmediate { aaa } => 0b0001_1000 | aaa,
             Instruction::LoadIndirect { aaa } => 0b0010_0000 | aaa,
             Instruction::Save { aaa } => 0b0010_1000 | aaa,
@@ -232,6 +234,54 @@ impl Into<u8> for Instruction {
             Instruction::Clrf => 0b1111_1110,
             Instruction::Halt => 0b1111_1111,
         }
+    }
+}
+
+
+/// This Instruction takes a three bit operand indicating under what condition the jump should be performed.
+///
+/// If the condition is met, the next two bytes after this Jump instruction are loaded into the PC. If the condition is not
+/// met, the PC is incremented by two, skipping over the two bytes of the target address.
+///
+/// This table shows what combination of bits to the JUMP instruction check what flags and in what combination
+///
+/// FFF | Name | Description
+/// ----|------|-------------
+/// 000 | JMPZ | Zero flag
+/// 001 | JMPP | Parity flag
+/// 010 | JMPG | NOT Zero AND Greater than flag (i.e. greater than)
+/// 011 | JMPC | Carry flag
+/// 100 | JMZG | Zero OR Greater than flags
+/// 101 | JMZL | Zero OR NOT Greater than flag
+/// 110 | JMPL | NOT Zero AND NOT Greater than flag (i.e. less than)
+/// 111 | JUMP | Unconditional Jump (always jumps)
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionJumpCondition {
+    Jmpz = 0b000,
+    Jmpp = 0b001,
+    Jmpg = 0b010,
+    Jmpc = 0b011,
+    Jmzg = 0b100,
+    Jmzl = 0b101,
+    Jmpl = 0b110,
+    Jump = 0b111,
+}
+
+impl TryFrom<u8> for InstructionJumpCondition {
+    type Error = ();
+
+    fn try_from(raw: u8) -> Result<InstructionJumpCondition, ()> {
+        let nib = limit_to_width(raw, 3).ok_or(())?;
+        Ok(match ((nib & 0b0100) != 0, (nib & 0b0010) != 0, (nib & 0b0001) != 0) {
+            (false, false, false) => InstructionJumpCondition::Jmpz,
+            (false, false, true) => InstructionJumpCondition::Jmpp,
+            (false, true, false) => InstructionJumpCondition::Jmpg,
+            (false, true, true) => InstructionJumpCondition::Jmpc,
+            (true, false, false) => InstructionJumpCondition::Jmzg,
+            (true, false, true) => InstructionJumpCondition::Jmzl,
+            (true, true, false) => InstructionJumpCondition::Jmpl,
+            (true, true, true) => InstructionJumpCondition::Jump,
+        })
     }
 }
 

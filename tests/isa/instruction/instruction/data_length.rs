@@ -1,10 +1,19 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionStckDirection,
-                                  AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
+                                  InstructionStckDirection, AluOperation, Instruction};
 
 
 #[test]
 fn jump() {
-    single_register(0, |r| Instruction::Jump { xxx: r })
+    for &cond in &[InstructionJumpCondition::Jmpz,
+                   InstructionJumpCondition::Jmpp,
+                   InstructionJumpCondition::Jmpg,
+                   InstructionJumpCondition::Jmpc,
+                   InstructionJumpCondition::Jmzg,
+                   InstructionJumpCondition::Jmzl,
+                   InstructionJumpCondition::Jmpl,
+                   InstructionJumpCondition::Jump] {
+        assert_eq!(Instruction::Jump(cond).data_length(), 0);
+    }
 }
 
 #[test]

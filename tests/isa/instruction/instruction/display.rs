@@ -1,11 +1,20 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionStckDirection,
-                                  AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
+                                  InstructionStckDirection, AluOperation, Instruction};
 use pir_8_emu::isa::{GeneralPurposeRegister, default_general_purpose_registers};
 
 
 #[test]
 fn jump() {
-    single_register("JUMP", |r| Instruction::Jump { xxx: r })
+    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpz).display(regs).to_string(), "JMPZ");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpp).display(regs).to_string(), "JMPP");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpg).display(regs).to_string(), "JMPG");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpc).display(regs).to_string(), "JMPC");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmzg).display(regs).to_string(), "JMZG");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmzl).display(regs).to_string(), "JMZL");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpl).display(regs).to_string(), "JMPL");
+        assert_eq!(Instruction::Jump(InstructionJumpCondition::Jump).display(regs).to_string(), "JUMP");
+    }
 }
 
 #[test]
@@ -25,44 +34,37 @@ fn save() {
 
 #[test]
 fn alu_valid() {
-    assert_eq!(Instruction::from(0b0011_0000), Instruction::Alu(AluOperation::Add));
-    assert_eq!(Instruction::from(0b0011_0001), Instruction::Alu(AluOperation::Sub));
-    assert_eq!(Instruction::from(0b0011_0010), Instruction::Alu(AluOperation::Not));
-    assert_eq!(Instruction::from(0b0011_0100), Instruction::Alu(AluOperation::Or));
-    assert_eq!(Instruction::from(0b0011_0101), Instruction::Alu(AluOperation::Xor));
-    assert_eq!(Instruction::from(0b0011_0110), Instruction::Alu(AluOperation::And));
+    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+        assert_eq!(Instruction::Alu(AluOperation::Add).display(regs).to_string(), "ALU ADD");
+        assert_eq!(Instruction::Alu(AluOperation::Sub).display(regs).to_string(), "ALU SUB");
+        assert_eq!(Instruction::Alu(AluOperation::Not).display(regs).to_string(), "ALU NOT");
+        assert_eq!(Instruction::Alu(AluOperation::Or).display(regs).to_string(), "ALU OR");
+        assert_eq!(Instruction::Alu(AluOperation::Xor).display(regs).to_string(), "ALU XOR");
+        assert_eq!(Instruction::Alu(AluOperation::And).display(regs).to_string(), "ALU AND");
+    }
 }
 
 #[test]
 fn alu_valid_shift_or_rotate() {
-    for &(dir, d) in &[(0b0000, AluOperationShiftOrRotateDirection::Right), (0b0100, AluOperationShiftOrRotateDirection::Left)] {
-        assert_eq!(Instruction::from(0b0011_1000 | dir),
-                   Instruction::Alu(AluOperation::ShiftOrRotate {
-                       d: d,
-                       tt: AluOperationShiftOrRotateType::Lsf,
-                   }));
-        assert_eq!(Instruction::from(0b0011_1001 | dir),
-                   Instruction::Alu(AluOperation::ShiftOrRotate {
-                       d: d,
-                       tt: AluOperationShiftOrRotateType::Asf,
-                   }));
-        assert_eq!(Instruction::from(0b0011_1010 | dir),
-                   Instruction::Alu(AluOperation::ShiftOrRotate {
-                       d: d,
-                       tt: AluOperationShiftOrRotateType::Rtc,
-                   }));
-        assert_eq!(Instruction::from(0b0011_1011 | dir),
-                   Instruction::Alu(AluOperation::ShiftOrRotate {
-                       d: d,
-                       tt: AluOperationShiftOrRotateType::Rtw,
-                   }));
+    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+        for &d in &[AluOperationShiftOrRotateDirection::Right, AluOperationShiftOrRotateDirection::Left] {
+            for &tt in &[AluOperationShiftOrRotateType::Lsf,
+                         AluOperationShiftOrRotateType::Asf,
+                         AluOperationShiftOrRotateType::Rtc,
+                         AluOperationShiftOrRotateType::Rtw] {
+                assert_eq!(Instruction::Alu(AluOperation::ShiftOrRotate { d: d, tt: tt }).display(regs).to_string(),
+                           format!("ALU SOR {} {}", d, tt));
+            }
+        }
     }
 }
 
 #[test]
 fn alu_reserved() {
-    assert_eq!(Instruction::from(0b0011_0011), Instruction::Alu(AluOperation::Reserved(0b0011)));
-    assert_eq!(Instruction::from(0b0011_0111), Instruction::Alu(AluOperation::Reserved(0b0111)));
+    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+        assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0011)).display(regs).to_string(), "ALU 0b0011");
+        assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0111)).display(regs).to_string(), "ALU 0b0111");
+    }
 }
 
 #[test]

@@ -1,10 +1,32 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionStckDirection,
-                                  AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
+                                  InstructionStckDirection, AluOperation, Instruction};
 
 
 #[test]
 fn jump() {
-    single_register(0b0001_0000, |r| Instruction::Jump { xxx: r })
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpz).into();
+    assert_eq!(raw, 0b0001_0000);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpp).into();
+    assert_eq!(raw, 0b0001_0001);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpg).into();
+    assert_eq!(raw, 0b0001_0010);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpc).into();
+    assert_eq!(raw, 0b0001_0011);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmzg).into();
+    assert_eq!(raw, 0b0001_0100);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmzl).into();
+    assert_eq!(raw, 0b0001_0101);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpl).into();
+    assert_eq!(raw, 0b0001_0110);
+
+    let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jump).into();
+    assert_eq!(raw, 0b0001_0111);
 }
 
 #[test]

@@ -1,10 +1,17 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionStckDirection,
-                                  AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
+                                  InstructionStckDirection, AluOperation, Instruction};
 
 
 #[test]
 fn jump() {
-    single_register(0b0001_0000, |r| Instruction::Jump { xxx: r })
+    assert_eq!(Instruction::from(0b0001_0000), Instruction::Jump(InstructionJumpCondition::Jmpz));
+    assert_eq!(Instruction::from(0b0001_0001), Instruction::Jump(InstructionJumpCondition::Jmpp));
+    assert_eq!(Instruction::from(0b0001_0010), Instruction::Jump(InstructionJumpCondition::Jmpg));
+    assert_eq!(Instruction::from(0b0001_0011), Instruction::Jump(InstructionJumpCondition::Jmpc));
+    assert_eq!(Instruction::from(0b0001_0100), Instruction::Jump(InstructionJumpCondition::Jmzg));
+    assert_eq!(Instruction::from(0b0001_0101), Instruction::Jump(InstructionJumpCondition::Jmzl));
+    assert_eq!(Instruction::from(0b0001_0110), Instruction::Jump(InstructionJumpCondition::Jmpl));
+    assert_eq!(Instruction::from(0b0001_0111), Instruction::Jump(InstructionJumpCondition::Jump));
 }
 
 #[test]

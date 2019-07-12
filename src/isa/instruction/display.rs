@@ -1,5 +1,5 @@
-use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionStckDirection, AluOperation,
-                  Instruction};
+use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionStckRegisterPair,
+                  InstructionStckDirection, AluOperation, Instruction};
 use self::super::super::GeneralPurposeRegister;
 use std::fmt;
 
@@ -19,7 +19,7 @@ impl<'a> fmt::Display for DisplayInstruction<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.instr {
             Instruction::Reserved(raw) => write!(f, "{:#06b}_{:04b}", (raw & 0b1111_0000) >> 4, raw & 0b0000_1111),
-            Instruction::Jump { xxx } => write!(f, "JUMP {}", self.registers[*xxx as usize].letter()),
+            Instruction::Jump(cond) => cond.fmt(f),
             Instruction::LoadImmediate { aaa } => write!(f, "LOAD IMM {}", self.registers[*aaa as usize].letter()),
             Instruction::LoadIndirect { aaa } => write!(f, "LOAD IND {}", self.registers[*aaa as usize].letter()),
             Instruction::Save { aaa } => write!(f, "SAVE {}", self.registers[*aaa as usize].letter()),
@@ -29,6 +29,22 @@ impl<'a> fmt::Display for DisplayInstruction<'a> {
             Instruction::Stck { d, r } => write!(f, "STCK {} {}", d, r),
             Instruction::Clrf => f.write_str("CLRF"),
             Instruction::Halt => f.write_str("HALT"),
+        }
+    }
+}
+
+
+impl fmt::Display for InstructionJumpCondition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InstructionJumpCondition::Jmpz => f.write_str("JMPZ"),
+            InstructionJumpCondition::Jmpp => f.write_str("JMPP"),
+            InstructionJumpCondition::Jmpg => f.write_str("JMPG"),
+            InstructionJumpCondition::Jmpc => f.write_str("JMPC"),
+            InstructionJumpCondition::Jmzg => f.write_str("JMZG"),
+            InstructionJumpCondition::Jmzl => f.write_str("JMZL"),
+            InstructionJumpCondition::Jmpl => f.write_str("JMPL"),
+            InstructionJumpCondition::Jump => f.write_str("JUMP"),
         }
     }
 }
