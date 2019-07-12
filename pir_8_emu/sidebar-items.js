@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["isa",""],["util","Module containing various utility functions."]],"struct":[["Cpu",""]]});
+initSidebarItems({"mod":[["isa",""],["util","Module containing various utility functions."]],"struct":[["Cpu",""],["Memory","Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array"]]});

@@ -28,26 +28,38 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>, <span class="ident">default_general_purpose_registers</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">Memory</span>;
 
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cpu</span> {
     <span class="doccomment">/// Address of the next instruction to be fetched</span>
-    <span class="ident">pc</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">pc</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current address of the stack</span>
-    <span class="ident">sp</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">sp</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current address of RAM being accessed</span>
-    <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Instruction currently being executed</span>
-    <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU.</span>
-    <span class="ident">general_purpose</span>: [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>],
+    <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU</span>
+    <span class="kw">pub</span> <span class="ident">general_purpose</span>: [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>],
+
+    <span class="doccomment">/// The entire 64KiB of addressable memory</span>
+    <span class="kw">pub</span> <span class="ident">memory</span>: <span class="ident">Memory</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Cpu</span> {
+    <span class="doccomment">/// Create a fresh CPU context with default registers and zeroed-out memory</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Cpu</span> {
         <span class="ident">Cpu</span> {
             <span class="ident">pc</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Program Counter&quot;</span>, <span class="string">&quot;PC&quot;</span>),
@@ -56,6 +68,8 @@
             <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Instruction&quot;</span>, <span class="string">&quot;INS&quot;</span>),
 
             <span class="ident">general_purpose</span>: <span class="ident">default_general_purpose_registers</span>(),
+
+            <span class="ident">memory</span>: <span class="ident">Memory</span>::<span class="ident">new</span>(),
         }
     }
 }
