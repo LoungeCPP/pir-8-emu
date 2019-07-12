@@ -1,5 +1,5 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionStckDirection, AluOperation, Instruction};
+                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 
 
 #[test]
@@ -18,17 +18,17 @@ fn jump() {
 
 #[test]
 fn load_immediate() {
-    single_register(1, |r| Instruction::LoadImmediate { aaa: r })
+    single_register(1, |r| Instruction::LoadImmediate { aaa: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register(2, |r| Instruction::LoadIndirect { aaa: r })
+    single_register(2, |r| Instruction::LoadIndirect { aaa: r });
 }
 
 #[test]
 fn save() {
-    single_register(2, |r| Instruction::Save { aaa: r })
+    single_register(2, |r| Instruction::Save { aaa: r });
 }
 
 #[test]
@@ -74,8 +74,14 @@ fn move_() {
 }
 
 #[test]
+fn port() {
+    single_register(0, |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
+    single_register(0, |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+}
+
+#[test]
 fn comp() {
-    single_register(0, |r| Instruction::Comp { aaa: r })
+    single_register(0, |r| Instruction::Comp { aaa: r });
 }
 
 #[test]

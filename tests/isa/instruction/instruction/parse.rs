@@ -1,5 +1,5 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionStckDirection, AluOperation, Instruction};
+                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 
 
 #[test]
@@ -16,17 +16,17 @@ fn jump() {
 
 #[test]
 fn load_immediate() {
-    single_register(0b0001_1000, |r| Instruction::LoadImmediate { aaa: r })
+    single_register(0b0001_1000, |r| Instruction::LoadImmediate { aaa: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register(0b0010_0000, |r| Instruction::LoadIndirect { aaa: r })
+    single_register(0b0010_0000, |r| Instruction::LoadIndirect { aaa: r });
 }
 
 #[test]
 fn save() {
-    single_register(0b0010_1000, |r| Instruction::Save { aaa: r })
+    single_register(0b0010_1000, |r| Instruction::Save { aaa: r });
 }
 
 #[test]
@@ -89,8 +89,14 @@ fn move_() {
 }
 
 #[test]
+fn port() {
+    single_register(0b1110_1000, |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
+    single_register(0b1110_0000, |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+}
+
+#[test]
 fn comp() {
-    single_register(0b1111_0000, |r| Instruction::Comp { aaa: r })
+    single_register(0b1111_0000, |r| Instruction::Comp { aaa: r });
 }
 
 #[test]
@@ -148,11 +154,6 @@ fn reserved_block_2() {
 
 #[test]
 fn reserved_block_3() {
-    reserved_block(0b1110_0000, 0b1111);
-}
-
-#[test]
-fn reserved_block_4() {
     reserved_block(0b1111_1100, 0b1);
 }
 

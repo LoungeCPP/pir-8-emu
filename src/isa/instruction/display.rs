@@ -1,5 +1,5 @@
 use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionStckRegisterPair,
-                  InstructionStckDirection, AluOperation, Instruction};
+                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 use self::super::super::GeneralPurposeRegister;
 use std::fmt;
 
@@ -25,6 +25,7 @@ impl<'a> fmt::Display for DisplayInstruction<'a> {
             Instruction::Save { aaa } => write!(f, "SAVE {}", self.registers[*aaa as usize].letter()),
             Instruction::Alu(op) => write!(f, "ALU {}", op),
             Instruction::Move { aaa, bbb } => write!(f, "MOVE {} {}", self.registers[*aaa as usize].letter(), self.registers[*bbb as usize].letter()),
+            Instruction::Port { d, aaa } => write!(f, "PORT {} {}", d, self.registers[*aaa as usize].letter()),
             Instruction::Comp { aaa } => write!(f, "COMP {}", self.registers[*aaa as usize].letter()),
             Instruction::Stck { d, r } => write!(f, "STCK {} {}", d, r),
             Instruction::Clrf => f.write_str("CLRF"),
@@ -45,6 +46,16 @@ impl fmt::Display for InstructionJumpCondition {
             InstructionJumpCondition::Jmzl => f.write_str("JMZL"),
             InstructionJumpCondition::Jmpl => f.write_str("JMPL"),
             InstructionJumpCondition::Jump => f.write_str("JUMP"),
+        }
+    }
+}
+
+
+impl fmt::Display for InstructionPortDirection {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InstructionPortDirection::In => f.write_str("IN"),
+            InstructionPortDirection::Out => f.write_str("OUT"),
         }
     }
 }

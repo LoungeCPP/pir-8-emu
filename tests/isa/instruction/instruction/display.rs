@@ -1,5 +1,5 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionStckDirection, AluOperation, Instruction};
+                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 use pir_8_emu::isa::{GeneralPurposeRegister, default_general_purpose_registers};
 
 
@@ -19,17 +19,17 @@ fn jump() {
 
 #[test]
 fn load_immediate() {
-    single_register("LOAD IMM", |r| Instruction::LoadImmediate { aaa: r })
+    single_register("LOAD IMM", |r| Instruction::LoadImmediate { aaa: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register("LOAD IND", |r| Instruction::LoadIndirect { aaa: r })
+    single_register("LOAD IND", |r| Instruction::LoadIndirect { aaa: r });
 }
 
 #[test]
 fn save() {
-    single_register("SAVE", |r| Instruction::Save { aaa: r })
+    single_register("SAVE", |r| Instruction::Save { aaa: r });
 }
 
 #[test]
@@ -85,8 +85,14 @@ fn move_() {
 }
 
 #[test]
+fn port() {
+    single_register("PORT IN", |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
+    single_register("PORT OUT", |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+}
+
+#[test]
 fn comp() {
-    single_register("COMP", |r| Instruction::Comp { aaa: r })
+    single_register("COMP", |r| Instruction::Comp { aaa: r });
 }
 
 #[test]

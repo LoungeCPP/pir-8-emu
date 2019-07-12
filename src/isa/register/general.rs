@@ -6,8 +6,9 @@ use std::fmt;
 /// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
 /// 'MOVE' and 'LOAD' can use these addresses.
 ///
-/// The first four registers have some special functionality, as described, the second four have no special functionality but
-/// can be used with the stack.
+/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
+/// 'MOVE' and 'LOAD' can use these addresses. The first five registers have some special functionality, as described, the last
+/// three have no special functionality. The last four registers can also be used with the stack.
 ///
 /// Address | Letter | Description
 /// --------|--------|------------
@@ -15,7 +16,7 @@ use std::fmt;
 /// 001     | S      | Output of the ALU - ALU operations will overwrite any value stored
 /// 010     | X      | Input to ALU (Only input for unary operations)
 /// 011     | Y      | Second input for ALU
-/// 100     | A      |
+/// 100     | A      | Port number for PORT instruction
 /// 101     | B      |
 /// 110     | C      |
 /// 111     | D      |

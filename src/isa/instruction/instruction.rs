@@ -33,12 +33,20 @@ use std::convert::{TryFrom, From};
 /// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`
 /// 10XX XXXX |      |    64 | Reserved
 /// 110X XXXX |      |    32 | Reserved
-/// 1110 XXXX |      |    16 | Reserved
+/// 1110 XXXX | PORT |    16 | Perform I/O, see section below
 /// 1111 0AAA | COMP |     8 | Compare register S with register `AAA`, see section below
 /// 1111 10XX | STCK |     4 | Stack manipulation, see section below
 /// 1111 110X |      |     2 | Reserved
 /// 1111 1110 | CLRF |     1 | Clear the 'F' register, by setting it to `0000 0000`
 /// 1111 1111 | HALT |     1 | Stop the CPU from doing any more execution
+///
+/// ## PORT - I/O
+///
+/// The PORT instruction in the form 1110 DAAA will perform I/O on the port specified in register A.
+///
+/// The `D` bit specifies the direction - `1` for reading in from the port (`PORT IN`) and `0` for writing out to the port
+/// (`PORT OUT`).
+/// The `AAA` bits specify the register to write to (D=1) or read from (D=0).
 ///
 /// ## COMP - Compare
 ///
@@ -89,6 +97,11 @@ pub enum Instruction {
     Alu(AluOperation),
     /// Move a value from register `AAA` to register `BBB`
     Move { aaa: u8, bbb: u8, },
+    /// Perform I/O, see section above
+    Port {
+        d: InstructionPortDirection,
+        aaa: u8,
+    },
     /// Compare register S with register `AAA`, see section above
     Comp { aaa: u8, },
     /// Stack manipulation, see member doc
@@ -201,7 +214,12 @@ impl From<u8> for Instruction {
             }
             (true, false, _, _, _, _, _, _) => Instruction::Reserved(raw),
             (true, true, false, _, _, _, _, _) => Instruction::Reserved(raw),
-            (true, true, true, false, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, true, false, d, _, _, _) => {
+                Instruction::Port {
+                    d: d.into(),
+                    aaa: raw & 0b0000_0111,
+                }
+            }
             (true, true, true, true, false, _, _, _) => Instruction::Comp { aaa: raw & 0b0000_0111 },
             (true, true, true, true, true, false, d, r) => {
                 Instruction::Stck {
@@ -229,6 +247,7 @@ impl Into<u8> for Instruction {
                 0b0011_0000u8 | op_b
             }
             Instruction::Move { aaa, bbb } => 0b0100_0000 | (aaa << 3) | bbb,
+            Instruction::Port { d, aaa } => 0b1110_0000 | (d as u8) | aaa,
             Instruction::Comp { aaa } => 0b1111_0000 | aaa,
             Instruction::Stck { d, r } => 0b1111_1000 | (d as u8) | (r as u8),
             Instruction::Clrf => 0b1111_1110,
@@ -282,6 +301,24 @@ impl TryFrom<u8> for InstructionJumpCondition {
             (true, true, false) => InstructionJumpCondition::Jmpl,
             (true, true, true) => InstructionJumpCondition::Jump,
         })
+    }
+}
+
+
+/// The `D` bit specifies the direction - `1` for reading in from the port (`PORT IN`) and `0` for writing out to the port
+/// (`PORT OUT`).
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionPortDirection {
+    In = 0b1000,
+    Out = 0b0000,
+}
+
+impl From<bool> for InstructionPortDirection {
+    fn from(raw: bool) -> InstructionPortDirection {
+        match raw {
+            true => InstructionPortDirection::In,
+            false => InstructionPortDirection::Out,
+        }
     }
 }
 
