@@ -424,7 +424,7 @@
 <span id="424">424</span>
 <span id="425">425</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! An instruction is a single byte, and can include some following imediate values purely for data.</span>
+<span class="doccomment">//! An instruction is a single byte, and can include some following immediate values purely for data.</span>
 
 
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -436,10 +436,10 @@
 <span class="doccomment">/// Instructions will increase the PC by one, unless otherwise stated.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The PC is incremented as the instruction is loaded from RAM.</span>
-<span class="doccomment">/// An instruction is a single byte, and can include some following imediate values purely for data.</span>
+<span class="doccomment">/// An instruction is a single byte, and can include some following immediate values purely for data.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The &#39;Bit Mask&#39; shows a pattern which denotes an instruction or group of instructions, the letters donoting where any value</span>
-<span class="doccomment">/// can be used and still be consdiered part of the same instruction.</span>
+<span class="doccomment">/// The &#39;Bit Mask&#39; shows a pattern which denotes an instruction or group of instructions, the letters denoting where any value</span>
+<span class="doccomment">/// can be used and still be considered part of the same instruction.</span>
 <span class="doccomment">/// The &#39;name&#39; is for either a group or single instruction.</span>
 <span class="doccomment">/// &#39;Count&#39; is how many of the 256 possible instructions are used by that bit pattern; HALT for example is exactly one</span>
 <span class="doccomment">/// instruction, whilst MOVE is effectively 64 possible combinations [this was added to help me keep track of how many</span>
@@ -469,12 +469,12 @@
 <span class="doccomment">/// ## COMP - Compare</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The compare instruction will compare the S register with a selected register. It will set the Zero and Parity flag based on</span>
-<span class="doccomment">/// the value of the S register; the Zero flag if all the bits are zero, Parity if the number of one bits is even. Compare will</span>
+<span class="doccomment">/// the value of the S register; the Zero flag if all the bits are zero, Parity if the number of set bits is even. Compare will</span>
 <span class="doccomment">/// set the Equal flag if the two registers have the same bit pattern. The Greater than flag is set if S is greater than the</span>
-<span class="doccomment">/// second register. Note that when when doing a compare signed/unsigned is not taken into account, the two registers are</span>
-<span class="doccomment">/// treated as if they contain two unsigned values.</span>
+<span class="doccomment">/// second register. Note that when doing a compare signed/unsigned is not taken into account, the two registers are treated as</span>
+<span class="doccomment">/// if they contain two unsigned values.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// NB: This might change to instead compare just the X and Y register.</span>
+<span class="doccomment">/// **NB:** This might change to instead compare just the X and Y register.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Stack Manipulation</span>
 <span class="doccomment">///</span>
@@ -497,7 +497,7 @@
 <span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read from the same pair of registers, and the SP</span>
 <span class="doccomment">/// increased by two.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// **NB:** I Think I might update this to allow pushing/poping the PC, this would make it very easy (hardware wise) to handle</span>
+<span class="doccomment">/// **NB:** I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle</span>
 <span class="doccomment">/// calling and returning functions</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
@@ -811,8 +811,8 @@
 <span class="doccomment">/// 10 | RTC  | Rotate with carry - the Carry flag is inserted (Carry flag value before it is updated is used)</span>
 <span class="doccomment">/// 11 | RTW  | Rotate without carry - the bit shifted out is is inserted</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// **NB:** An &#39;Arithmetic shift left&#39; is the same as performing a &#39;Logcal shift left&#39;, they _can_ be used interchagably, but</span>
-<span class="doccomment">/// &#39;Arithmtic shift left&#39; should be avoided.</span>
+<span class="doccomment">/// **NB:** An &#39;Arithmetic shift left&#39; is the same as performing a &#39;Logcal shift left&#39;, they _can_ be used interchangeably, but</span>
+<span class="doccomment">/// &#39;Arithmetic shift left&#39; should be avoided.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AluOperationShiftOrRotateType</span> {
     <span class="doccomment">/// Logical shift - a zero is inserted</span>

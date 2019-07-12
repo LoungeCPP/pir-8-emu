@@ -28,9 +28,9 @@
     Halt,
 }</pre></div><div class='docblock'><p>Instructions will increase the PC by one, unless otherwise stated.</p>
 <p>The PC is incremented as the instruction is loaded from RAM.
-An instruction is a single byte, and can include some following imediate values purely for data.</p>
-<p>The 'Bit Mask' shows a pattern which denotes an instruction or group of instructions, the letters donoting where any value
-can be used and still be consdiered part of the same instruction.
+An instruction is a single byte, and can include some following immediate values purely for data.</p>
+<p>The 'Bit Mask' shows a pattern which denotes an instruction or group of instructions, the letters denoting where any value
+can be used and still be considered part of the same instruction.
 The 'name' is for either a group or single instruction.
 'Count' is how many of the 256 possible instructions are used by that bit pattern; HALT for example is exactly one
 instruction, whilst MOVE is effectively 64 possible combinations [this was added to help me keep track of how many
@@ -57,11 +57,11 @@ operations I've defined, it should add up to 256].</p>
 </tbody></table>
 <h2 id="comp---compare" class="section-header"><a href="#comp---compare">COMP - Compare</a></h2>
 <p>The compare instruction will compare the S register with a selected register. It will set the Zero and Parity flag based on
-the value of the S register; the Zero flag if all the bits are zero, Parity if the number of one bits is even. Compare will
+the value of the S register; the Zero flag if all the bits are zero, Parity if the number of set bits is even. Compare will
 set the Equal flag if the two registers have the same bit pattern. The Greater than flag is set if S is greater than the
-second register. Note that when when doing a compare signed/unsigned is not taken into account, the two registers are
-treated as if they contain two unsigned values.</p>
-<p>NB: This might change to instead compare just the X and Y register.</p>
+second register. Note that when doing a compare signed/unsigned is not taken into account, the two registers are treated as
+if they contain two unsigned values.</p>
+<p><strong>NB:</strong> This might change to instead compare just the X and Y register.</p>
 <h2 id="stack-manipulation" class="section-header"><a href="#stack-manipulation">Stack Manipulation</a></h2>
 <p>When dealing with the stack, a pair of registers will be moved to or from 'the stack' and the SP updated to reflect the
 changed address.</p>
@@ -77,7 +77,7 @@ The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</p>
 After PUSHing, the SP will have been decremented by two.</p>
 <p>When POPing, the same respective pairs of memory locations will be read from the same pair of registers, and the SP
 increased by two.</p>
-<p><strong>NB:</strong> I Think I might update this to allow pushing/poping the PC, this would make it very easy (hardware wise) to handle
+<p><strong>NB:</strong> I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle
 calling and returning functions</p>
 </div><h2 id='variants' class='variants small-section-header'>
                    Variants<a href='#variants' class='anchor'></a></h2>
