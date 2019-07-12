@@ -444,6 +444,56 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! An instruction is a single byte, and can include some following immediate values purely for data.</span>
 
@@ -524,8 +574,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// Reserved instruction, contains the entire byte</span>
     <span class="ident">Reserved</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// Jump, see section above</span>
-    <span class="ident">Jump</span> { <span class="ident">xxx</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Jump, see member doc</span>
+    <span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>),
     <span class="doccomment">/// Load the the next byte into register `AAA` (PC will be incremented a second time)</span>
     <span class="ident">LoadImmediate</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Load value in address indicated by the next two bytes into register `AAA` (PC will be incremented two more times)</span>
@@ -631,7 +681,9 @@
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span>) <span class="op">!=</span> <span class="number">0</span>,
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span>) <span class="op">!=</span> <span class="number">0</span>) {
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Jump</span> { <span class="ident">xxx</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+                <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for JUMP condition parse&quot;</span>))
+            }
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
@@ -665,7 +717,7 @@
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=&gt;</span> <span class="ident">raw</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Jump</span> { <span class="ident">xxx</span> } <span class="op">=&gt;</span> <span class="number">0b0001_0000</span> <span class="op">|</span> <span class="ident">xxx</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=&gt;</span> <span class="number">0b0001_0000</span> <span class="op">|</span> (<span class="ident">cond</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0001_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0010_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
             <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0010_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
@@ -679,6 +731,54 @@
             <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=&gt;</span> <span class="number">0b1111_1110</span>,
             <span class="ident">Instruction</span>::<span class="ident">Halt</span> <span class="op">=&gt;</span> <span class="number">0b1111_1111</span>,
         }
+    }
+}
+
+
+<span class="doccomment">/// This Instruction takes a three bit operand indicating under what condition the jump should be performed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If the condition is met, the next two bytes after this Jump instruction are loaded into the PC. If the condition is not</span>
+<span class="doccomment">/// met, the PC is incremented by two, skipping over the two bytes of the target address.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This table shows what combination of bits to the JUMP instruction check what flags and in what combination</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// FFF | Name | Description</span>
+<span class="doccomment">/// ----|------|-------------</span>
+<span class="doccomment">/// 000 | JMPZ | Zero flag</span>
+<span class="doccomment">/// 001 | JMPP | Parity flag</span>
+<span class="doccomment">/// 010 | JMPG | NOT Zero AND Greater than flag (i.e. greater than)</span>
+<span class="doccomment">/// 011 | JMPC | Carry flag</span>
+<span class="doccomment">/// 100 | JMZG | Zero OR Greater than flags</span>
+<span class="doccomment">/// 101 | JMZL | Zero OR NOT Greater than flag</span>
+<span class="doccomment">/// 110 | JMPL | NOT Zero AND NOT Greater than flag (i.e. less than)</span>
+<span class="doccomment">/// 111 | JUMP | Unconditional Jump (always jumps)</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionJumpCondition</span> {
+    <span class="ident">Jmpz</span> <span class="op">=</span> <span class="number">0b000</span>,
+    <span class="ident">Jmpp</span> <span class="op">=</span> <span class="number">0b001</span>,
+    <span class="ident">Jmpg</span> <span class="op">=</span> <span class="number">0b010</span>,
+    <span class="ident">Jmpc</span> <span class="op">=</span> <span class="number">0b011</span>,
+    <span class="ident">Jmzg</span> <span class="op">=</span> <span class="number">0b100</span>,
+    <span class="ident">Jmzl</span> <span class="op">=</span> <span class="number">0b101</span>,
+    <span class="ident">Jmpl</span> <span class="op">=</span> <span class="number">0b110</span>,
+    <span class="ident">Jump</span> <span class="op">=</span> <span class="number">0b111</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionJumpCondition</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InstructionJumpCondition</span>, ()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nib</span> <span class="op">=</span> <span class="ident">limit_to_width</span>(<span class="ident">raw</span>, <span class="number">3</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!=</span> <span class="number">0</span>) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpz</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpp</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpg</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpc</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzg</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzl</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpl</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jump</span>,
+        })
     }
 }
 
