@@ -45,6 +45,7 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     /// The full name of this register
     ///
     /// E.g. "Program Counter"
+    #[inline]
     pub fn name(&self) -> &'static str {
         self.name
     }
@@ -52,6 +53,7 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     /// The short/mnemonical name of this register
     ///
     /// E.g. "PC"
+    #[inline]
     pub fn short_name(&self) -> &'static str {
         self.short
     }
@@ -60,12 +62,14 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
 impl<T: Num + Unsigned + PrimInt> Deref for SpecialPurposeRegister<T> {
     type Target = T;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.data
     }
 }
 
 impl<T: Num + Unsigned + PrimInt> DerefMut for SpecialPurposeRegister<T> {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data
     }

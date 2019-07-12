@@ -4,7 +4,7 @@ use std::convert::TryFrom;
 
 mod serialise;
 mod parse_ok;
-// mod display;
+mod display;
 
 
 #[test]

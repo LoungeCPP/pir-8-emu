@@ -51,16 +51,19 @@ fn alu_valid_shift_or_rotate() {
                        d: d,
                        tt: AluOperationShiftOrRotateType::Lsf,
                    }));
+
         assert_eq!(Instruction::from(0b0011_1001 | dir),
                    Instruction::Alu(AluOperation::ShiftOrRotate {
                        d: d,
                        tt: AluOperationShiftOrRotateType::Asf,
                    }));
+
         assert_eq!(Instruction::from(0b0011_1010 | dir),
                    Instruction::Alu(AluOperation::ShiftOrRotate {
                        d: d,
                        tt: AluOperationShiftOrRotateType::Rtc,
                    }));
+
         assert_eq!(Instruction::from(0b0011_1011 | dir),
                    Instruction::Alu(AluOperation::ShiftOrRotate {
                        d: d,

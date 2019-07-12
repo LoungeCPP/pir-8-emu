@@ -1,7 +1,9 @@
 //! An instruction is a single byte, and can include some following imediate values purely for data.
 
 
-use self::super::super::util::limit_to_width;
+use self::super::super::super::util::limit_to_width;
+use self::super::super::GeneralPurposeRegister;
+use self::super::DisplayInstruction;
 use std::convert::{TryFrom, From};
 
 
@@ -118,6 +120,34 @@ impl Instruction {
             Instruction::Reserved(_) => false,
             Instruction::Alu(op) => op.is_valid(),
             _ => true,
+        }
+    }
+
+    /// Get proxy object implementing `Display` for printing instructions in assembly format
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::{InstructionStckRegisterPair, InstructionStckDirection, AluOperation, Instruction};
+    /// # use pir_8_emu::isa::default_general_purpose_registers;
+    /// # let registers = default_general_purpose_registers();
+    /// assert_eq!(Instruction::Clrf.display(&registers).to_string(),
+    ///            "CLRF");
+    /// assert_eq!(Instruction::Alu(AluOperation::Or).display(&registers).to_string(),
+    ///            "ALU OR");
+    /// assert_eq!(Instruction::Stck {
+    ///                d: InstructionStckDirection::Push,
+    ///                r: InstructionStckRegisterPair::Cd,
+    ///            }.display(&registers).to_string(),
+    ///            "STCK PUSH C&D");
+    ///
+    /// assert_eq!(Instruction::Reserved(0b1111_0000).display(&registers).to_string(),
+    ///            "0b1111_0000");
+    /// ```
+    pub fn display<'r, 's: 'r>(&'s self, registers: &'r [GeneralPurposeRegister; 8]) -> DisplayInstruction<'r> {
+        DisplayInstruction {
+            instr: self,
+            registers: registers,
         }
     }
 }
@@ -323,6 +353,24 @@ impl Into<u8> for AluOperation {
 }
 
 
+/// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it's a right shift, moving bits
+/// to lower values.
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum AluOperationShiftOrRotateDirection {
+    Left = 0b100,
+    Right = 0b000,
+}
+
+impl From<bool> for AluOperationShiftOrRotateDirection {
+    fn from(raw: bool) -> AluOperationShiftOrRotateDirection {
+        match raw {
+            true => AluOperationShiftOrRotateDirection::Left,
+            false => AluOperationShiftOrRotateDirection::Right,
+        }
+    }
+}
+
+
 /// All shifts can be performed left or right, as designated by the D bit of the instruction.
 ///
 /// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it's a right shift, moving bits
@@ -372,24 +420,6 @@ impl Into<u8> for AluOperationShiftOrRotateType {
             AluOperationShiftOrRotateType::Asf => 0b01,
             AluOperationShiftOrRotateType::Rtc => 0b10,
             AluOperationShiftOrRotateType::Rtw => 0b11,
-        }
-    }
-}
-
-
-/// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it's a right shift, moving bits
-/// to lower values.
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AluOperationShiftOrRotateDirection {
-    Left = 0b100,
-    Right = 0b000,
-}
-
-impl From<bool> for AluOperationShiftOrRotateDirection {
-    fn from(raw: bool) -> AluOperationShiftOrRotateDirection {
-        match raw {
-            true => AluOperationShiftOrRotateDirection::Left,
-            false => AluOperationShiftOrRotateDirection::Right,
         }
     }
 }

@@ -52,6 +52,7 @@ impl GeneralPurposeRegister {
     /// The address for this register
     ///
     /// Limited to 3 bits' width
+    #[inline]
     pub fn address(&self) -> u8 {
         self.address
     }
@@ -59,6 +60,7 @@ impl GeneralPurposeRegister {
     /// The letter/mnemonic for this register
     ///
     /// E.g. "X"
+    #[inline]
     pub fn letter(&self) -> char {
         self.letter
     }
@@ -67,12 +69,14 @@ impl GeneralPurposeRegister {
 impl Deref for GeneralPurposeRegister {
     type Target = u8;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.data
     }
 }
 
 impl DerefMut for GeneralPurposeRegister {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data
     }

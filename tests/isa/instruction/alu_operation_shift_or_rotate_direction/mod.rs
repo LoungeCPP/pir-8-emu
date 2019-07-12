@@ -12,3 +12,9 @@ fn serialise() {
     assert_eq!(AluOperationShiftOrRotateDirection::Right as u8, 0b000);
     assert_eq!(AluOperationShiftOrRotateDirection::Left as u8, 0b100);
 }
+
+#[test]
+fn display() {
+    assert_eq!(AluOperationShiftOrRotateDirection::Right.to_string(), "RIGHT");
+    assert_eq!(AluOperationShiftOrRotateDirection::Left.to_string(), "LEFT");
+}
