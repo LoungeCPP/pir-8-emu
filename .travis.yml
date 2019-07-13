@@ -47,8 +47,6 @@ script:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then cargo build --verbose --release; fi
   -
   - if [ "$LANGUAGE" == "Ruby" ]; then
-      mkdir man;
-      cp pir-8-emu.md man/;
       ronn --organization="Lounge<C++>" man/*.md;
     fi
 

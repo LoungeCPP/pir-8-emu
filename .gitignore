@@ -9,6 +9,8 @@
 !rustfmt.toml
 !*.sublime-project
 !*.md
+!man
+!man/**
 !ext
 !ext/**
 !src
