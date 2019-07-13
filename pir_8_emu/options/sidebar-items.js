@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AssemblerOptions","Representation of the assembler's all configurable values."]]});

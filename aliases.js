@@ -1,2 +1,12 @@
 var ALIASES = {};
+ALIASES["ansi_term"] = {};
+ALIASES["atty"] = {};
+ALIASES["bitflags"] = {};
+ALIASES["clap"] = {};
+ALIASES["libc"] = {};
 ALIASES["num_traits"] = {};
+ALIASES["pir_8_emu"] = {};
+ALIASES["strsim"] = {};
+ALIASES["textwrap"] = {};
+ALIASES["unicode_width"] = {};
+ALIASES["vec_map"] = {};
