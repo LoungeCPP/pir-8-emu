@@ -106,6 +106,10 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">DerefMut</span>, <span class="ident">Deref</span>};
@@ -173,7 +177,11 @@
         <span class="prelude-val">Some</span>(<span class="ident">GeneralPurposeRegister</span> {
             <span class="ident">data</span>: <span class="number">0</span>,
             <span class="ident">address</span>: <span class="ident">limit_to_width</span>(<span class="ident">address</span>, <span class="number">3</span>)<span class="question-mark">?</span>,
-            <span class="ident">letter</span>: <span class="ident">letter</span>,
+            <span class="ident">letter</span>: <span class="kw">if</span> <span class="ident">letter</span>.<span class="ident">is_ascii</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">letter</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">None</span>
+            }<span class="question-mark">?</span>,
         })
     }
 
