@@ -23,6 +23,16 @@ The comment characer is ";".
 
     Default: "a.p8b"
 
+## Exit values
+
+    1 - option parsing error
+    2 - output file creation failure
+    3 - input file opening failure
+    4 - output write failure
+    5 - input read failure
+    6 - instruction parse error
+    7 - instruction data parse error
+
 ## AUTHOR
 
 Written by nabijaczleweli &lt;<nabijaczleweli@gmail.com>&gt;
