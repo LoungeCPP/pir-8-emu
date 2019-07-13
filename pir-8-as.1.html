@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
   <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
-  <title>pir-8-emu(1) - Implementation of the pir-8 ISA</title>
+  <title>pir-8-as(1) - Assembler for the pir-8</title>
   <style type='text/css' media='all'>
   /* style: man */
   body#manpage {margin:0}
@@ -64,38 +64,42 @@
   </div>
 
   <ol class='man-decor man-head man head'>
-    <li class='tl'>pir-8-emu(1)</li>
+    <li class='tl'>pir-8-as(1)</li>
     <li class='tc'></li>
-    <li class='tr'>pir-8-emu(1)</li>
+    <li class='tr'>pir-8-as(1)</li>
   </ol>
 
   <h2 id="NAME">NAME</h2>
 <p class="man-name">
-  <code>pir-8-emu</code> - <span class="man-whatis">Implementation of the pir-8 ISA</span>
+  <code>pir-8-as</code> - <span class="man-whatis">Assembler for the pir-8</span>
 </p>
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>pir-8-emu</code> <a href="#OPTIONS" title="OPTIONS" data-bare-link="true">OPTIONS</a></p>
+<p><code>pir-8-as</code> [OPTIONS] [ASMFILE...]</p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Implementation of the pir-8 ISA.</p>
+<p>Assembler for the pir-8.</p>
 
-<p>First, compile your source code with <a class="man-ref" href="pir-8-as.1.html">pir-8-as<span class="s">(1)</span></a>.</p>
+<p>Specified input files (or "-" for stdin) are assembled sequentially into the output file.</p>
+
+<p>The comment characer is ";".</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
-<p>  -a --all</p>
+<p>  -o [BINFILE]</p>
 
-<pre><code>Update all currently installed executables.
+<pre><code>Name of the the binary-file output, or "-" for stdout
 
-Required if list of packages not given.
+Parent directory must exist
+
+Default: "a.p8b"
 </code></pre>
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#110;&#x61;&#98;&#x69;&#x6a;&#97;&#x63;&#122;&#108;&#x65;&#119;&#x65;&#x6c;&#105;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;" data-bare-link="true">&#x6e;&#97;&#x62;&#105;&#106;&#x61;&#x63;&#122;&#108;&#x65;&#119;&#x65;&#108;&#x69;&#64;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#110;&#97;&#x62;&#105;&#x6a;&#x61;&#99;&#122;&#108;&#x65;&#119;&#101;&#x6c;&#x69;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#110;&#x61;&#x62;&#x69;&#x6a;&#97;&#x63;&#x7a;&#108;&#101;&#119;&#x65;&#108;&#105;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#111;&#109;</a>&gt;</p>
 
 <h2 id="SPECIAL-THANKS">SPECIAL THANKS</h2>
 
@@ -118,7 +122,7 @@ Required if list of packages not given.
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>Lounge&lt;C++&gt;</li>
     <li class='tc'>July 2019</li>
-    <li class='tr'>pir-8-emu(1)</li>
+    <li class='tr'>pir-8-as(1)</li>
   </ol>
 
   </div>

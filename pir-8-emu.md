@@ -9,6 +9,8 @@ pir-8-emu(1) -- Implementation of the pir-8 ISA
 
 Implementation of the pir-8 ISA.
 
+First, compile your source code with pir-8-as(1).
+
 ## OPTIONS
 
   -a --all
@@ -29,8 +31,8 @@ To all who support further development, in particular:
 
 ## REPORTING BUGS
 
-&lt;<https://github.com/nabijaczleweli/cargo-update/issues>&gt;
+&lt;<https://github.com/LoungeCPP/pir-8-emu/issues>&gt;
 
 ## SEE ALSO
 
-&lt;<https://github.com/nabijaczleweli/cargo-update>&gt;
+&lt;<https://github.com/LoungeCPP/pir-8-emu>&gt;
