@@ -53,3 +53,20 @@ pub fn parse_with_prefix<T: Num + PrimInt>(from: &str) -> Option<T> {
 
     T::from_str_radix(&from[depth..], radix).ok()
 }
+
+/// Strip off all data starting with the specified character, if exists
+///
+/// # Examples
+///
+/// ```
+/// # use pir_8_emu::util::remove_comment;
+/// assert_eq!(remove_comment(';', "UwU ; OwO"), "UwU ");
+///
+/// assert_eq!(remove_comment(';', "yeehaw"), "yeehaw");
+/// ```
+pub fn remove_comment(comment_char: char, from: &str) -> &str {
+    match from.find(comment_char) {
+        Some(idx) => &from[0..idx],
+        None => from,
+    }
+}

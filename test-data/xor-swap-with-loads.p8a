@@ -1,0 +1,34 @@
+; 0
+  LOAD IND A
+  0x0110      ; Address for A
+
+; 1
+  LOAD IMM B
+  0x69        ; Value for B
+
+; 2
+  MOVE A X
+  MOVE B Y
+
+; 3
+  ALU XOR
+  MOVE S A
+
+; 4
+  MOVE A Y
+  MOVE B X
+
+; 5
+  ALU XOR
+  MOVE S B
+
+; 6
+  MOVE A X
+  MOVE B Y
+
+; 7
+  ALU XOR
+  MOVE S A
+
+; 8
+  HALT
