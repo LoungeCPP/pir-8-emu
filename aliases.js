@@ -5,6 +5,7 @@ ALIASES["bitflags"] = {};
 ALIASES["clap"] = {};
 ALIASES["libc"] = {};
 ALIASES["num_traits"] = {};
+ALIASES["pir_8_as"] = {};
 ALIASES["pir_8_emu"] = {};
 ALIASES["strsim"] = {};
 ALIASES["textwrap"] = {};

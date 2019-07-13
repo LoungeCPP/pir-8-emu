@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["limit_to_width","Limit the specified number to be at most the specified bit-width"],["parse_with_prefix","Parse a number from the specified string, automatically detecting the base prefix."]]});
+initSidebarItems({"fn":[["limit_to_width","Limit the specified number to be at most the specified bit-width"],["parse_with_prefix","Parse a number from the specified string, automatically detecting the base prefix."],["remove_comment","Strip off all data starting with the specified character, if exists"]]});
