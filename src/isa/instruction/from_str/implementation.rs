@@ -9,7 +9,7 @@ use std::usize;
 
 
 impl Instruction {
-    pub(crate) fn from_str_impl(crate) fn from_str_impl( s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
+    pub(crate) fn from_str_impl(s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
         if let Some(idx) = s.find(is_invalid_character) {
             return Err(ParseInstructionError::InvalidCharacter(idx));
         }

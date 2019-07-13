@@ -17,6 +17,7 @@ exclude = ["*.enc"]
 
 [dependencies]
 num-traits = "0.2"
+clap = "2.33"
 
 [dev-dependencies]
 rand = "0.7"
