@@ -1,9 +1,9 @@
 //! An instruction is a single byte, and can include some following immediate values purely for data.
 
 
+use self::super::{ParseInstructionError, DisplayInstruction};
 use self::super::super::super::util::limit_to_width;
 use self::super::super::GeneralPurposeRegister;
-use self::super::DisplayInstruction;
 use std::convert::{TryFrom, From};
 
 
@@ -183,6 +183,34 @@ impl Instruction {
             instr: self,
             registers: registers,
         }
+    }
+
+    /// Parse assembly instruction format
+    ///
+    /// The input string must be ASCII and contain no vertical whitespace
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::default_general_purpose_registers;
+    /// # use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+    /// #                                   InstructionJumpCondition, AluOperation, Instruction};
+    /// # let registers = default_general_purpose_registers();
+    /// assert_eq!(Instruction::from_str("JMPL", &registers),
+    ///            Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));
+    ///
+    /// assert_eq!(Instruction::from_str("LOAD IND B", &registers),
+    ///            Ok(Instruction::LoadIndirect { aaa: 0b101 }));
+    ///
+    /// assert_eq!(Instruction::from_str("ALU SOR RIGHT ASF", &registers),
+    ///            Ok(Instruction::Alu(AluOperation::ShiftOrRotate {
+    ///                d: AluOperationShiftOrRotateDirection::Right,
+    ///                tt: AluOperationShiftOrRotateType::Asf,
+    ///            })));
+    /// ```
+    #[inline]
+    pub fn from_str(s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
+        Instruction::from_str_impl(s, registers)
     }
 }
 

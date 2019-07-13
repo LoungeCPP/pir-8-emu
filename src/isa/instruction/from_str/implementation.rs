@@ -9,30 +9,7 @@ use std::usize;
 
 
 impl Instruction {
-    /// Parse assembly instruction format
-    ///
-    /// The input string must be ASCII and contain no vertical whitespace
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use pir_8_emu::isa::default_general_purpose_registers;
-    /// # use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
-    /// #                                   InstructionJumpCondition, AluOperation, Instruction};
-    /// # let registers = default_general_purpose_registers();
-    /// assert_eq!(Instruction::from_str("JMPL", &registers),
-    ///            Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));
-    ///
-    /// assert_eq!(Instruction::from_str("LOAD IND B", &registers),
-    ///            Ok(Instruction::LoadIndirect { aaa: 0b101 }));
-    ///
-    /// assert_eq!(Instruction::from_str("ALU SOR RIGHT ASF", &registers),
-    ///            Ok(Instruction::Alu(AluOperation::ShiftOrRotate {
-    ///                d: AluOperationShiftOrRotateDirection::Right,
-    ///                tt: AluOperationShiftOrRotateType::Asf,
-    ///            })));
-    /// ```
-    pub fn from_str(s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
+    pub(crate) fn from_str_impl(crate) fn from_str_impl( s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
         if let Some(idx) = s.find(is_invalid_character) {
             return Err(ParseInstructionError::InvalidCharacter(idx));
         }
@@ -198,7 +175,6 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
                 Ok(Instruction::from(raw))
             }
             // Raw/restricted end
-
             else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }
