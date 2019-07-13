@@ -5,4 +5,5 @@ mod instruction_jump_condition;
 mod instruction_port_direction;
 mod instruction_stck_direction;
 mod alu_operation;
+mod parse_error;
 mod instruction;

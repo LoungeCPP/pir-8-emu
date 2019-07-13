@@ -64,7 +64,11 @@ impl GeneralPurposeRegister {
         Some(GeneralPurposeRegister {
             data: 0,
             address: limit_to_width(address, 3)?,
-            letter: letter,
+            letter: if letter.is_ascii() {
+                Some(letter)
+            } else {
+                None
+            }?,
         })
     }
 

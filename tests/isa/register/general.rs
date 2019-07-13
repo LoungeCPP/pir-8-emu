@@ -26,6 +26,12 @@ fn new_letter_preserved() {
 }
 
 #[test]
+fn new_invalid_letter_rejected() {
+    assert_eq!(GeneralPurposeRegister::new(0b010, 'Ą'), None);
+    assert_eq!(GeneralPurposeRegister::new(0b010, 'Ж'), None);
+}
+
+#[test]
 fn display() {
     let mut reg = GeneralPurposeRegister::new(0b010, 'X').unwrap();
     for i in 0..2u32.pow(8) {
