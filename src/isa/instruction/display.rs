@@ -1,6 +1,6 @@
 use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionStckRegisterPair,
                   InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
-use self::super::super::GeneralPurposeRegister;
+use self::super::super::GeneralPurposeRegisterBank;
 use std::fmt;
 
 
@@ -12,7 +12,7 @@ use std::fmt;
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DisplayInstruction<'a> {
     pub(crate) instr: &'a Instruction,
-    pub(crate) registers: &'a [GeneralPurposeRegister; 8],
+    pub(crate) registers: &'a GeneralPurposeRegisterBank,
 }
 
 impl<'a> fmt::Display for DisplayInstruction<'a> {

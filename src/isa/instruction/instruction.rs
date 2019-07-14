@@ -1,6 +1,6 @@
 use self::super::{ParseInstructionError, DisplayInstruction};
 use self::super::super::super::util::limit_to_width;
-use self::super::super::GeneralPurposeRegister;
+use self::super::super::GeneralPurposeRegisterBank;
 use std::convert::{TryFrom, From};
 
 
@@ -176,7 +176,7 @@ impl Instruction {
     /// assert_eq!(Instruction::Reserved(0b1111_0000).display(&registers).to_string(),
     ///            "0b1111_0000");
     /// ```
-    pub fn display<'r, 's: 'r>(&'s self, registers: &'r [GeneralPurposeRegister; 8]) -> DisplayInstruction<'r> {
+    pub fn display<'r, 's: 'r>(&'s self, registers: &'r GeneralPurposeRegisterBank) -> DisplayInstruction<'r> {
         DisplayInstruction {
             instr: self,
             registers: registers,
@@ -207,7 +207,7 @@ impl Instruction {
     ///            })));
     /// ```
     #[inline]
-    pub fn from_str(s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
+    pub fn from_str(s: &str, registers: &GeneralPurposeRegisterBank) -> Result<Instruction, ParseInstructionError> {
         Instruction::from_str_impl(s, registers)
     }
 }

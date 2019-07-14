@@ -1,6 +1,6 @@
+use pir_8_emu::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister};
 use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
 use rand::distributions::{Alphanumeric, Distribution};
-use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use rand::thread_rng;
 use std::ops::Range;
@@ -36,8 +36,8 @@ fn empty_string() {
 }
 
 
-fn unrecognised_token(base: &str, valid: &[&str], lens: Range<usize>, discriminator: fn(&str, &[GeneralPurposeRegister; 8]) -> bool,
-                      err: fn(usize, &str, &[GeneralPurposeRegister; 8]) -> ParseInstructionError) {
+fn unrecognised_token(base: &str, valid: &[&str], lens: Range<usize>, discriminator: fn(&str, &GeneralPurposeRegisterBank) -> bool,
+                      err: fn(usize, &str, &GeneralPurposeRegisterBank) -> ParseInstructionError) {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_center in 1..5 {
@@ -82,7 +82,7 @@ fn unrecognised_register_letter(base: &str) {
     })
 }
 
-fn missing_token(base: &str, err: fn(usize, &[GeneralPurposeRegister; 8]) -> ParseInstructionError) {
+fn missing_token(base: &str, err: fn(usize, &GeneralPurposeRegisterBank) -> ParseInstructionError) {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_right in 1..5 {

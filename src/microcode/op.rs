@@ -1,4 +1,4 @@
-use self::super::super::isa::instruction::{InstructionJumpCondition, InstructionPortDirection, AluOperation};
+use self::super::super::isa::instruction::{InstructionJumpCondition, AluOperation};
 
 
 /// Actual μOps executable by the CPU

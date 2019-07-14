@@ -1,7 +1,7 @@
 use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
                          InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 use self::super::super::super::super::util::{parse_with_prefix, limit_to_width};
-use self::super::super::super::GeneralPurposeRegister;
+use self::super::super::super::GeneralPurposeRegisterBank;
 use self::super::ParseInstructionError;
 use std::convert::TryFrom;
 use std::str::FromStr;
@@ -10,7 +10,7 @@ use std::usize;
 
 impl Instruction {
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    pub(crate) fn from_str_impl(s: &str, registers: &[GeneralPurposeRegister; 8]) -> Result<Instruction, ParseInstructionError> {
+    pub(crate) fn from_str_impl(s: &str, registers: &GeneralPurposeRegisterBank) -> Result<Instruction, ParseInstructionError> {
         if let Some(idx) = s.find(is_invalid_character) {
             return Err(ParseInstructionError::InvalidCharacter(idx));
         }
@@ -68,7 +68,7 @@ fn is_invalid_character(c: char) -> bool {
 }
 
 
-fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, registers: &[GeneralPurposeRegister; 8])
+fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, registers: &GeneralPurposeRegisterBank)
                                                       -> Result<Instruction, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["JMPZ",
                                      "JMPP",
@@ -184,7 +184,7 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
     }
 }
 
-fn parse_instruction_load<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &[GeneralPurposeRegister; 8])
+fn parse_instruction_load<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &GeneralPurposeRegisterBank)
                                                            -> Result<Instruction, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["IMM", "IND"];
 
@@ -204,7 +204,7 @@ fn parse_instruction_load<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
     }
 }
 
-fn parse_instruction_port<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &[GeneralPurposeRegister; 8])
+fn parse_instruction_port<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &GeneralPurposeRegisterBank)
                                                            -> Result<Instruction, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["IN", "OUT"];
 
@@ -362,7 +362,7 @@ fn parse_alu_operation_shift_or_rotate_type<'i, I: Iterator<Item = &'i str>>(itr
     }
 }
 
-fn parse_register<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &[GeneralPurposeRegister; 8])
+fn parse_register<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &GeneralPurposeRegisterBank)
                                                    -> Result<(usize, u8), ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["[register letter]"];
 

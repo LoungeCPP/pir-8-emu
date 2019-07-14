@@ -1,4 +1,5 @@
 use self::super::super::super::util::limit_to_width;
+use self::super::GeneralPurposeRegisterBank;
 use std::ops::{DerefMut, Deref};
 use std::fmt;
 
@@ -91,7 +92,7 @@ impl GeneralPurposeRegister {
 
 impl GeneralPurposeRegister {
     /// Get the default 8 GP registers specified in the ISA
-    pub fn defaults() -> [GeneralPurposeRegister; 8] {
+    pub fn defaults() -> GeneralPurposeRegisterBank {
         [GeneralPurposeRegister::new(0b000, 'F').expect("F register"), // Flag register (can also be used to get a zero value)
          GeneralPurposeRegister::new(0b001, 'S').expect("S register"), // Output of the ALU - ALU operations will overwrite any value stored
          GeneralPurposeRegister::new(0b010, 'X').expect("X register"), // Input to ALU (Only input for unary operations)
@@ -116,7 +117,7 @@ impl GeneralPurposeRegister {
     /// # use pir_8_emu::isa::GeneralPurposeRegister;
     /// assert_eq!(GeneralPurposeRegister::from_letters("FSXYABCD"), Ok(GeneralPurposeRegister::defaults()));
     /// ```
-    pub fn from_letters(s: &str) -> Result<[GeneralPurposeRegister; 8], i8> {
+    pub fn from_letters(s: &str) -> Result<GeneralPurposeRegisterBank, i8> {
         let mut cc = s.chars();
 
         let ret = [GeneralPurposeRegister::new(0b000, cc.next().ok_or(-1)?).ok_or(0b000)?,

@@ -1,4 +1,4 @@
-use self::super::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
+use self::super::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister, SpecialPurposeRegister};
 use self::super::Memory;
 
 
@@ -14,7 +14,7 @@ pub struct Cpu {
     pub ins: SpecialPurposeRegister<u8>,
 
     /// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU
-    pub general_purpose: [GeneralPurposeRegister; 8],
+    pub general_purpose: GeneralPurposeRegisterBank,
 
     /// The entire 64KiB of addressable memory
     pub memory: Memory,

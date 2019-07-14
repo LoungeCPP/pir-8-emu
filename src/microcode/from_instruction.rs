@@ -1,5 +1,4 @@
-use self::super::super::isa::instruction::{InstructionStckRegisterPair, InstructionJumpCondition, InstructionPortDirection, InstructionStckDirection,
-                                           AluOperation, Instruction};
+use self::super::super::isa::instruction::{InstructionStckRegisterPair, InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
 use self::super::MicroOp;
 
 

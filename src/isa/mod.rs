@@ -9,4 +9,4 @@ mod register;
 
 pub mod instruction;
 
-pub use self::register::{GeneralPurposeRegister, SpecialPurposeRegister};
+pub use self::register::{GeneralPurposeRegisterBank, GeneralPurposeRegister, SpecialPurposeRegister};
