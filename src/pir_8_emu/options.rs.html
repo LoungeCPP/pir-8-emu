@@ -311,7 +311,7 @@
                 <span class="ident">f</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">f</span>.<span class="ident">to_string</span>(), <span class="ident">fs</span>::<span class="ident">canonicalize</span>(<span class="ident">f</span>).<span class="ident">unwrap</span>())),
             },
             <span class="ident">skip</span>: <span class="ident">parse_with_prefix</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;e&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>(),
-            <span class="ident">keep</span>: <span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;k&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">kk</span><span class="op">|</span> <span class="ident">kk</span>.<span class="ident">flat_map</span>(<span class="ident">parse_keep</span>).<span class="ident">collect</span>()).<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[]),
+            <span class="ident">keep</span>: <span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;k&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">kk</span><span class="op">|</span> <span class="ident">kk</span>.<span class="ident">flat_map</span>(<span class="ident">parse_keep</span>).<span class="ident">collect</span>()).<span class="ident">unwrap_or_else</span>(<span class="ident">Vec</span>::<span class="ident">new</span>),
         }
     }
 }

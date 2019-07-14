@@ -112,7 +112,7 @@
 <span class="doccomment">/// assert_eq!(limit_to_width(0b1010, 3), None);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit_to_width</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">PrimInt</span> <span class="op">+</span> <span class="ident">CheckedShr</span><span class="op">&gt;</span>(<span class="ident">number</span>: <span class="ident">T</span>, <span class="ident">bit_width</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">number</span>.<span class="ident">checked_shr</span>(<span class="ident">bit_width</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or</span>(<span class="ident">T</span>::<span class="ident">zero</span>()) <span class="op">!=</span> <span class="ident">T</span>::<span class="ident">zero</span>() {
+    <span class="kw">if</span> <span class="ident">number</span>.<span class="ident">checked_shr</span>(<span class="ident">bit_width</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or_else</span>(<span class="ident">T</span>::<span class="ident">zero</span>) <span class="op">!=</span> <span class="ident">T</span>::<span class="ident">zero</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
         <span class="prelude-val">Some</span>(<span class="ident">number</span>)
@@ -131,7 +131,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_byte_width</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">PrimInt</span> <span class="op">+</span> <span class="ident">CheckedShr</span><span class="op">&gt;</span>(<span class="ident">number</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_bytes</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">while</span> <span class="ident">number</span>.<span class="ident">checked_shr</span>(<span class="number">8</span> <span class="op">*</span> <span class="ident">cur_bytes</span>).<span class="ident">unwrap_or</span>(<span class="ident">T</span>::<span class="ident">zero</span>()) <span class="op">!=</span> <span class="ident">T</span>::<span class="ident">zero</span>() {
+    <span class="kw">while</span> <span class="ident">number</span>.<span class="ident">checked_shr</span>(<span class="number">8</span> <span class="op">*</span> <span class="ident">cur_bytes</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">T</span>::<span class="ident">zero</span>) <span class="op">!=</span> <span class="ident">T</span>::<span class="ident">zero</span>() {
         <span class="ident">cur_bytes</span> <span class="op">*=</span> <span class="number">2</span>;
     }
     <span class="ident">cur_bytes</span> <span class="kw">as</span> <span class="ident">u8</span>

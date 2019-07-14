@@ -102,6 +102,12 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">DerefMut</span>, <span class="ident">Deref</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="self">self</span>, <span class="ident">Hash</span>};
@@ -117,6 +123,12 @@
 <span class="kw">impl</span> <span class="ident">Memory</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Memory</span> {
         <span class="ident">Memory</span>(<span class="ident">Box</span>::<span class="ident">new</span>([<span class="number">0</span>; <span class="number">0xFFFF</span>]))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Memory</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Memory</span> {
+        <span class="ident">Memory</span>::<span class="ident">new</span>()
     }
 }
 
