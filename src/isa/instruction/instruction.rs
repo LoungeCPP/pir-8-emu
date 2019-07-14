@@ -1,6 +1,3 @@
-//! An instruction is a single byte, and can include some following immediate values purely for data.
-
-
 use self::super::{ParseInstructionError, DisplayInstruction};
 use self::super::super::super::util::limit_to_width;
 use self::super::super::GeneralPurposeRegister;

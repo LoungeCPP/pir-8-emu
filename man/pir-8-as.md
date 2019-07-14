@@ -31,7 +31,7 @@ And so, all of these are equivalent:
 
     0x24
     1
-    0b0001_0000
+    0o20
 
 ## OPTIONS
 
