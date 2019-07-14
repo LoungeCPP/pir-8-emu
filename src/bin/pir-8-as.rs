@@ -76,7 +76,7 @@ fn actual_main() -> Result<(), i32> {
                         7
                     })?;
 
-                let data_length = pir_8_emu::util::min_byte_width(data);
+                let data_length = data_remaining; // pir_8_emu::util::min_byte_width(data) doesn't handle, e.g. JUMP 0x0000
                 data_remaining -= data_length;
 
                 if data_length == 1 {
