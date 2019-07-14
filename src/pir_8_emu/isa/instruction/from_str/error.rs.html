@@ -183,8 +183,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};</span>
-<span class="doccomment">/// # use pir_8_emu::isa::default_general_purpose_registers;</span>
-<span class="doccomment">/// # let registers = default_general_purpose_registers();</span>
+<span class="doccomment">/// # use pir_8_emu::isa::GeneralPurposeRegister;</span>
+<span class="doccomment">/// # let registers = GeneralPurposeRegister::defaults();</span>
 <span class="doccomment">/// let res = Instruction::from_str(&quot;LOAD IND Q&quot;, &amp;registers);</span>
 <span class="doccomment">/// assert_eq!(res,</span>
 <span class="doccomment">///            Err(ParseInstructionError::UnrecognisedRegisterLetter(</span>

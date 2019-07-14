@@ -110,6 +110,20 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">DerefMut</span>, <span class="ident">Deref</span>};
@@ -199,6 +213,20 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">char</span> {
         <span class="self">self</span>.<span class="ident">letter</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">GeneralPurposeRegister</span> {
+    <span class="doccomment">/// Get the default 8 GP registers specified in the ISA</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">defaults</span>() <span class="op">-&gt;</span> [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>] {
+        [<span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b000</span>, <span class="string">&#39;F&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;F register&quot;</span>), <span class="comment">// Flag register (can also be used to get a zero value)</span>
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b001</span>, <span class="string">&#39;S&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;S register&quot;</span>), <span class="comment">// Output of the ALU - ALU operations will overwrite any value stored</span>
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b010</span>, <span class="string">&#39;X&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;X register&quot;</span>), <span class="comment">// Input to ALU (Only input for unary operations)</span>
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b011</span>, <span class="string">&#39;Y&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;Y register&quot;</span>), <span class="comment">// Second input for ALU</span>
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b100</span>, <span class="string">&#39;A&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;A register&quot;</span>),
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b101</span>, <span class="string">&#39;B&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;B register&quot;</span>),
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b110</span>, <span class="string">&#39;C&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;C register&quot;</span>),
+         <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b111</span>, <span class="string">&#39;D&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;D register&quot;</span>)]
     }
 }
 

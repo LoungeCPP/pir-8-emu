@@ -159,7 +159,7 @@
 
 <span class="kw">fn</span> <span class="ident">actual_main</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">i32</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">pir_8_emu</span>::<span class="ident">options</span>::<span class="ident">DisassemblerOptions</span>::<span class="ident">parse</span>();
-    <span class="kw">let</span> <span class="ident">registers</span> <span class="op">=</span> <span class="ident">pir_8_emu</span>::<span class="ident">isa</span>::<span class="ident">default_general_purpose_registers</span>();
+    <span class="kw">let</span> <span class="ident">registers</span> <span class="op">=</span> <span class="ident">pir_8_emu</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegister</span>::<span class="ident">defaults</span>();
 
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">stdout</span>();

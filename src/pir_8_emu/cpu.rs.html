@@ -36,7 +36,7 @@
 <span id="36">36</span>
 <span id="37">37</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>, <span class="ident">default_general_purpose_registers</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">Memory</span>;
 
 
@@ -67,7 +67,7 @@
             <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Memory Address&quot;</span>, <span class="string">&quot;ADR&quot;</span>),
             <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Instruction&quot;</span>, <span class="string">&quot;INS&quot;</span>),
 
-            <span class="ident">general_purpose</span>: <span class="ident">default_general_purpose_registers</span>(),
+            <span class="ident">general_purpose</span>: <span class="ident">GeneralPurposeRegister</span>::<span class="ident">defaults</span>(),
 
             <span class="ident">memory</span>: <span class="ident">Memory</span>::<span class="ident">new</span>(),
         }
