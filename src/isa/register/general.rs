@@ -101,6 +101,35 @@ impl GeneralPurposeRegister {
          GeneralPurposeRegister::new(0b110, 'C').expect("C register"),
          GeneralPurposeRegister::new(0b111, 'D').expect("D register")]
     }
+
+    /// Create a GP register bank from letters contained within the specified string
+    ///
+    /// The string must be 8-ASCII-characters-long.
+    ///
+    /// If it's shorter, `Err(-1)` is returned,
+    /// if it's longer, `Err(8)` is returned,
+    /// if character for register at address `AAA` is non-ASCII, `Err(AAA)` is returned,
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::GeneralPurposeRegister;
+    /// assert_eq!(GeneralPurposeRegister::from_letters("FSXYABCD"), Ok(GeneralPurposeRegister::defaults()));
+    /// ```
+    pub fn from_letters(s: &str) -> Result<[GeneralPurposeRegister; 8], i8> {
+        let mut cc = s.chars();
+
+        let ret = [GeneralPurposeRegister::new(0b000, cc.next().ok_or(-1)?).ok_or(0b000)?,
+                   GeneralPurposeRegister::new(0b001, cc.next().ok_or(-1)?).ok_or(0b001)?,
+                   GeneralPurposeRegister::new(0b010, cc.next().ok_or(-1)?).ok_or(0b010)?,
+                   GeneralPurposeRegister::new(0b011, cc.next().ok_or(-1)?).ok_or(0b011)?,
+                   GeneralPurposeRegister::new(0b100, cc.next().ok_or(-1)?).ok_or(0b100)?,
+                   GeneralPurposeRegister::new(0b101, cc.next().ok_or(-1)?).ok_or(0b101)?,
+                   GeneralPurposeRegister::new(0b110, cc.next().ok_or(-1)?).ok_or(0b110)?,
+                   GeneralPurposeRegister::new(0b111, cc.next().ok_or(-1)?).ok_or(0b111)?];
+
+        if cc.next().is_some() { Err(8) } else { Ok(ret) }
+    }
 }
 
 impl Deref for GeneralPurposeRegister {
