@@ -1,8 +1,8 @@
 use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
 use self::super::{too_many_tokens_aaa, unrecognised_token};
-use pir_8_emu::isa::default_general_purpose_registers;
 use rand::distributions::{Alphanumeric, Distribution};
 use self::super::super::super::alt_gp_registers;
+use pir_8_emu::isa::GeneralPurposeRegister;
 use rand::thread_rng;
 
 
@@ -126,7 +126,7 @@ fn alu_sor() {
 
 #[test]
 fn move_() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for aaa in regs {
             for bbb in regs {
                 for pad_left in 1..3 {

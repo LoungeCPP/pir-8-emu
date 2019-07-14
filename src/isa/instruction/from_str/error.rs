@@ -9,8 +9,8 @@ use std::fmt;
 ///
 /// ```
 /// # use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
-/// # use pir_8_emu::isa::default_general_purpose_registers;
-/// # let registers = default_general_purpose_registers();
+/// # use pir_8_emu::isa::GeneralPurposeRegister;
+/// # let registers = GeneralPurposeRegister::defaults();
 /// let res = Instruction::from_str("LOAD IND Q", &registers);
 /// assert_eq!(res,
 ///            Err(ParseInstructionError::UnrecognisedRegisterLetter(

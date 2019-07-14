@@ -1,4 +1,4 @@
-use self::super::isa::{GeneralPurposeRegister, SpecialPurposeRegister, default_general_purpose_registers};
+use self::super::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
 use self::super::Memory;
 
 
@@ -29,7 +29,7 @@ impl Cpu {
             adr: SpecialPurposeRegister::new("Memory Address", "ADR"),
             ins: SpecialPurposeRegister::new("Instruction", "INS"),
 
-            general_purpose: default_general_purpose_registers(),
+            general_purpose: GeneralPurposeRegister::defaults(),
 
             memory: Memory::new(),
         }

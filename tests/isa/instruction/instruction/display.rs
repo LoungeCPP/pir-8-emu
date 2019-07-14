@@ -1,12 +1,12 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
                                   InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
-use pir_8_emu::isa::default_general_purpose_registers;
+use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::alt_gp_registers;
 
 
 #[test]
 fn jump() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpz).display(regs).to_string(), "JMPZ");
         assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpp).display(regs).to_string(), "JMPP");
         assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpg).display(regs).to_string(), "JMPG");
@@ -35,7 +35,7 @@ fn save() {
 
 #[test]
 fn alu_valid() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Alu(AluOperation::Add).display(regs).to_string(), "ALU ADD");
         assert_eq!(Instruction::Alu(AluOperation::Sub).display(regs).to_string(), "ALU SUB");
         assert_eq!(Instruction::Alu(AluOperation::Not).display(regs).to_string(), "ALU NOT");
@@ -47,7 +47,7 @@ fn alu_valid() {
 
 #[test]
 fn alu_valid_shift_or_rotate() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for &d in &[AluOperationShiftOrRotateDirection::Right, AluOperationShiftOrRotateDirection::Left] {
             for &tt in &[AluOperationShiftOrRotateType::Lsf,
                          AluOperationShiftOrRotateType::Asf,
@@ -62,7 +62,7 @@ fn alu_valid_shift_or_rotate() {
 
 #[test]
 fn alu_reserved() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0011)).display(regs).to_string(), "ALU 0b0011");
         assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0111)).display(regs).to_string(), "ALU 0b0111");
     }
@@ -70,7 +70,7 @@ fn alu_reserved() {
 
 #[test]
 fn move_() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for aaa in regs {
             for bbb in regs {
                 assert_eq!(Instruction::Move {
@@ -98,7 +98,7 @@ fn comp() {
 
 #[test]
 fn stck() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Stck {
                            d: InstructionStckDirection::Push,
                            r: InstructionStckRegisterPair::Ab,
@@ -135,14 +135,14 @@ fn stck() {
 
 #[test]
 fn clrf() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Clrf.display(regs).to_string(), "CLRF");
     }
 }
 
 #[test]
 fn halt() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Halt.display(regs).to_string(), "HALT");
     }
 }
@@ -175,7 +175,7 @@ fn reserved_block_4() {
 
 
 fn single_register(base: &str, instr: fn(u8) -> Instruction) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for register in regs {
             assert_eq!(instr(register.address()).display(regs).to_string(), format!("{} {}", base, register.letter()));
         }
@@ -183,7 +183,7 @@ fn single_register(base: &str, instr: fn(u8) -> Instruction) {
 }
 
 fn reserved_block(base: u8, max: u8) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0..=max {
             let raw = base | i;
             assert_eq!(Instruction::Reserved(raw).display(regs).to_string(),

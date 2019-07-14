@@ -163,8 +163,8 @@ impl Instruction {
     ///
     /// ```
     /// # use pir_8_emu::isa::instruction::{InstructionStckRegisterPair, InstructionStckDirection, AluOperation, Instruction};
-    /// # use pir_8_emu::isa::default_general_purpose_registers;
-    /// # let registers = default_general_purpose_registers();
+    /// # use pir_8_emu::isa::GeneralPurposeRegister;
+    /// # let registers = GeneralPurposeRegister::defaults();
     /// assert_eq!(Instruction::Clrf.display(&registers).to_string(),
     ///            "CLRF");
     /// assert_eq!(Instruction::Alu(AluOperation::Or).display(&registers).to_string(),
@@ -192,10 +192,10 @@ impl Instruction {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::isa::default_general_purpose_registers;
     /// # use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
     /// #                                   InstructionJumpCondition, AluOperation, Instruction};
-    /// # let registers = default_general_purpose_registers();
+    /// # use pir_8_emu::isa::GeneralPurposeRegister;
+    /// # let registers = GeneralPurposeRegister::defaults();
     /// assert_eq!(Instruction::from_str("JMPL", &registers),
     ///            Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));
     ///

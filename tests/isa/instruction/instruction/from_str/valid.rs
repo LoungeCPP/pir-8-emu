@@ -1,6 +1,5 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
                                   InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
-use pir_8_emu::isa::default_general_purpose_registers;
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use std::convert::TryFrom;
@@ -8,7 +7,7 @@ use std::convert::TryFrom;
 
 #[test]
 fn raw() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0..=0b1111_1111 {
             assert_eq!(Instruction::from_str(&format!("{}", i), regs), Ok(Instruction::from(i as u8)));
             assert_eq!(Instruction::from_str(&format!("{:#0x}", i), regs), Ok(Instruction::from(i as u8)));
@@ -21,7 +20,7 @@ fn raw() {
 
 #[test]
 fn jump() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("JMPZ", regs), Ok(Instruction::Jump(InstructionJumpCondition::Jmpz)));
         assert_eq!(Instruction::from_str("JMPP", regs), Ok(Instruction::Jump(InstructionJumpCondition::Jmpp)));
         assert_eq!(Instruction::from_str("JMPG", regs), Ok(Instruction::Jump(InstructionJumpCondition::Jmpg)));
@@ -50,7 +49,7 @@ fn save() {
 
 #[test]
 fn alu_raw() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0..=0b1111 {
             assert_eq!(Instruction::from_str(&format!("ALU {}", i), regs),
                        Ok(Instruction::Alu(AluOperation::try_from(i as u8).unwrap())));
@@ -72,7 +71,7 @@ fn alu_raw() {
 
 #[test]
 fn alu() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("ALU ADD", regs), Ok(Instruction::Alu(AluOperation::Add)));
         assert_eq!(Instruction::from_str("ALU SUB", regs), Ok(Instruction::Alu(AluOperation::Sub)));
         assert_eq!(Instruction::from_str("ALU NOT", regs), Ok(Instruction::Alu(AluOperation::Not)));
@@ -125,7 +124,7 @@ fn alu() {
 
 #[test]
 fn move_() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for aaa in regs {
             for bbb in regs {
                 assert_eq!(Instruction::from_str(&format!("MOVE {} {}", aaa.letter(), bbb.letter()), regs),
@@ -162,7 +161,7 @@ fn comp() {
 
 #[test]
 fn stck() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("STCK PUSH A&B", regs),
                    Ok(Instruction::Stck {
                        d: InstructionStckDirection::Push,
@@ -191,21 +190,21 @@ fn stck() {
 
 #[test]
 fn clrf() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("CLRF", regs), Ok(Instruction::Clrf));
     }
 }
 
 #[test]
 fn halt() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("HALT", regs), Ok(Instruction::Halt));
     }
 }
 
 
 fn aaa(base: &str, ins: fn(&GeneralPurposeRegister) -> Instruction) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for aaa in regs {
             assert_eq!(Instruction::from_str(&format!("{} {}", base, aaa.letter()), regs), Ok(ins(aaa)));
         }

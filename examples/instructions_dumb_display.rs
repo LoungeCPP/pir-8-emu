@@ -1,12 +1,12 @@
 extern crate pir_8_emu;
 
-use pir_8_emu::isa::default_general_purpose_registers;
 use pir_8_emu::isa::instruction::Instruction;
+use pir_8_emu::isa::GeneralPurposeRegister;
 use std::{env, fs};
 
 
 fn main() {
-    let regs = default_general_purpose_registers();
+    let regs = GeneralPurposeRegister::defaults();
     for (i, (b, ins)) in fs::read(env::args().skip(1).next().expect("File argument not passed"))
         .expect("Passed file nonexistant")
         .into_iter()

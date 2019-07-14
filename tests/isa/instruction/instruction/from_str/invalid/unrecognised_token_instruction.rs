@@ -1,6 +1,6 @@
 use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
-use pir_8_emu::isa::default_general_purpose_registers;
 use self::super::super::super::alt_gp_registers;
+use pir_8_emu::isa::GeneralPurposeRegister;
 use pir_8_emu::util::parse_with_prefix;
 use self::super::unrecognised_token;
 
@@ -26,7 +26,7 @@ fn toplevel_raw() {
                                    "HALT",
                                    "[raw instruction literal]"];
 
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0b0001_0000_0000..0b0100_0000_0000 {
             assert_eq!(Instruction::from_str(&format!("{}", i), regs),
                        Err(ParseInstructionError::UnrecognisedToken(1, TOKENS_TOP)),
@@ -89,7 +89,7 @@ fn toplevel() {
 fn alu_raw() {
     static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
 
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0b0001_0000..=0b1111_1111 {
             for pad in 1..5 {
                 assert_eq!(Instruction::from_str(&format!("ALU{e:w$}{}    ", i, e = "", w = pad), regs),

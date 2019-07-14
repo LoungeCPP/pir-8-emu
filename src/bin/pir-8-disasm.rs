@@ -13,7 +13,7 @@ fn main() {
 
 fn actual_main() -> Result<(), i32> {
     let mut opts = pir_8_emu::options::DisassemblerOptions::parse();
-    let registers = pir_8_emu::isa::default_general_purpose_registers();
+    let registers = pir_8_emu::isa::GeneralPurposeRegister::defaults();
 
 
     let mut output = stdout();

@@ -1,8 +1,8 @@
 use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
-use pir_8_emu::isa::default_general_purpose_registers;
 use rand::distributions::{Alphanumeric, Distribution};
 use self::super::super::super::alt_gp_registers;
 use self::super::unrecognised_register_letter;
+use pir_8_emu::isa::GeneralPurposeRegister;
 use rand::thread_rng;
 
 
@@ -18,7 +18,7 @@ fn move_aaa() {
 
 #[test]
 fn move_bbb() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_center in 1..5 {
                 for pad_right in 1..5 {

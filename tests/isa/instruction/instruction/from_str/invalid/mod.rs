@@ -1,6 +1,6 @@
-use pir_8_emu::isa::{GeneralPurposeRegister, default_general_purpose_registers};
 use pir_8_emu::isa::instruction::{ParseInstructionError, Instruction};
 use rand::distributions::{Alphanumeric, Distribution};
+use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use rand::thread_rng;
 use std::ops::Range;
@@ -15,7 +15,7 @@ mod too_many_tokens;
 
 #[test]
 fn invalid_character() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("  \n", regs), Err(ParseInstructionError::InvalidCharacter(2)));
         assert_eq!(Instruction::from_str("  \x0B", regs), Err(ParseInstructionError::InvalidCharacter(2)));
 
@@ -26,7 +26,7 @@ fn invalid_character() {
 
 #[test]
 fn empty_string() {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         let mut empty = String::new();
         for _ in 0..100 {
             assert_eq!(Instruction::from_str(&empty, regs), Err(ParseInstructionError::EmptyString));
@@ -38,7 +38,7 @@ fn empty_string() {
 
 fn unrecognised_token(base: &str, valid: &[&str], lens: Range<usize>, discriminator: fn(&str, &[GeneralPurposeRegister; 8]) -> bool,
                       err: fn(usize, &str, &[GeneralPurposeRegister; 8]) -> ParseInstructionError) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_center in 1..5 {
                 for pad_right in 1..5 {
@@ -83,7 +83,7 @@ fn unrecognised_register_letter(base: &str) {
 }
 
 fn missing_token(base: &str, err: fn(usize, &[GeneralPurposeRegister; 8]) -> ParseInstructionError) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_right in 1..5 {
                 let instr = format!("{e:wl$}{}{e:wr$}", base, e = "", wl = pad_left, wr = pad_right);
@@ -98,7 +98,7 @@ fn missing_token(base: &str, err: fn(usize, &[GeneralPurposeRegister; 8]) -> Par
 }
 
 fn too_many_tokens_aaa(base: &str) {
-    for regs in &[default_general_purpose_registers(), alt_gp_registers()] {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for aaa in regs {
             for pad_left in 1..5 {
                 for pad_center in 1..5 {

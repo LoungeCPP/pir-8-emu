@@ -16,7 +16,7 @@ fn main() {
 
 fn actual_main() -> Result<(), i32> {
     let opts = pir_8_emu::options::AssemblerOptions::parse();
-    let registers = pir_8_emu::isa::default_general_purpose_registers();
+    let registers = pir_8_emu::isa::GeneralPurposeRegister::defaults();
 
     let mut output: Box<Write> = match opts.output {
         Some((name, path)) => {
