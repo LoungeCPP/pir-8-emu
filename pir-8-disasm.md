@@ -34,6 +34,14 @@ The output consists of four columns:
 
     Can be specified multiple times
 
+  -r REGISTER_LETTERS
+
+    Use REGISTER_LETTERS as the letters for the registers
+    in the general-purpose bank instead of the defaults,
+    as specified in the ISA
+
+    Must be 8-ASCII-characters-long
+
 ## Exit values
 
     1 - option parsing error
@@ -64,6 +72,26 @@ The output consists of four columns:
     0000000E   6B   MOVE B Y
     0000000F   35   ALU XOR
     00000010   4C   MOVE S A
+    00000011   FF   HALT
+
+  `pir-8-disasm -r 01234567 test-data/xor-swap-with-loads.p8b`
+
+    00000000   24   LOAD IND 4
+    00000002 0110 D 0x0110
+    00000003   1D   LOAD IMM 5
+    00000004   69 D 0x69
+    00000005   62   MOVE 4 2
+    00000006   6B   MOVE 5 3
+    00000007   35   ALU XOR
+    00000008   4C   MOVE 1 4
+    00000009   63   MOVE 4 3
+    0000000A   6A   MOVE 5 2
+    0000000B   35   ALU XOR
+    0000000C   4D   MOVE 1 5
+    0000000D   62   MOVE 4 2
+    0000000E   6B   MOVE 5 3
+    0000000F   35   ALU XOR
+    00000010   4C   MOVE 1 4
     00000011   FF   HALT
 
   `pir-8-disasm -e 3 test-data/xor-swap-with-loads.p8b`
