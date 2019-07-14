@@ -103,12 +103,12 @@ Can be specified multiple times
 <h2 id="Exit-values">Exit values</h2>
 
 <pre><code>1 - option parsing error
-2 - output file creation failure
+2 - unused
 3 - input file opening failure
 4 - output write failure
 5 - input read failure
-6 - instruction parse error
-7 - instruction data parse error
+6 - unused
+7 - insufficient instruction data
 </code></pre>
 
 <h2 id="EXAMPLES">EXAMPLES</h2>
@@ -162,14 +162,21 @@ Can be specified multiple times
 00000005   62   MOVE A X
 00000006   6B   MOVE B Y
 00000007   35   ALU XOR
-00000008        skipping 0x07 bytes
+00000008      S skipping 0x07 bytes
 00000010   4C   MOVE S A
 00000011   FF   HALT
 </code></pre>
 
+<p>  <code>pir-8-disasm -e 3 -k 1,0x0D test-data/xor-swap-with-loads.p8b</code></p>
+
+<pre><code>00000000   1D   LOAD IMM B
+00000001      S skipping 0x0D bytes
+0000000E   FF D 0xFF
+</code></pre>
+
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#x6e;&#97;&#98;&#105;&#106;&#97;&#x63;&#122;&#108;&#x65;&#119;&#x65;&#x6c;&#x69;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#x6e;&#97;&#98;&#105;&#x6a;&#97;&#99;&#122;&#108;&#101;&#119;&#101;&#x6c;&#105;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#x6e;&#x61;&#x62;&#x69;&#106;&#97;&#99;&#122;&#108;&#101;&#x77;&#101;&#108;&#x69;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#x6e;&#97;&#98;&#x69;&#x6a;&#97;&#99;&#x7a;&#x6c;&#x65;&#119;&#x65;&#x6c;&#105;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a>&gt;</p>
 
 <h2 id="SPECIAL-THANKS">SPECIAL THANKS</h2>
 
