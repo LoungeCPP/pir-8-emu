@@ -18,6 +18,39 @@ Specified input files (or "\-" for stdin) are assembled sequentially into the ou
 .P
 The comment characer is ";"\.
 .
+.P
+The assembly format is as follows:
+.
+.IP "\(bu" 4
+1 instruction per line, or
+.
+.IP "\(bu" 4
+if an instruction required data, each line afterward will be attempted to be parsed as data therefor, until the required amount of data is consumed\.
+.
+.IP "" 0
+.
+.P
+And so, all of these are equivalent:
+.
+.IP "" 4
+.
+.nf
+
+LOAD IND A
+0x0110
+
+LOAD IND A
+0x01
+0b0001_0000
+
+0x24
+1
+0b0001_0000
+.
+.fi
+.
+.IP "" 0
+.
 .SH "OPTIONS"
 \-o BINFILE
 .

@@ -13,6 +13,26 @@ Specified input files (or "-" for stdin) are assembled sequentially into the out
 
 The comment characer is ";".
 
+The assembly format is as follows:
+
+  * 1 instruction per line, or
+  * if an instruction required data, each line afterward
+    will be attempted to be parsed as data therefor,
+    until the required amount of data is consumed.
+
+And so, all of these are equivalent:
+
+    LOAD IND A
+    0x0110
+
+    LOAD IND A
+    0x01
+    0b0001_0000
+
+    0x24
+    1
+    0b0001_0000
+
 ## OPTIONS
 
   -o BINFILE

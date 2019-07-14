@@ -86,6 +86,23 @@
 
 <p>Specified input file (or "-" for stdin) is disassembled into stdout.</p>
 
+<p>The output consists of four columns:</p>
+
+<ul>
+<li>The leftmost 8 characters specify the address of the data in the input file,</li>
+<li>The next 4 are the raw data, as read, right-aligned if the data is 1-byte wide,</li>
+<li><p>The 1 character that follows functions as a status indicator, it can either be:</p>
+
+<ul>
+<li>empty, if the data is an instruction,</li>
+<li>an exclamation mark (!), if the instruction is invalid (reserved),</li>
+<li>D, if the data is instruction data, or</li>
+<li>S, if the line is a skip (-k) information</li>
+</ul>
+</li>
+</ul>
+
+
 <h2 id="OPTIONS">OPTIONS</h2>
 
 <p>  -e BYTES</p>
@@ -176,7 +193,7 @@ Can be specified multiple times
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#x6e;&#x61;&#x62;&#x69;&#106;&#97;&#99;&#122;&#108;&#101;&#x77;&#101;&#108;&#x69;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#x6e;&#97;&#98;&#x69;&#x6a;&#97;&#99;&#x7a;&#x6c;&#x65;&#119;&#x65;&#x6c;&#105;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#x6e;&#x61;&#98;&#105;&#x6a;&#97;&#x63;&#x7a;&#x6c;&#101;&#x77;&#x65;&#108;&#x69;&#x40;&#x67;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#x6d;" data-bare-link="true">&#x6e;&#x61;&#98;&#x69;&#x6a;&#x61;&#x63;&#x7a;&#108;&#x65;&#x77;&#x65;&#108;&#105;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a>&gt;</p>
 
 <h2 id="SPECIAL-THANKS">SPECIAL THANKS</h2>
 

@@ -15,6 +15,35 @@ Disassembler for the pir\-8\.
 .P
 Specified input file (or "\-" for stdin) is disassembled into stdout\.
 .
+.P
+The output consists of four columns:
+.
+.IP "\(bu" 4
+The leftmost 8 characters specify the address of the data in the input file,
+.
+.IP "\(bu" 4
+The next 4 are the raw data, as read, right\-aligned if the data is 1\-byte wide,
+.
+.IP "\(bu" 4
+The 1 character that follows functions as a status indicator, it can either be:
+.
+.IP "\(bu" 4
+empty, if the data is an instruction,
+.
+.IP "\(bu" 4
+an exclamation mark (!), if the instruction is invalid (reserved),
+.
+.IP "\(bu" 4
+D, if the data is instruction data, or
+.
+.IP "\(bu" 4
+S, if the line is a skip (\-k) information
+.
+.IP "" 0
+
+.
+.IP "" 0
+.
 .SH "OPTIONS"
 \-e BYTES
 .
