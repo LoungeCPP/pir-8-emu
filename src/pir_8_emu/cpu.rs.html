@@ -36,7 +36,7 @@
 <span id="36">36</span>
 <span id="37">37</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">Memory</span>;
 
 
@@ -52,7 +52,7 @@
     <span class="kw">pub</span> <span class="ident">ins</span>: <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU</span>
-    <span class="kw">pub</span> <span class="ident">general_purpose</span>: [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>],
+    <span class="kw">pub</span> <span class="ident">general_purpose</span>: <span class="ident">GeneralPurposeRegisterBank</span>,
 
     <span class="doccomment">/// The entire 64KiB of addressable memory</span>
     <span class="kw">pub</span> <span class="ident">memory</span>: <span class="ident">Memory</span>,

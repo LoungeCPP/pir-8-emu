@@ -120,7 +120,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">InstructionJumpCondition</span>, <span class="ident">InstructionStckRegisterPair</span>,
                   <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">GeneralPurposeRegister</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
 
@@ -132,7 +132,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DisplayInstruction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">instr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Instruction</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GeneralPurposeRegisterBank</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DisplayInstruction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {

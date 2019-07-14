@@ -153,8 +153,10 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
+<span id="156">156</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">DerefMut</span>, <span class="ident">Deref</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -247,7 +249,7 @@
 
 <span class="kw">impl</span> <span class="ident">GeneralPurposeRegister</span> {
     <span class="doccomment">/// Get the default 8 GP registers specified in the ISA</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">defaults</span>() <span class="op">-&gt;</span> [<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">defaults</span>() <span class="op">-&gt;</span> <span class="ident">GeneralPurposeRegisterBank</span> {
         [<span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b000</span>, <span class="string">&#39;F&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;F register&quot;</span>), <span class="comment">// Flag register (can also be used to get a zero value)</span>
          <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b001</span>, <span class="string">&#39;S&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;S register&quot;</span>), <span class="comment">// Output of the ALU - ALU operations will overwrite any value stored</span>
          <span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b010</span>, <span class="string">&#39;X&#39;</span>).<span class="ident">expect</span>(<span class="string">&quot;X register&quot;</span>), <span class="comment">// Input to ALU (Only input for unary operations)</span>
@@ -272,7 +274,7 @@
     <span class="doccomment">/// # use pir_8_emu::isa::GeneralPurposeRegister;</span>
     <span class="doccomment">/// assert_eq!(GeneralPurposeRegister::from_letters(&quot;FSXYABCD&quot;), Ok(GeneralPurposeRegister::defaults()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_letters</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">GeneralPurposeRegister</span>; <span class="number">8</span>], <span class="ident">i8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_letters</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">i8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cc</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>();
 
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="ident">GeneralPurposeRegister</span>::<span class="ident">new</span>(<span class="number">0b000</span>, <span class="ident">cc</span>.<span class="ident">next</span>().<span class="ident">ok_or</span>(<span class="op">-</span><span class="number">1</span>)<span class="question-mark">?</span>).<span class="ident">ok_or</span>(<span class="number">0b000</span>)<span class="question-mark">?</span>,
