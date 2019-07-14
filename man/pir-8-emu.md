@@ -11,6 +11,8 @@ Implementation of the pir-8 ISA.
 
 First, compile your source code with pir-8-as(1).
 
+Alternatively, check the content of a binary with pir-8-disasm(1).
+
 ## OPTIONS
 
   -a --all

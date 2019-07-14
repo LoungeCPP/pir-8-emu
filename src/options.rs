@@ -105,7 +105,7 @@ impl DisassemblerOptions {
                         .default_value("0")
                         .hide_default_value(true)
                         .validator(|s| parse_with_prefix::<usize>(&s).map(|_| ()).ok_or_else(|| format!("\"{}\" not a number with optional base prefix", s))),
-                    Arg::from_usage("-k <START,BYTES>... 'Don't disassemble <BYTES> bytes from position <START>'")
+                    Arg::from_usage("-k [START,BYTES]... 'Don't disassemble <BYTES> bytes from position <START>'")
                         .use_delimiter(false)
                         .number_of_values(1)
                         .validator(|s| parse_keep(&s).map(|_| ())),

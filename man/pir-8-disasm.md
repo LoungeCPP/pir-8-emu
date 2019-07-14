@@ -26,12 +26,12 @@ Specified input file (or "-" for stdin) is disassembled into stdout.
 ## Exit values
 
     1 - option parsing error
-    2 - output file creation failure
+    2 - unused
     3 - input file opening failure
     4 - output write failure
     5 - input read failure
-    6 - instruction parse error
-    7 - instruction data parse error
+    6 - unused
+    7 - insufficient instruction data
 
 ## EXAMPLES
 
@@ -82,9 +82,15 @@ Specified input file (or "-" for stdin) is disassembled into stdout.
     00000005   62   MOVE A X
     00000006   6B   MOVE B Y
     00000007   35   ALU XOR
-    00000008        skipping 0x07 bytes
+    00000008      S skipping 0x07 bytes
     00000010   4C   MOVE S A
     00000011   FF   HALT
+
+  `pir-8-disasm -e 3 -k 1,0x0D test-data/xor-swap-with-loads.p8b`
+
+    00000000   1D   LOAD IMM B
+    00000001      S skipping 0x0D bytes
+    0000000E   FF D 0xFF
 
 ## AUTHOR
 

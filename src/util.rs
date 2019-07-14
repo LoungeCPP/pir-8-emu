@@ -1,7 +1,7 @@
 //! Module containing various utility functions.
 
 
-use num_traits::{PrimInt, Num};
+use num_traits::{CheckedShr, PrimInt, Num};
 
 
 /// Limit the specified number to be at most the specified bit-width
@@ -14,12 +14,30 @@ use num_traits::{PrimInt, Num};
 ///
 /// assert_eq!(limit_to_width(0b1010, 3), None);
 /// ```
-pub fn limit_to_width<T: Num + PrimInt>(number: T, bit_width: u8) -> Option<T> {
-    if (number >> bit_width as usize) != T::zero() {
+pub fn limit_to_width<T: Num + PrimInt + CheckedShr>(number: T, bit_width: u8) -> Option<T> {
+    if number.checked_shr(bit_width.into()).unwrap_or(T::zero()) != T::zero() {
         None
     } else {
         Some(number)
     }
+}
+
+/// Limit the specified number to be at most the specified bit-width
+///
+/// # Examples
+///
+/// ```
+/// # use pir_8_emu::util::min_byte_width;
+/// assert_eq!(min_byte_width(0x0F), 1);
+/// assert_eq!(min_byte_width(0x010F), 2);
+/// assert_eq!(min_byte_width(0x00F0010F), 4);
+/// ```
+pub fn min_byte_width<T: Num + PrimInt + CheckedShr>(number: T) -> u8 {
+    let mut cur_bytes = 1;
+    while number.checked_shr(8 * cur_bytes).unwrap_or(T::zero()) != T::zero() {
+        cur_bytes *= 2;
+    }
+    cur_bytes as u8
 }
 
 /// Parse a number from the specified string, automatically detecting the base prefix.

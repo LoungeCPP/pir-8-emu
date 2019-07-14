@@ -32,7 +32,7 @@ fn actual_main() -> Result<(), i32> {
         let (input, input_name): (Box<BufRead>, Cow<'static, str>) = match input {
             Some((name, path)) => {
                 (Box::new(BufReader::new(File::open(path).map_err(|err| {
-                         eprintln!("Couldn't open intput file \"{}\": {}", name, err);
+                         eprintln!("Couldn't open input file \"{}\": {}", name, err);
                          3
                      })?)),
                  name.into())
@@ -58,11 +58,7 @@ fn actual_main() -> Result<(), i32> {
             if data_remaining != 0 {
                 let line = line.trim_start();
 
-                let data: u16 = pir_8_emu::util::parse_with_prefix(line).and_then(|data| if data_remaining == 1 {
-                        pir_8_emu::util::limit_to_width(data, 8) // not data_remaining * 8 because it yielded shift-with-overflow panics
-                    } else {
-                        Some(data)
-                    })
+                let data: u16 = pir_8_emu::util::parse_with_prefix(line).and_then(|data| pir_8_emu::util::limit_to_width(data, data_remaining * 8))
                     .ok_or_else(|| {
                         eprintln!("Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:",
                                   data_remaining,
@@ -73,11 +69,11 @@ fn actual_main() -> Result<(), i32> {
                         eprintln!("{}",
                                   pir_8_emu::isa::instruction::ParseInstructionError::UnrecognisedToken((line.as_ptr() as usize) -
                                                                                                         (line_orig.as_ptr() as usize),
-                                                                                                        DATA_REMAINING_EXPECTEDS[data_remaining - 1]));
+                                                                                                        DATA_REMAINING_EXPECTEDS[data_remaining as usize - 1]));
                         7
                     })?;
 
-                let data_length = if (data & 0xFF00) != 0 { 2 } else { 1 };
+                let data_length = pir_8_emu::util::min_byte_width(data);
                 data_remaining -= data_length;
 
                 if data_length == 1 {
@@ -85,12 +81,13 @@ fn actual_main() -> Result<(), i32> {
                     } else {
                         output.write_all(&[(data >> 8) as u8, (data & 0b1111_1111) as u8])
                     }.map_err(|err| {
-                        eprintln!("Failed to write instruction data {:#6x} for {} from {}:{}: {}",
+                        eprintln!("Failed to write instruction data {:#w$x} for {} from {}:{}: {}",
                                   data,
                                   last_instruction.display(&registers),
                                   input_name,
                                   line_number,
-                                  err);
+                                  err,
+                                  w = 2 + data_length as usize * 2);
                         4
                     })?;
             } else {
@@ -100,7 +97,7 @@ fn actual_main() -> Result<(), i32> {
                         eprintln!("{}", err);
                         6
                     })?;
-                data_remaining += last_instruction.data_length();
+                data_remaining = last_instruction.data_length() as u8;
 
                 output.write_all(&[last_instruction.into()])
                     .map_err(|err| {
