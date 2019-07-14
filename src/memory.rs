@@ -15,6 +15,12 @@ impl Memory {
     }
 }
 
+impl Default for Memory {
+    fn default() -> Memory {
+        Memory::new()
+    }
+}
+
 impl Deref for Memory {
     type Target = [u8; 0xFFFF];
 

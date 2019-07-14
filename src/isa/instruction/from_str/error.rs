@@ -144,28 +144,29 @@ fn write_expected<X: Expectable>(expected: &[X], f: &mut fmt::Formatter<'_>) -> 
 
 
 trait Expectable {
-    #[inline(always)]
     fn len(&self) -> usize;
-
-    #[inline(always)]
     fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
 }
 
 impl Expectable for &str {
+    #[inline(always)]
     fn len(&self) -> usize {
         (self as &str).len()
     }
 
+    #[inline(always)]
     fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self)
     }
 }
 
 impl Expectable for char {
+    #[inline(always)]
     fn len(&self) -> usize {
         1
     }
 
+    #[inline(always)]
     fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self)
     }

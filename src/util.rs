@@ -15,7 +15,7 @@ use num_traits::{CheckedShr, PrimInt, Num};
 /// assert_eq!(limit_to_width(0b1010, 3), None);
 /// ```
 pub fn limit_to_width<T: Num + PrimInt + CheckedShr>(number: T, bit_width: u8) -> Option<T> {
-    if number.checked_shr(bit_width.into()).unwrap_or(T::zero()) != T::zero() {
+    if number.checked_shr(bit_width.into()).unwrap_or_else(T::zero) != T::zero() {
         None
     } else {
         Some(number)
@@ -34,7 +34,7 @@ pub fn limit_to_width<T: Num + PrimInt + CheckedShr>(number: T, bit_width: u8) -
 /// ```
 pub fn min_byte_width<T: Num + PrimInt + CheckedShr>(number: T) -> u8 {
     let mut cur_bytes = 1;
-    while number.checked_shr(8 * cur_bytes).unwrap_or(T::zero()) != T::zero() {
+    while number.checked_shr(8 * cur_bytes).unwrap_or_else(T::zero) != T::zero() {
         cur_bytes *= 2;
     }
     cur_bytes as u8

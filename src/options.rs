@@ -122,7 +122,7 @@ impl DisassemblerOptions {
                 f => Some((f.to_string(), fs::canonicalize(f).unwrap())),
             },
             skip: parse_with_prefix(matches.value_of("e").unwrap()).unwrap(),
-            keep: matches.values_of("k").map(|kk| kk.flat_map(parse_keep).collect()).unwrap_or(vec![]),
+            keep: matches.values_of("k").map(|kk| kk.flat_map(parse_keep).collect()).unwrap_or_else(Vec::new),
         }
     }
 }
