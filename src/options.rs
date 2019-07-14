@@ -12,6 +12,7 @@
 //! ```
 
 
+use self::super::isa::GeneralPurposeRegister;
 use self::super::util::parse_with_prefix;
 use clap::{AppSettings, App, Arg};
 use std::path::PathBuf;
@@ -27,7 +28,7 @@ pub struct AssemblerOptions {
     ///
     /// Guaranteed to be non-empty
     ///
-    /// Defaults to `[None]` (stdin)
+    /// Default: `[None]` (stdin)
     pub input: Vec<Option<(String, PathBuf)>>,
     /// File to write the binary to, or `None` for stdout
     ///
@@ -35,6 +36,10 @@ pub struct AssemblerOptions {
     ///
     /// Default: `"a.p8b"`
     pub output: Option<(String, PathBuf)>,
+    /// Custom GP register letters, if specified
+    ///
+    /// Default: `None`
+    pub register_lettters: Option<String>,
 }
 
 /// Representation of the assembler's all configurable values.
@@ -54,6 +59,10 @@ pub struct DisassemblerOptions {
     ///
     /// Default: empty
     pub keep: Vec<(usize, usize)>,
+    /// Custom GP register letters, if specified
+    ///
+    /// Default: `None`
+    pub register_lettters: Option<String>,
 }
 
 
@@ -66,6 +75,8 @@ impl AssemblerOptions {
             .about("Assembler for the pir-8")
             .setting(AppSettings::ColoredHelp)
             .args(&[Arg::from_usage("-o [BINFILE] 'Name of the the binary-file output'").default_value("a.p8b").validator(output_file_validator),
+                    Arg::from_usage("-r [REGISTERS] 'Use the specified general-purpose register bank letters instead of the defaults'")
+                        .validator(register_bank_validator),
                     Arg::from_usage("[ASMFILE]... 'Files to assemble'")
                         .empty_values(false)
                         .validator(|s| if s == "-" {
@@ -89,6 +100,7 @@ impl AssemblerOptions {
                 "-" => None,
                 f => Some(output_file_process(f)),
             },
+            register_lettters: matches.value_of("r").map(str::to_string),
         }
     }
 }
@@ -109,6 +121,8 @@ impl DisassemblerOptions {
                         .use_delimiter(false)
                         .number_of_values(1)
                         .validator(|s| parse_keep(&s).map(|_| ())),
+                    Arg::from_usage("-r [REGISTERS] 'Use the specified general-purpose register bank letters instead of the defaults'")
+                        .validator(register_bank_validator),
                     Arg::from_usage("<FILE> 'Binary to disassemble'").empty_values(false).validator(|s| if s == "-" {
                         Ok(())
                     } else {
@@ -123,6 +137,7 @@ impl DisassemblerOptions {
             },
             skip: parse_with_prefix(matches.value_of("e").unwrap()).unwrap(),
             keep: matches.values_of("k").map(|kk| kk.flat_map(parse_keep).collect()).unwrap_or_else(Vec::new),
+            register_lettters: matches.value_of("r").map(str::to_string),
         }
     }
 }
@@ -154,6 +169,13 @@ fn output_file_validator(s: String) -> Result<(), String> {
             buf.canonicalize().map(|_| ()).map_err(|e| format!("Output file: {}", e))
         }
     }
+}
+
+fn register_bank_validator(s: String) -> Result<(), String> {
+    GeneralPurposeRegister::from_letters(&s).map(|_| ()).map_err(|i| match i {
+        -1 | 8 => format!("Register bank letterset \"{}\" too {}", s, if i == -1 { "short" } else { "long" }),
+        i => format!("Register bank register {:#05b} letter '{}' non-ASCII", i, s.chars().nth(i as usize).unwrap()),
+    })
 }
 
 

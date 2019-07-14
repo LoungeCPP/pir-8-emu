@@ -43,6 +43,14 @@ And so, all of these are equivalent:
 
     Default: "a.p8b"
 
+  -r REGISTER_LETTERS
+
+    Use REGISTER_LETTERS as the letters for the registers
+    in the general-purpose bank instead of the defaults,
+    as specified in the ISA
+
+    Must be 8-ASCII-characters-long
+
 ## Exit values
 
     1 - option parsing error
