@@ -186,6 +186,28 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Executable option parsing and management.</span>
 <span class="doccomment">//!</span>
@@ -201,6 +223,7 @@
 <span class="doccomment">//! ```</span>
 
 
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegister</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>;
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">AppSettings</span>, <span class="ident">App</span>, <span class="ident">Arg</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
@@ -216,7 +239,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Guaranteed to be non-empty</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `[None]` (stdin)</span>
+    <span class="doccomment">/// Default: `[None]` (stdin)</span>
     <span class="kw">pub</span> <span class="ident">input</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">PathBuf</span>)<span class="op">&gt;&gt;</span>,
     <span class="doccomment">/// File to write the binary to, or `None` for stdout</span>
     <span class="doccomment">///</span>
@@ -224,6 +247,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default: `&quot;a.p8b&quot;`</span>
     <span class="kw">pub</span> <span class="ident">output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">PathBuf</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Custom GP register letters, if specified</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default: `None`</span>
+    <span class="kw">pub</span> <span class="ident">register_lettters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Representation of the assembler&#39;s all configurable values.</span>
@@ -243,6 +270,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default: empty</span>
     <span class="kw">pub</span> <span class="ident">keep</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Custom GP register letters, if specified</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default: `None`</span>
+    <span class="kw">pub</span> <span class="ident">register_lettters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 
@@ -255,6 +286,8 @@
             .<span class="ident">about</span>(<span class="string">&quot;Assembler for the pir-8&quot;</span>)
             .<span class="ident">setting</span>(<span class="ident">AppSettings</span>::<span class="ident">ColoredHelp</span>)
             .<span class="ident">args</span>(<span class="kw-2">&amp;</span>[<span class="ident">Arg</span>::<span class="ident">from_usage</span>(<span class="string">&quot;-o [BINFILE] &#39;Name of the the binary-file output&#39;&quot;</span>).<span class="ident">default_value</span>(<span class="string">&quot;a.p8b&quot;</span>).<span class="ident">validator</span>(<span class="ident">output_file_validator</span>),
+                    <span class="ident">Arg</span>::<span class="ident">from_usage</span>(<span class="string">&quot;-r [REGISTERS] &#39;Use the specified general-purpose register bank letters instead of the defaults&#39;&quot;</span>)
+                        .<span class="ident">validator</span>(<span class="ident">register_bank_validator</span>),
                     <span class="ident">Arg</span>::<span class="ident">from_usage</span>(<span class="string">&quot;[ASMFILE]... &#39;Files to assemble&#39;&quot;</span>)
                         .<span class="ident">empty_values</span>(<span class="bool-val">false</span>)
                         .<span class="ident">validator</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;-&quot;</span> {
@@ -278,6 +311,7 @@
                 <span class="string">&quot;-&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                 <span class="ident">f</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">output_file_process</span>(<span class="ident">f</span>)),
             },
+            <span class="ident">register_lettters</span>: <span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;r&quot;</span>).<span class="ident">map</span>(<span class="ident">str</span>::<span class="ident">to_string</span>),
         }
     }
 }
@@ -298,6 +332,8 @@
                         .<span class="ident">use_delimiter</span>(<span class="bool-val">false</span>)
                         .<span class="ident">number_of_values</span>(<span class="number">1</span>)
                         .<span class="ident">validator</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">parse_keep</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())),
+                    <span class="ident">Arg</span>::<span class="ident">from_usage</span>(<span class="string">&quot;-r [REGISTERS] &#39;Use the specified general-purpose register bank letters instead of the defaults&#39;&quot;</span>)
+                        .<span class="ident">validator</span>(<span class="ident">register_bank_validator</span>),
                     <span class="ident">Arg</span>::<span class="ident">from_usage</span>(<span class="string">&quot;&lt;FILE&gt; &#39;Binary to disassemble&#39;&quot;</span>).<span class="ident">empty_values</span>(<span class="bool-val">false</span>).<span class="ident">validator</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;-&quot;</span> {
                         <span class="prelude-val">Ok</span>(())
                     } <span class="kw">else</span> {
@@ -312,6 +348,7 @@
             },
             <span class="ident">skip</span>: <span class="ident">parse_with_prefix</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;e&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>(),
             <span class="ident">keep</span>: <span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;k&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">kk</span><span class="op">|</span> <span class="ident">kk</span>.<span class="ident">flat_map</span>(<span class="ident">parse_keep</span>).<span class="ident">collect</span>()).<span class="ident">unwrap_or_else</span>(<span class="ident">Vec</span>::<span class="ident">new</span>),
+            <span class="ident">register_lettters</span>: <span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;r&quot;</span>).<span class="ident">map</span>(<span class="ident">str</span>::<span class="ident">to_string</span>),
         }
     }
 }
@@ -343,6 +380,13 @@
             <span class="ident">buf</span>.<span class="ident">canonicalize</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Output file: {}&quot;</span>, <span class="ident">e</span>))
         }
     }
+}
+
+<span class="kw">fn</span> <span class="ident">register_bank_validator</span>(<span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="ident">GeneralPurposeRegister</span>::<span class="ident">from_letters</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">i</span> {
+        <span class="op">-</span><span class="number">1</span> <span class="op">|</span> <span class="number">8</span> <span class="op">=&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Register bank letterset \&quot;{}\&quot; too {}&quot;</span>, <span class="ident">s</span>, <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> { <span class="string">&quot;short&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;long&quot;</span> }),
+        <span class="ident">i</span> <span class="op">=&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Register bank register {:#05b} letter &#39;{}&#39; non-ASCII&quot;</span>, <span class="ident">i</span>, <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">nth</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap</span>()),
+    })
 }
 
 
