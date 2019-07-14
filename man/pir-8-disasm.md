@@ -11,6 +11,17 @@ Disassembler for the pir-8.
 
 Specified input file (or "-" for stdin) is disassembled into stdout.
 
+The output consists of four columns:
+
+  * The leftmost 8 characters specify the address of the data in the input file,
+  * The next 4 are the raw data, as read, right-aligned if the data is 1-byte wide,
+  * The 1 character that follows functions as a status indicator, it can either be:
+
+    - empty, if the data is an instruction,
+    - an exclamation mark (!), if the instruction is invalid (reserved),
+    - D, if the data is instruction data, or
+    - S, if the line is a skip (-k) information
+
 ## OPTIONS
 
   -e BYTES

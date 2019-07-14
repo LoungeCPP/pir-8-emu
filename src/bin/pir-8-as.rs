@@ -61,8 +61,8 @@ fn actual_main() -> Result<(), i32> {
                 let data: u16 = pir_8_emu::util::parse_with_prefix(line).and_then(|data| pir_8_emu::util::limit_to_width(data, data_remaining * 8))
                     .ok_or_else(|| {
                         eprintln!("Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:",
-                                  data_remaining,
                                   last_instruction.display(&registers),
+                                  data_remaining,
                                   input_name,
                                   line_number);
                         eprintln!("{}", line_orig);

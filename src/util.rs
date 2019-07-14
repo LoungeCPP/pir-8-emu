@@ -50,6 +50,8 @@ pub fn min_byte_width<T: Num + PrimInt + CheckedShr>(number: T) -> u8 {
 /// assert_eq!(parse_with_prefix::<u16>("0o0420"), Some(0o0420));
 /// assert_eq!(parse_with_prefix::<u16>("0B0101"), Some(0b0101));
 ///
+/// assert_eq!(parse_with_prefix::<u16>("0b1010_0101"), Some(0b1010_0101));
+///
 /// assert_eq!(parse_with_prefix::<u16>("0"), Some(0));
 ///
 /// assert_eq!(parse_with_prefix::<u16>("0x2OOM"), None);
@@ -69,7 +71,11 @@ pub fn parse_with_prefix<T: Num + PrimInt>(from: &str) -> Option<T> {
         (10, 0)
     };
 
-    T::from_str_radix(&from[depth..], radix).ok()
+    if from.contains('_') {
+            T::from_str_radix(&from[depth..].replace('_', ""), radix).ok()
+        } else {
+            T::from_str_radix(&from[depth..], radix).ok()
+        }
 }
 
 /// Strip off all data starting with the specified character, if exists
