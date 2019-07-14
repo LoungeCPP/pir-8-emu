@@ -1,2 +1,3 @@
-pir-8-as(1)   pir-8-as.1.ronn
-pir-8-emu(1)  pir-8-emu.1.ronn
+pir-8-as(1)      pir-8-as.1.ronn
+pir-8-disasm(1)  pir-8-disasm.1.ronn
+pir-8-emu(1)     pir-8-emu.1.ronn

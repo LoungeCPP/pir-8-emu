@@ -15,7 +15,7 @@ The comment characer is ";".
 
 ## OPTIONS
 
-  -o [BINFILE]
+  -o BINFILE
 
     Name of the the binary-file output, or "-" for stdout
 

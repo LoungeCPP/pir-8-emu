@@ -1,0 +1,153 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "PIR\-8\-DISASM" "1" "July 2019" "Lounge<C++>" ""
+.
+.SH "NAME"
+\fBpir\-8\-disasm\fR \- Disassembler for the pir\-8
+.
+.SH "SYNOPSIS"
+\fBpir\-8\-disasm\fR \fIOPTIONS\fR \fIFILE\fR
+.
+.SH "DESCRIPTION"
+Disassembler for the pir\-8\.
+.
+.P
+Specified input file (or "\-" for stdin) is disassembled into stdout\.
+.
+.SH "OPTIONS"
+\-e BYTES
+.
+.IP "" 4
+.
+.nf
+
+Skip BYTES bytes of header
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\-k START,BYTES\.\.\.
+.
+.IP "" 4
+.
+.nf
+
+Don\'t disassemble BYTES bytes from position START
+
+Can be specified multiple times
+.
+.fi
+.
+.IP "" 0
+.
+.SH "Exit values"
+.
+.nf
+
+1 \- option parsing error
+2 \- output file creation failure
+3 \- input file opening failure
+4 \- output write failure
+5 \- input read failure
+6 \- instruction parse error
+7 \- instruction data parse error
+.
+.fi
+.
+.SH "EXAMPLES"
+\fBpir\-8\-disasm test\-data/xor\-swap\-with\-loads\.p8b\fR
+.
+.IP "" 4
+.
+.nf
+
+00000000   24   LOAD IND A
+00000002 0110 D 0x0110
+00000003   1D   LOAD IMM B
+00000004   69 D 0x69
+00000005   62   MOVE A X
+00000006   6B   MOVE B Y
+00000007   35   ALU XOR
+00000008   4C   MOVE S A
+00000009   63   MOVE A Y
+0000000A   6A   MOVE B X
+0000000B   35   ALU XOR
+0000000C   4D   MOVE S B
+0000000D   62   MOVE A X
+0000000E   6B   MOVE B Y
+0000000F   35   ALU XOR
+00000010   4C   MOVE S A
+00000011   FF   HALT
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBpir\-8\-disasm \-e 3 test\-data/xor\-swap\-with\-loads\.p8b\fR
+.
+.IP "" 4
+.
+.nf
+
+00000000   1D   LOAD IMM B
+00000001   69 D 0x69
+00000002   62   MOVE A X
+00000003   6B   MOVE B Y
+00000004   35   ALU XOR
+00000005   4C   MOVE S A
+00000006   63   MOVE A Y
+00000007   6A   MOVE B X
+00000008   35   ALU XOR
+00000009   4D   MOVE S B
+0000000A   62   MOVE A X
+0000000B   6B   MOVE B Y
+0000000C   35   ALU XOR
+0000000D   4C   MOVE S A
+0000000E   FF   HALT
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBpir\-8\-disasm \-k 1,7 test\-data/xor\-swap\-with\-loads\.p8b\fR
+.
+.IP "" 4
+.
+.nf
+
+00000000   24   LOAD IND A
+00000002 0110 D 0x0110
+00000003   1D   LOAD IMM B
+00000004   69 D 0x69
+00000005   62   MOVE A X
+00000006   6B   MOVE B Y
+00000007   35   ALU XOR
+00000008        skipping 0x07 bytes
+00000010   4C   MOVE S A
+00000011   FF   HALT
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "SPECIAL THANKS"
+To all who support further development, in particular:
+.
+.IP "\(bu" 4
+ThePhD
+.
+.IP "" 0
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/LoungeCPP/pir\-8\-emu/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/LoungeCPP/pir\-8\-emu\fR>
