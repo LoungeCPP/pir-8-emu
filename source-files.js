@@ -6,6 +6,7 @@ sourcesIndex["clap"] = {"name":"","dirs":[{"name":"app","files":["help.rs","meta
 sourcesIndex["libc"] = {"name":"","dirs":[{"name":"unix","dirs":[{"name":"linux_like","dirs":[{"name":"linux","dirs":[{"name":"gnu","dirs":[{"name":"b64","dirs":[{"name":"x86_64","files":["mod.rs","not_x32.rs"]}],"files":["mod.rs"]}],"files":["align.rs","mod.rs"]}],"files":["align.rs","mod.rs"]}],"files":["mod.rs"]}],"files":["align.rs","mod.rs"]}],"files":["fixed_width_ints.rs","lib.rs","macros.rs"]};
 sourcesIndex["num_traits"] = {"name":"","dirs":[{"name":"ops","files":["checked.rs","inv.rs","mod.rs","mul_add.rs","saturating.rs","wrapping.rs"]}],"files":["bounds.rs","cast.rs","float.rs","identities.rs","int.rs","lib.rs","macros.rs","pow.rs","real.rs","sign.rs"]};
 sourcesIndex["pir_8_as"] = {"name":"","files":["pir-8-as.rs"]};
+sourcesIndex["pir_8_disasm"] = {"name":"","files":["pir-8-disasm.rs"]};
 sourcesIndex["pir_8_emu"] = {"name":"","dirs":[{"name":"isa","dirs":[{"name":"instruction","dirs":[{"name":"from_str","files":["error.rs","implementation.rs","mod.rs"]}],"files":["display.rs","instruction.rs","mod.rs"]},{"name":"register","files":["general.rs","mod.rs","special.rs"]}],"files":["mod.rs"]}],"files":["cpu.rs","lib.rs","memory.rs","options.rs","util.rs"]};
 sourcesIndex["strsim"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["textwrap"] = {"name":"","files":["indentation.rs","lib.rs","splitting.rs"]};
