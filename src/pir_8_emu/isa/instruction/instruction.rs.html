@@ -556,6 +556,7 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
+<span id="559">559</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -708,6 +709,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=&gt;</span> <span class="number">1</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { .. } <span class="op">|</span>
+            <span class="ident">Instruction</span>::<span class="ident">Jump</span>(..) <span class="op">|</span>
             <span class="ident">Instruction</span>::<span class="ident">Save</span> { .. } <span class="op">=&gt;</span> <span class="number">2</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="number">0</span>,
         }

@@ -196,7 +196,7 @@
                         <span class="number">7</span>
                     })<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">data_length</span> <span class="op">=</span> <span class="ident">pir_8_emu</span>::<span class="ident">util</span>::<span class="ident">min_byte_width</span>(<span class="ident">data</span>);
+                <span class="kw">let</span> <span class="ident">data_length</span> <span class="op">=</span> <span class="ident">data_remaining</span>; <span class="comment">// pir_8_emu::util::min_byte_width(data) doesn&#39;t handle, e.g. JUMP 0x0000</span>
                 <span class="ident">data_remaining</span> <span class="op">-=</span> <span class="ident">data_length</span>;
 
                 <span class="kw">if</span> <span class="ident">data_length</span> <span class="op">==</span> <span class="number">1</span> {
