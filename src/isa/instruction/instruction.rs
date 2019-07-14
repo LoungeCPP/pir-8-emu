@@ -149,6 +149,7 @@ impl Instruction {
         match self {
             Instruction::LoadImmediate { .. } => 1,
             Instruction::LoadIndirect { .. } |
+            Instruction::Jump(..) |
             Instruction::Save { .. } => 2,
             _ => 0,
         }

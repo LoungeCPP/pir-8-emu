@@ -12,7 +12,7 @@ fn jump() {
                    InstructionJumpCondition::Jmzl,
                    InstructionJumpCondition::Jmpl,
                    InstructionJumpCondition::Jump] {
-        assert_eq!(Instruction::Jump(cond).data_length(), 0);
+        assert_eq!(Instruction::Jump(cond).data_length(), 2);
     }
 }
 
