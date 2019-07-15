@@ -9,6 +9,7 @@
 <span id="9"> 9</span>
 <span id="10">10</span>
 <span id="11">11</span>
+<span id="12">12</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! An instruction is a single byte, and can include some following immediate values purely for data.</span>
 
@@ -16,6 +17,7 @@
 <span class="kw">mod</span> <span class="ident">instruction</span>;
 <span class="kw">mod</span> <span class="ident">from_str</span>;
 <span class="kw">mod</span> <span class="ident">display</span>;
+<span class="kw">mod</span> <span class="ident">execute</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">instruction</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">InstructionStckRegisterPair</span>, <span class="ident">InstructionJumpCondition</span>,
                             <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};

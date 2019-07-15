@@ -557,6 +557,34 @@
 <span id="557">557</span>
 <span id="558">558</span>
 <span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -1001,6 +1029,34 @@
             <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
         }
+    }
+
+    <span class="doccomment">/// Perform the ALU operation on the specified operands</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `0` and sets carry for reserved ops.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};</span>
+    <span class="doccomment">/// assert_eq!(AluOperation::Or.perform(0b0001, 0b0100, &amp;mut false), 0b0101);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut carry = true;</span>
+    <span class="doccomment">/// assert_eq!(AluOperation::ShiftOrRotate {</span>
+    <span class="doccomment">///                d: AluOperationShiftOrRotateDirection::Left,</span>
+    <span class="doccomment">///                tt: AluOperationShiftOrRotateType::Rtc,</span>
+    <span class="doccomment">///            }.perform(0b0101_0000, 0, &amp;mut carry),</span>
+    <span class="doccomment">///            0b1010_0001);</span>
+    <span class="doccomment">/// assert_eq!(carry, false);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut carry = false;</span>
+    <span class="doccomment">/// assert_eq!(AluOperation::Add.perform(0b1001_0000, 0b1010_0101, &amp;mut carry),</span>
+    <span class="doccomment">///            0b0011_0101);</span>
+    <span class="doccomment">/// assert_eq!(carry, true);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="self">self</span>.<span class="ident">perform_impl</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>)
     }
 }
 
