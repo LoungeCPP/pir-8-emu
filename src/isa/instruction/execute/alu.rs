@@ -1,4 +1,4 @@
-use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};
+use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};
 
 
 impl AluOperation {

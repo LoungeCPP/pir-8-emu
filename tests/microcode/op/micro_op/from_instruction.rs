@@ -147,7 +147,11 @@ fn port_out() {
 #[test]
 fn comp() {
     single_register(|aaa| Instruction::Comp { aaa: aaa }, |aaa| {
-        vec![MicroOp::ReadRegister(S_REGISTER_ADDRESS), MicroOp::ReadRegister(aaa), MicroOp::Compare, MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS)]
+        vec![MicroOp::ReadRegister(S_REGISTER_ADDRESS),
+             MicroOp::ReadRegister(aaa),
+             MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
+             MicroOp::Compare,
+             MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS)]
     });
 }
 

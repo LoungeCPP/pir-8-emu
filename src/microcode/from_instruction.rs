@@ -140,11 +140,11 @@ impl MicroOp {
                 ([// forcebreak
                   MicroOp::ReadRegister(S_REGISTER_ADDRESS),
                   MicroOp::ReadRegister(aaa),
+                  MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
                   MicroOp::Compare,
                   MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),
-                  MicroOp::Nop,
                   MicroOp::Nop],
-                 4)
+                 5)
             }
 
             Instruction::Stck { d: InstructionStckDirection::Push, r } => {

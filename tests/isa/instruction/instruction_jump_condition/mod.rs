@@ -2,6 +2,7 @@ use pir_8_emu::isa::instruction::InstructionJumpCondition;
 use std::convert::TryFrom;
 
 
+mod is_satisfied;
 mod serialise;
 mod parse_ok;
 mod display;
