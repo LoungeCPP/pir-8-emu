@@ -65,8 +65,8 @@
 <span class="doccomment">/// bytes are individually pushed and popped onto the μstack (separate from the actual program stack),</span>
 <span class="doccomment">/// and there is no other storage.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Each high-level instruction deconstructs losslessly into up to five μOps,</span>
-<span class="doccomment">/// with the exception of reserved instructions, which are converted into 5 NOPs.</span>
+<span class="doccomment">/// Each high-level instruction deconstructs losslessly into up to six μOps,</span>
+<span class="doccomment">/// with the exception of reserved instructions, which are converted into 6 NOPs.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MicroOp</span> {
     <span class="doccomment">/// Do nothing</span>
