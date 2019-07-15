@@ -12,6 +12,13 @@ const C_REGISTER_ADDRESS: u8 = 0b110;
 const D_REGISTER_ADDRESS: u8 = 0b111;
 
 
+/// `[MicroOp; N]` typedef, where `N` is *not* to be relied upon
+///
+/// Use this type for storing values returned by [`MicroOp::from_instruction()`](enum.MicroOp.html#fn.from_instruction) instead of
+/// any fixed-size array, as the size of this is not part of the stable API and subject to change without notice.
+pub type MicroOpBlock = [MicroOp; 6];
+
+
 impl MicroOp {
     /// Get μOps corresponding to the given instruction
     ///
@@ -28,7 +35,7 @@ impl MicroOp {
     ///
     /// assert_eq!(ops, &[MicroOp::ReadRegister(0b100), MicroOp::WriteRegister(0b101)]);
     /// ```
-    pub fn from_instruction(instr: Instruction) -> ([MicroOp; 5], usize) {
+    pub fn from_instruction(instr: Instruction) -> (MicroOpBlock, usize) {
         match instr {
             Instruction::Reserved(_) |
             Instruction::Alu(AluOperation::Reserved(_)) => {
@@ -37,8 +44,9 @@ impl MicroOp {
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
+                  MicroOp::Nop,
                   MicroOp::Nop],
-                 5)
+                 6)
             }
 
             Instruction::Jump(cond) => {
@@ -47,7 +55,8 @@ impl MicroOp {
                   MicroOp::LoadImmediate,
                   MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
                   MicroOp::CheckJumpCondition(cond),
-                  MicroOp::Jump],
+                  MicroOp::Jump,
+                  MicroOp::Nop],
                  5)
             }
 
@@ -55,6 +64,7 @@ impl MicroOp {
                 ([// forcebreak
                   MicroOp::LoadImmediate,
                   MicroOp::WriteRegister(aaa),
+                  MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop],
@@ -67,6 +77,7 @@ impl MicroOp {
                   MicroOp::LoadImmediate,
                   MicroOp::FetchAddress,
                   MicroOp::WriteRegister(aaa),
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  4)
             }
@@ -77,6 +88,7 @@ impl MicroOp {
                   MicroOp::LoadImmediate,
                   MicroOp::LoadImmediate,
                   MicroOp::WriteAddress,
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  4)
             }
@@ -85,16 +97,18 @@ impl MicroOp {
                 ([// forcebreak
                   MicroOp::ReadRegister(X_REGISTER_ADDRESS),
                   MicroOp::ReadRegister(Y_REGISTER_ADDRESS),
+                  MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
                   MicroOp::Alu(op),
-                  MicroOp::WriteRegister(S_REGISTER_ADDRESS),
-                  MicroOp::Nop],
-                 4)
+                  MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),
+                  MicroOp::WriteRegister(S_REGISTER_ADDRESS)],
+                 6)
             }
 
             Instruction::Move { aaa, bbb } => {
                 ([// forcebreak
                   MicroOp::ReadRegister(aaa),
                   MicroOp::WriteRegister(bbb),
+                  MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop],
@@ -107,6 +121,7 @@ impl MicroOp {
                   MicroOp::PortIn,
                   MicroOp::WriteRegister(aaa),
                   MicroOp::Nop,
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  3)
             }
@@ -115,6 +130,7 @@ impl MicroOp {
                   MicroOp::ReadRegister(aaa),
                   MicroOp::ReadRegister(A_REGISTER_ADDRESS),
                   MicroOp::PortOut,
+                  MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop],
                  3)
@@ -126,6 +142,7 @@ impl MicroOp {
                   MicroOp::ReadRegister(aaa),
                   MicroOp::Compare,
                   MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  4)
             }
@@ -138,6 +155,7 @@ impl MicroOp {
                   MicroOp::StackPush,
                   MicroOp::ReadRegister(s),
                   MicroOp::StackPush,
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  4)
             }
@@ -149,6 +167,7 @@ impl MicroOp {
                   MicroOp::WriteRegister(s),
                   MicroOp::StackPop,
                   MicroOp::WriteRegister(f),
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  4)
             }
@@ -159,6 +178,7 @@ impl MicroOp {
                   MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),
                   MicroOp::Nop,
                   MicroOp::Nop,
+                  MicroOp::Nop,
                   MicroOp::Nop],
                  2)
             }
@@ -166,6 +186,7 @@ impl MicroOp {
             Instruction::Halt => {
                 ([// forcebreak
                   MicroOp::Halt,
+                  MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,

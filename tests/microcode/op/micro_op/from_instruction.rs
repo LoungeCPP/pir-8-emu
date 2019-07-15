@@ -91,14 +91,7 @@ fn alu_reserved_block_1() {
 #[test]
 fn alu() {
     for &op in &[AluOperation::Add, AluOperation::Sub, AluOperation::Not, AluOperation::Or, AluOperation::Xor, AluOperation::And] {
-        let ops = MicroOp::from_instruction(Instruction::Alu(op));
-        let ops = &ops.0[..ops.1];
-
-        assert_eq!(ops,
-                   &[MicroOp::ReadRegister(X_REGISTER_ADDRESS),
-                     MicroOp::ReadRegister(Y_REGISTER_ADDRESS),
-                     MicroOp::Alu(op),
-                     MicroOp::WriteRegister(S_REGISTER_ADDRESS)]);
+        alu_impl(op);
     }
 }
 
@@ -109,16 +102,7 @@ fn alu_sor() {
                      AluOperationShiftOrRotateType::Asf,
                      AluOperationShiftOrRotateType::Rtc,
                      AluOperationShiftOrRotateType::Rtw] {
-            let op = AluOperation::ShiftOrRotate { d: d, tt: tt };
-
-            let ops = MicroOp::from_instruction(Instruction::Alu(op));
-            let ops = &ops.0[..ops.1];
-
-            assert_eq!(ops,
-                       &[MicroOp::ReadRegister(X_REGISTER_ADDRESS),
-                         MicroOp::ReadRegister(Y_REGISTER_ADDRESS),
-                         MicroOp::Alu(op),
-                         MicroOp::WriteRegister(S_REGISTER_ADDRESS)]);
+            alu_impl(AluOperation::ShiftOrRotate { d: d, tt: tt });
         }
     }
 }
@@ -229,7 +213,7 @@ fn halt() {
 
 
 fn single_register(instr: fn(u8) -> Instruction, wops: fn(u8) -> Vec<MicroOp>) {
-    for aaa in 0..0b111 {
+    for aaa in 0..=0b111 {
         let ops = MicroOp::from_instruction(instr(aaa));
         let ops = &ops.0[..ops.1];
 
@@ -242,4 +226,17 @@ fn reserved_block(base: u8, max: u8, instr: fn(u8) -> Instruction) {
         let raw = base | i;
         assert_eq!(instr(raw).data_length(), 0);
     }
+}
+
+fn alu_impl(op: AluOperation) {
+    let ops = MicroOp::from_instruction(Instruction::Alu(op));
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::ReadRegister(X_REGISTER_ADDRESS),
+                 MicroOp::ReadRegister(Y_REGISTER_ADDRESS),
+                 MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
+                 MicroOp::Alu(op),
+                 MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),
+                 MicroOp::WriteRegister(S_REGISTER_ADDRESS)]);
 }

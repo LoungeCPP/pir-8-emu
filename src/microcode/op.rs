@@ -7,8 +7,8 @@ use self::super::super::isa::instruction::{InstructionJumpCondition, AluOperatio
 /// bytes are individually pushed and popped onto the μstack (separate from the actual program stack),
 /// and there is no other storage.
 ///
-/// Each high-level instruction deconstructs losslessly into up to five μOps,
-/// with the exception of reserved instructions, which are converted into 5 NOPs.
+/// Each high-level instruction deconstructs losslessly into up to six μOps,
+/// with the exception of reserved instructions, which are converted into 6 NOPs.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MicroOp {
     /// Do nothing
