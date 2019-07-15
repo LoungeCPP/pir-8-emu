@@ -442,6 +442,34 @@ impl AluOperation {
             _ => true,
         }
     }
+
+    /// Perform the ALU operation on the specified operands
+    ///
+    /// Returns `0` and sets carry for reserved ops.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};
+    /// assert_eq!(AluOperation::Or.perform(0b0001, 0b0100, &mut false), 0b0101);
+    ///
+    /// let mut carry = true;
+    /// assert_eq!(AluOperation::ShiftOrRotate {
+    ///                d: AluOperationShiftOrRotateDirection::Left,
+    ///                tt: AluOperationShiftOrRotateType::Rtc,
+    ///            }.perform(0b0101_0000, 0, &mut carry),
+    ///            0b1010_0001);
+    /// assert_eq!(carry, false);
+    ///
+    /// let mut carry = false;
+    /// assert_eq!(AluOperation::Add.perform(0b1001_0000, 0b1010_0101, &mut carry),
+    ///            0b0011_0101);
+    /// assert_eq!(carry, true);
+    /// ```
+    #[inline]
+    pub fn perform(&self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
+        self.perform_impl(lhs, rhs, carry)
+    }
 }
 
 impl TryFrom<u8> for AluOperation {

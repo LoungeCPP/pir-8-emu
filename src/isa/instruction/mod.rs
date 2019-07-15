@@ -4,6 +4,7 @@
 mod instruction;
 mod from_str;
 mod display;
+mod execute;
 
 pub use self::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
                             InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
