@@ -46,7 +46,7 @@ impl MicroOp {
     /// assert_eq!(stack, &[0x69]);
     /// ```
     pub fn execute(&self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
-                   pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, _adr: &mut SpecialPurposeRegister<u16>)
+                   pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, adr: &mut SpecialPurposeRegister<u16>)
                    -> Result<bool, MicrocodeExecutionError> {
         match *self {
             MicroOp::Nop => {}
@@ -56,10 +56,12 @@ impl MicroOp {
                 let byte = stack.pop().ok_or(MicrocodeExecutionError::MicrostackUnderflow)?;
 
                 **sp = sp.checked_add(1).ok_or(MicrocodeExecutionError::StackOverflow)?;
-                memory[**sp as usize] = byte;
+                **adr = **sp;
+                memory[**adr as usize] = byte;
             }
             MicroOp::StackPop => {
-                let byte = memory[**sp as usize];
+                **adr = **sp;
+                let byte = memory[**adr as usize];
                 **sp = sp.checked_sub(1).ok_or(MicrocodeExecutionError::StackUnderflow)?;
 
                 stack.push(byte);
@@ -110,7 +112,8 @@ impl MicroOp {
 
             MicroOp::MakeImmediate(b) => stack.push(b),
             MicroOp::LoadImmediate => {
-                let byte = memory[**pc as usize];
+                **adr = **pc;
+                let byte = memory[**adr as usize];
                 **pc = pc.checked_add(1).ok_or(MicrocodeExecutionError::ProgramOverflow)?;
 
                 stack.push(byte);
@@ -119,7 +122,8 @@ impl MicroOp {
             MicroOp::FetchAddress => {
                 let address = pop_address(stack)?;
 
-                let byte = memory[address as usize];
+                **adr = address;
+                let byte = memory[**adr as usize];
 
                 stack.push(byte);
             }
@@ -127,7 +131,8 @@ impl MicroOp {
                 let address = pop_address(stack)?;
                 let byte = stack.pop().ok_or(MicrocodeExecutionError::MicrostackUnderflow)?;
 
-                memory[address as usize] = byte;
+                **adr = address;
+                memory[**adr as usize] = byte;
             }
 
             MicroOp::CheckJumpCondition(cond) => {

@@ -16,6 +16,7 @@ fn load_immediate() {
                Err(MicrocodeExecutionError::ProgramOverflow));
 
     *uni_orig.3 = addr;
+    *uni_orig.5 = addr;
 
     assert_eq!(memory, uni_orig.0);
     assert_eq!(ports, uni_orig.1);
