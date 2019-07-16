@@ -56,8 +56,39 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionJumpCondition</span>, <span class="ident">AluOperation</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">DisplayMicroOp</span>;
 
 
 <span class="doccomment">/// Actual μOps executable by the CPU</span>
@@ -114,6 +145,33 @@
     <span class="ident">ReadRegister</span>(<span class="ident">u8</span>),
     <span class="doccomment">/// Write the top of the μstack to the specified register.</span>
     <span class="ident">WriteRegister</span>(<span class="ident">u8</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">MicroOp</span> {
+    <span class="doccomment">/// Get proxy object implementing `Display` for printing μOps in human-readable format</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{InstructionJumpCondition, AluOperation};</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::GeneralPurposeRegister;</span>
+    <span class="doccomment">/// # use pir_8_emu::microcode::MicroOp;</span>
+    <span class="doccomment">/// # let registers = GeneralPurposeRegister::defaults();</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::WriteRegister(registers[1].address()).display(&amp;registers).to_string(),</span>
+    <span class="doccomment">///            &quot;WriteRegister S&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::Alu(AluOperation::Or).display(&amp;registers).to_string(),</span>
+    <span class="doccomment">///            &quot;Alu OR&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpz).display(&amp;registers).to_string(),</span>
+    <span class="doccomment">///            &quot;CheckJumpCondition JMPZ&quot;);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;s</span>: <span class="lifetime">&#39;r</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="self">self</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">GeneralPurposeRegisterBank</span>) <span class="op">-&gt;</span> <span class="ident">DisplayMicroOp</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
+        <span class="ident">DisplayMicroOp</span> {
+            <span class="ident">op</span>: <span class="self">self</span>,
+            <span class="ident">registers</span>: <span class="ident">registers</span>,
+        }
+    }
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
