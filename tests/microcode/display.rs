@@ -82,7 +82,7 @@ fn compare() {
 #[test]
 fn make_immediate() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        for i in 0..0xFF {
+        for i in 0..=0xFF {
             assert_eq!(MicroOp::MakeImmediate(i).display(regs).to_string(), format!("MakeImmediate {:#04x}", i));
         }
     }

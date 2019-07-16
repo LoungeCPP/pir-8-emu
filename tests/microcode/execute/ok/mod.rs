@@ -213,12 +213,12 @@ fn load_immediate() {
 
             let mut stack = vec![];
             *pc = addr;
-            memory[addr as usize + 1] = i;
+            memory[addr as usize] = i;
 
             assert_eq!(MicroOp::LoadImmediate.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
                        Ok(true));
 
-            uni_orig.0[addr as usize + 1] = i;
+            uni_orig.0[addr as usize] = i;
             *uni_orig.3 = addr + 1;
 
             assert_eq!(memory, uni_orig.0);

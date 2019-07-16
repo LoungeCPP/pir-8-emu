@@ -110,8 +110,8 @@ impl MicroOp {
 
             MicroOp::MakeImmediate(b) => stack.push(b),
             MicroOp::LoadImmediate => {
-                **pc = pc.checked_add(1).ok_or(MicrocodeExecutionError::ProgramOverflow)?;
                 let byte = memory[**pc as usize];
+                **pc = pc.checked_add(1).ok_or(MicrocodeExecutionError::ProgramOverflow)?;
 
                 stack.push(byte);
             }
