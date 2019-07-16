@@ -1,4 +1,6 @@
 use self::super::super::isa::instruction::{InstructionJumpCondition, AluOperation};
+use self::super::super::isa::GeneralPurposeRegisterBank;
+use self::super::DisplayMicroOp;
 
 
 /// Actual μOps executable by the CPU
@@ -55,4 +57,31 @@ pub enum MicroOp {
     ReadRegister(u8),
     /// Write the top of the μstack to the specified register.
     WriteRegister(u8),
+}
+
+impl MicroOp {
+    /// Get proxy object implementing `Display` for printing μOps in human-readable format
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::instruction::{InstructionJumpCondition, AluOperation};
+    /// # use pir_8_emu::isa::GeneralPurposeRegister;
+    /// # use pir_8_emu::microcode::MicroOp;
+    /// # let registers = GeneralPurposeRegister::defaults();
+    /// assert_eq!(MicroOp::WriteRegister(registers[1].address()).display(&registers).to_string(),
+    ///            "WriteRegister S");
+    ///
+    /// assert_eq!(MicroOp::Alu(AluOperation::Or).display(&registers).to_string(),
+    ///            "Alu OR");
+    ///
+    /// assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpz).display(&registers).to_string(),
+    ///            "CheckJumpCondition JMPZ");
+    /// ```
+    pub fn display<'r, 's: 'r>(&'s self, registers: &'r GeneralPurposeRegisterBank) -> DisplayMicroOp<'r> {
+        DisplayMicroOp {
+            op: self,
+            registers: registers,
+        }
+    }
 }
