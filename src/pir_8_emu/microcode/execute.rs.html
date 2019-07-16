@@ -154,6 +154,28 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">MicrocodeExecutionError</span>, <span class="ident">MicroOp</span>};
@@ -180,6 +202,28 @@
 
 
 <span class="kw">impl</span> <span class="ident">MicroOp</span> {
+    <span class="doccomment">/// Execute this μOp</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `Ok(..)` return value indicates whether to continue execution (i.e. not halt)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};</span>
+    <span class="doccomment">/// # use pir_8_emu::microcode::MicroOp;</span>
+    <span class="doccomment">/// # use pir_8_emu::{Memory, Ports};</span>
+    <span class="doccomment">/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =</span>
+    <span class="doccomment">/// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),</span>
+    <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Program Counter&quot;, &quot;PC&quot;), SpecialPurposeRegister::new(&quot;Stack Pointer&quot;, &quot;SP&quot;),</span>
+    <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;));</span>
+    <span class="doccomment">/// memory[0x1A00] = 0x69;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut stack = vec![0x1A, 0x00];</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::FetchAddress.execute(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
+    <span class="doccomment">///                                          &amp;mut pc, &amp;mut sp, &amp;mut adr),</span>
+    <span class="doccomment">///            Ok(true));</span>
+    <span class="doccomment">/// assert_eq!(stack, &amp;[0x69]);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">memory</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Memory</span>, <span class="ident">ports</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ports</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GeneralPurposeRegisterBank</span>,
                    <span class="ident">pc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">sp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">_adr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>)
                    <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">MicrocodeExecutionError</span><span class="op">&gt;</span> {
@@ -236,8 +280,8 @@
                 <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicrocodeExecutionError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">FLAG_CLEARFLAGS_MASK_COMP</span>)                   <span class="op">|</span>
-                            (<span class="kw">if</span> <span class="ident">lhs</span> <span class="op">==</span> <span class="ident">rhs</span> { <span class="ident">FLAG_MASK_EQUALS</span> } <span class="kw">else</span> { <span class="number">0b00000</span> }) <span class="op">|</span> <span class="comment">// forcebreak</span>
-                            (<span class="kw">if</span> <span class="ident">lhs</span> <span class="op">&gt;</span> <span class="ident">rhs</span> { <span class="ident">FLAG_MASK_GREATER</span> } <span class="kw">else</span> { <span class="number">0b00000</span> }) <span class="op">|</span>
+                            (<span class="kw">if</span> <span class="ident">lhs</span> <span class="op">==</span> <span class="ident">rhs</span> { <span class="ident">FLAG_MASK_EQUALS</span> } <span class="kw">else</span> { <span class="number">0b00000</span> }) <span class="op">|</span>
+                            (<span class="kw">if</span> <span class="ident">lhs</span> <span class="op">&gt;</span> <span class="ident">rhs</span> { <span class="ident">FLAG_MASK_GREATER</span> } <span class="kw">else</span> { <span class="number">0b00000</span> }) <span class="op">|</span> <span class="comment">// forcebreak</span>
                             <span class="ident">s_reg_flags</span>(<span class="ident">lhs</span>);
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">flags</span>);
