@@ -11,7 +11,7 @@ fn microstack_underflow() {
 
 #[test]
 fn invalid_microstack_top() {
-    for top in 0..0xFF {
+    for top in 0..=0xFF {
         assert_eq!(MicrocodeExecutionError::InvalidMicrostackTop(top, EXPECTED).to_string(),
                    format!("Invalid top of the μstack: {:#04x}, expected any of: 0x00, 0x01, 0x02, 0x03, 0x04", top));
     }

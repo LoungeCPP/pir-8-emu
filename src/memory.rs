@@ -123,5 +123,5 @@ macro_rules! wrapper {
 }
 
 
-wrapper!(Memory, 0xFFFF, "64KiB", "");
-wrapper!(Ports,  0xFF,   "256B",  " for I/O ports");
+wrapper!(Memory, 0xFFFF + 1, "64KiB", "");
+wrapper!(Ports,  0xFF   + 1, "256B",  " for I/O ports");
