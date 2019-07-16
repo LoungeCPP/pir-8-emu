@@ -55,6 +55,7 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
+<span id="58">58</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionJumpCondition</span>, <span class="ident">AluOperation</span>};
 
@@ -104,8 +105,9 @@
 
     <span class="doccomment">/// Check if the specified jump condition is satisfied by the top of the μstack</span>
     <span class="ident">CheckJumpCondition</span>(<span class="ident">InstructionJumpCondition</span>),
-    <span class="doccomment">/// If the top of the μstack is 0, increment PC twice and pop two bytes off the top of the μstack.</span>
-    <span class="doccomment">/// Otherwise, pop an two bytes off the top of the μstack and load them into PC.</span>
+    <span class="doccomment">/// If the top of the μstack is `0`, pop two bytes off the top of the μstack and increment PC by 2.</span>
+    <span class="doccomment">/// If it&#39;s `1`, pop an two bytes off the top of the μstack and load them into PC.</span>
+    <span class="doccomment">/// Otherwise, error out.</span>
     <span class="ident">Jump</span>,
 
     <span class="doccomment">/// Read the specified register into the top of the μstack.</span>
