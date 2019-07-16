@@ -289,8 +289,8 @@
 
             <span class="ident">MicroOp</span>::<span class="ident">MakeImmediate</span>(<span class="ident">b</span>) <span class="op">=&gt;</span> <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">b</span>),
             <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span> <span class="op">=&gt;</span> {
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="ident">pc</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">MicrocodeExecutionError</span>::<span class="ident">ProgramOverflow</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="kw">as</span> <span class="ident">usize</span>];
+                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="ident">pc</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">MicrocodeExecutionError</span>::<span class="ident">ProgramOverflow</span>)<span class="question-mark">?</span>;
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
             }
