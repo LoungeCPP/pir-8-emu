@@ -23,6 +23,28 @@ static VALID_IS_OK_VALUES: &[u8] = &[0, 1];
 
 
 impl MicroOp {
+    /// Execute this μOp
+    ///
+    /// The `Ok(..)` return value indicates whether to continue execution (i.e. not halt)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
+    /// # use pir_8_emu::microcode::MicroOp;
+    /// # use pir_8_emu::{Memory, Ports};
+    /// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =
+    /// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),
+    /// #      SpecialPurposeRegister::new("Program Counter", "PC"), SpecialPurposeRegister::new("Stack Pointer", "SP"),
+    /// #      SpecialPurposeRegister::new("Memory Address", "ADR"));
+    /// memory[0x1A00] = 0x69;
+    ///
+    /// let mut stack = vec![0x1A, 0x00];
+    /// assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers,
+    ///                                          &mut pc, &mut sp, &mut adr),
+    ///            Ok(true));
+    /// assert_eq!(stack, &[0x69]);
+    /// ```
     pub fn execute(&self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
                    pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, _adr: &mut SpecialPurposeRegister<u16>)
                    -> Result<bool, MicrocodeExecutionError> {
@@ -79,8 +101,8 @@ impl MicroOp {
                 let lhs = stack.pop().ok_or(MicrocodeExecutionError::MicrostackUnderflow)?;
 
                 let flags = (flags & FLAG_CLEARFLAGS_MASK_COMP)                   |
-                            (if lhs == rhs { FLAG_MASK_EQUALS } else { 0b00000 }) | // forcebreak
-                            (if lhs > rhs { FLAG_MASK_GREATER } else { 0b00000 }) |
+                            (if lhs == rhs { FLAG_MASK_EQUALS } else { 0b00000 }) |
+                            (if lhs > rhs { FLAG_MASK_GREATER } else { 0b00000 }) | // forcebreak
                             s_reg_flags(lhs);
 
                 stack.push(flags);
