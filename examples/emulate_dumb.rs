@@ -1,7 +1,7 @@
 extern crate pir_8_emu;
 
 use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
-use pir_8_emu::microcode::{MicroOp, NEXT_INSTRUCTION};
+use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};
 use pir_8_emu::isa::instruction::Instruction;
 use pir_8_emu::{Memory, Ports};
 use std::{env, io};
@@ -26,7 +26,7 @@ fn main() {
         let ops = &ops.0[..ops.1];
         for op in ops {
             println!("{}", op.display(&registers));
-            if !op.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
+            if !op.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
                 break 'ol;
             }
         }
@@ -38,7 +38,7 @@ fn main() {
         let ops = &ops.0[..ops.1];
         for op in ops {
             println!("{}", op.display(&registers));
-            if !op.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
+            if !op.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
                 break 'ol;
             }
         }
