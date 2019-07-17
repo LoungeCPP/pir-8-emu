@@ -14,10 +14,9 @@ const D_REGISTER_ADDRESS: u8 = 0b111;
 
 /// `[MicroOp; N]` typedef, where `N` is *not* to be relied upon
 ///
-/// Use this type for storing values returned by [`MicroOp::from_instruction()`](enum.MicroOp.html#fn.from_instruction) instead of
-/// any fixed-size array, as the size of this is not part of the stable API and subject to change without notice.
+/// Use this type for storing values returned by [`MicroOp::from_instruction()`](enum.MicroOp.html#fn.from_instruction) instead
+/// of any fixed-size array, as the size of this is not part of the stable API and subject to change without notice.
 pub type MicroOpBlock = [MicroOp; 6];
-
 
 impl MicroOp {
     /// Get μOps corresponding to the given instruction
