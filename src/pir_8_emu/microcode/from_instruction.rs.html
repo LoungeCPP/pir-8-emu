@@ -202,7 +202,6 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-<span id="205">205</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionStckRegisterPair</span>, <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MicroOp</span>;
@@ -220,10 +219,9 @@
 
 <span class="doccomment">/// `[MicroOp; N]` typedef, where `N` is *not* to be relied upon</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Use this type for storing values returned by [`MicroOp::from_instruction()`](enum.MicroOp.html#fn.from_instruction) instead of</span>
-<span class="doccomment">/// any fixed-size array, as the size of this is not part of the stable API and subject to change without notice.</span>
+<span class="doccomment">/// Use this type for storing values returned by [`MicroOp::from_instruction()`](enum.MicroOp.html#fn.from_instruction) instead</span>
+<span class="doccomment">/// of any fixed-size array, as the size of this is not part of the stable API and subject to change without notice.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MicroOpBlock</span> <span class="op">=</span> [<span class="ident">MicroOp</span>; <span class="number">6</span>];
-
 
 <span class="kw">impl</span> <span class="ident">MicroOp</span> {
     <span class="doccomment">/// Get μOps corresponding to the given instruction</span>
