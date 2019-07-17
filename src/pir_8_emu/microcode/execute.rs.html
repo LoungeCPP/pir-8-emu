@@ -182,6 +182,17 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">MicrocodeExecutionError</span>, <span class="ident">MicroOp</span>};
@@ -229,14 +240,25 @@
     <span class="doccomment">///                                          &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
     <span class="doccomment">///            Ok(true));</span>
     <span class="doccomment">/// assert_eq!(stack, &amp;[0x69]);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::LoadInstruction.execute(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
+    <span class="doccomment">///                                             &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
+    <span class="doccomment">///            Ok(true));</span>
+    <span class="doccomment">/// assert_eq!(stack, &amp;[]);</span>
+    <span class="doccomment">/// assert_eq!(*ins, 0x69);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">memory</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Memory</span>, <span class="ident">ports</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ports</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GeneralPurposeRegisterBank</span>,
                    <span class="ident">pc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">sp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">adr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-                   <span class="ident">_ins</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)
+                   <span class="ident">ins</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)
                    <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">MicrocodeExecutionError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">MicroOp</span>::<span class="ident">Nop</span> <span class="op">=&gt;</span> {}
             <span class="ident">MicroOp</span>::<span class="ident">Halt</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="ident">MicroOp</span>::<span class="ident">LoadInstruction</span> <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicrocodeExecutionError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
+
+                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ins</span> <span class="op">=</span> <span class="ident">byte</span>;
+            },
 
             <span class="ident">MicroOp</span>::<span class="ident">StackPush</span> <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicrocodeExecutionError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;

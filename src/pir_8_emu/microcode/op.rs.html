@@ -85,6 +85,8 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionJumpCondition</span>, <span class="ident">AluOperation</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
@@ -105,8 +107,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also to pad out the returned instruction</span>
     <span class="ident">Nop</span>,
-    <span class="doccomment">/// Halt.</span>
+    <span class="doccomment">/// Halt</span>
     <span class="ident">Halt</span>,
+    <span class="doccomment">/// Load the top of the stack into INS</span>
+    <span class="ident">LoadInstruction</span>,
 
     <span class="doccomment">/// Push a byte from the top of the μstack to the stack</span>
     <span class="ident">StackPush</span>,
