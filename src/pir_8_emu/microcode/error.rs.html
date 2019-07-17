@@ -75,12 +75,12 @@
 <span class="doccomment">/// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};</span>
 <span class="doccomment">/// # use pir_8_emu::microcode::{MicrocodeExecutionError, MicroOp};</span>
 <span class="doccomment">/// # use pir_8_emu::{Memory, Ports};</span>
-<span class="doccomment">/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =</span>
+<span class="doccomment">/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =</span>
 <span class="doccomment">/// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),</span>
 <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Program Counter&quot;, &quot;PC&quot;), SpecialPurposeRegister::new(&quot;Stack Pointer&quot;, &quot;SP&quot;),</span>
-<span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;));</span>
+<span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;), SpecialPurposeRegister::new(&quot;Instruction&quot;, &quot;INS&quot;));</span>
 <span class="doccomment">/// assert_eq!(MicroOp::StackPush.execute(&amp;mut vec![], &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
-<span class="doccomment">///                                       &amp;mut pc, &amp;mut sp, &amp;mut adr),</span>
+<span class="doccomment">///                                       &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
 <span class="doccomment">///            Err(MicrocodeExecutionError::MicrostackUnderflow));</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>

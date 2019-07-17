@@ -181,6 +181,7 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">MicrocodeExecutionError</span>, <span class="ident">MicroOp</span>};
@@ -217,20 +218,21 @@
     <span class="doccomment">/// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};</span>
     <span class="doccomment">/// # use pir_8_emu::microcode::MicroOp;</span>
     <span class="doccomment">/// # use pir_8_emu::{Memory, Ports};</span>
-    <span class="doccomment">/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =</span>
+    <span class="doccomment">/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =</span>
     <span class="doccomment">/// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),</span>
     <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Program Counter&quot;, &quot;PC&quot;), SpecialPurposeRegister::new(&quot;Stack Pointer&quot;, &quot;SP&quot;),</span>
-    <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;));</span>
+    <span class="doccomment">/// #      SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;), SpecialPurposeRegister::new(&quot;Instruction&quot;, &quot;INS&quot;));</span>
     <span class="doccomment">/// memory[0x1A00] = 0x69;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut stack = vec![0x1A, 0x00];</span>
     <span class="doccomment">/// assert_eq!(MicroOp::FetchAddress.execute(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
-    <span class="doccomment">///                                          &amp;mut pc, &amp;mut sp, &amp;mut adr),</span>
+    <span class="doccomment">///                                          &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
     <span class="doccomment">///            Ok(true));</span>
     <span class="doccomment">/// assert_eq!(stack, &amp;[0x69]);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">memory</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Memory</span>, <span class="ident">ports</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ports</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GeneralPurposeRegisterBank</span>,
-                   <span class="ident">pc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">sp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">adr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>)
+                   <span class="ident">pc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">sp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">adr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+                   <span class="ident">_ins</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)
                    <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">MicrocodeExecutionError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">MicroOp</span>::<span class="ident">Nop</span> <span class="op">=&gt;</span> {}

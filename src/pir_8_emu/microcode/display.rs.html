@@ -30,20 +30,6 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MicroOp</span>;
@@ -64,30 +50,16 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DisplayMicroOp</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">op</span> {
-            <span class="ident">MicroOp</span>::<span class="ident">Nop</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Nop&quot;</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">Halt</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Halt&quot;</span>),
-
-            <span class="ident">MicroOp</span>::<span class="ident">StackPush</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;StackPush&quot;</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">StackPop</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;StackPop&quot;</span>),
-
             <span class="ident">MicroOp</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Alu {}&quot;</span>, <span class="ident">op</span>),
 
-            <span class="ident">MicroOp</span>::<span class="ident">PortIn</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PortIn&quot;</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">PortOut</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PortOut&quot;</span>),
-
-            <span class="ident">MicroOp</span>::<span class="ident">Compare</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Compare&quot;</span>),
-
             <span class="ident">MicroOp</span>::<span class="ident">MakeImmediate</span>(<span class="ident">imm</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;MakeImmediate {:#04x}&quot;</span>, <span class="ident">imm</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;LoadImmediate&quot;</span>),
-
-            <span class="ident">MicroOp</span>::<span class="ident">FetchAddress</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FetchAddress&quot;</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">WriteAddress</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;WriteAddress&quot;</span>),
 
             <span class="ident">MicroOp</span>::<span class="ident">CheckJumpCondition</span>(<span class="ident">cond</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;CheckJumpCondition {}&quot;</span>, <span class="ident">cond</span>),
-            <span class="ident">MicroOp</span>::<span class="ident">Jump</span> <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Jump&quot;</span>),
 
             <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ReadRegister {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
             <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;WriteRegister {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
+
+            <span class="ident">op</span> <span class="op">=&gt;</span> (<span class="ident">op</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">fmt</span>::<span class="ident">Debug</span>).<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
