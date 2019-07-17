@@ -11,12 +11,12 @@ fn ok() {
             let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 1];
             *pc = start_addr;
 
-            assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             *uni_orig.3 = dest_addr;
@@ -27,6 +27,7 @@ fn ok() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -42,12 +43,12 @@ fn not_ok() {
             let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 0];
             *pc = start_addr;
 
-            assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             *uni_orig.3 = start_addr + 2;
@@ -58,6 +59,7 @@ fn not_ok() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }

@@ -177,11 +177,11 @@ fn check_shift(expected_value: u8, expected_carry: bool, test_value: u8, shift: 
 
         for rhs in 0..=0xFF {
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![test_value, rhs, flags_start];
 
-            assert_eq!(MicroOp::Alu(shift).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Alu(shift).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             assert_eq!(memory, uni_orig.0);
@@ -190,6 +190,7 @@ fn check_shift(expected_value: u8, expected_carry: bool, test_value: u8, shift: 
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack,
                        vec![expected_value,

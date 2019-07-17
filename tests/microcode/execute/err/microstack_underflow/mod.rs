@@ -11,12 +11,12 @@ fn stack_push() {
         let addr = addr | ((addr + 1) << 8);
 
         let mut uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
         let mut stack = vec![];
         *sp = addr;
 
-        assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+        assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Err(MicrocodeExecutionError::MicrostackUnderflow));
 
         *uni_orig.4 = addr;
@@ -27,6 +27,7 @@ fn stack_push() {
         assert_eq!(pc, uni_orig.3);
         assert_eq!(sp, uni_orig.4);
         assert_eq!(adr, uni_orig.5);
+        assert_eq!(ins, uni_orig.6);
 
         assert_eq!(stack, vec![]);
     }
@@ -37,12 +38,12 @@ fn port_in() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
             ports[port as usize] = i;
 
-            assert_eq!(MicroOp::PortIn.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::PortIn.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Err(MicrocodeExecutionError::MicrostackUnderflow));
 
             uni_orig.1[port as usize] = i;
@@ -53,6 +54,7 @@ fn port_in() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -64,7 +66,7 @@ fn port_out() {
     for stack_depth in 0..2 {
         for i in 1..=0xFF {
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = match stack_depth {
                 0 => vec![],
@@ -72,7 +74,7 @@ fn port_out() {
                 _ => unreachable!(),
             };
 
-            assert_eq!(MicroOp::PortOut.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::PortOut.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Err(MicrocodeExecutionError::MicrostackUnderflow));
 
             assert_eq!(memory, uni_orig.0);
@@ -81,6 +83,7 @@ fn port_out() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -94,7 +97,7 @@ fn compare() {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = match stack_depth {
                 0 => vec![],
@@ -103,7 +106,7 @@ fn compare() {
                 _ => unreachable!(),
             };
 
-            assert_eq!(MicroOp::Compare.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Compare.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Err(MicrocodeExecutionError::MicrostackUnderflow));
 
             assert_eq!(memory, uni_orig.0);
@@ -112,6 +115,7 @@ fn compare() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -126,7 +130,7 @@ fn fetch_address() {
                 let addr = addr | ((addr + 1) << 8);
 
                 let mut uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -135,7 +139,7 @@ fn fetch_address() {
                 };
                 memory[addr as usize] = i;
 
-                assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+                assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                            Err(MicrocodeExecutionError::MicrostackUnderflow));
 
                 uni_orig.0[addr as usize] = i;
@@ -146,6 +150,7 @@ fn fetch_address() {
                 assert_eq!(pc, uni_orig.3);
                 assert_eq!(sp, uni_orig.4);
                 assert_eq!(adr, uni_orig.5);
+                assert_eq!(ins, uni_orig.6);
 
                 assert_eq!(stack, vec![]);
             }
@@ -161,7 +166,7 @@ fn write_address() {
                 let addr = addr | ((addr + 1) << 8);
 
                 let uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -170,7 +175,7 @@ fn write_address() {
                     _ => unreachable!(),
                 };
 
-                assert_eq!(MicroOp::WriteAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+                assert_eq!(MicroOp::WriteAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                            Err(MicrocodeExecutionError::MicrostackUnderflow));
 
                 assert_eq!(memory, uni_orig.0);
@@ -179,6 +184,7 @@ fn write_address() {
                 assert_eq!(pc, uni_orig.3);
                 assert_eq!(sp, uni_orig.4);
                 assert_eq!(adr, uni_orig.5);
+                assert_eq!(ins, uni_orig.6);
 
                 assert_eq!(stack, vec![]);
             }
@@ -196,7 +202,7 @@ fn jump() {
                 let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
                 let mut uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -206,7 +212,7 @@ fn jump() {
                 };
                 *pc = start_addr;
 
-                assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+                assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                            Err(MicrocodeExecutionError::MicrostackUnderflow));
 
                 *uni_orig.3 = start_addr;
@@ -217,6 +223,7 @@ fn jump() {
                 assert_eq!(pc, uni_orig.3);
                 assert_eq!(sp, uni_orig.4);
                 assert_eq!(adr, uni_orig.5);
+                assert_eq!(ins, uni_orig.6);
 
                 assert_eq!(stack, vec![]);
             }
@@ -228,11 +235,11 @@ fn jump() {
 fn write_register() {
     for aaa in 0..0b111 {
         let uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
         let mut stack = vec![];
 
-        assert_eq!(MicroOp::WriteRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+        assert_eq!(MicroOp::WriteRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Err(MicrocodeExecutionError::MicrostackUnderflow));
 
         assert_eq!(memory, uni_orig.0);
@@ -241,6 +248,7 @@ fn write_register() {
         assert_eq!(pc, uni_orig.3);
         assert_eq!(sp, uni_orig.4);
         assert_eq!(adr, uni_orig.5);
+        assert_eq!(ins, uni_orig.6);
 
         assert_eq!(stack, vec![]);
     }

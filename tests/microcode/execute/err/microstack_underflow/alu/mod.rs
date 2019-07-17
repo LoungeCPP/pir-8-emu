@@ -32,7 +32,7 @@ fn binary_nocarry(op: AluOperation) {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = match stack_depth {
                 0 => vec![],
@@ -41,7 +41,7 @@ fn binary_nocarry(op: AluOperation) {
                 _ => unreachable!(),
             };
 
-            assert_eq!(MicroOp::Alu(op).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Alu(op).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Err(MicrocodeExecutionError::MicrostackUnderflow));
 
             assert_eq!(memory, uni_orig.0);
@@ -50,6 +50,7 @@ fn binary_nocarry(op: AluOperation) {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }

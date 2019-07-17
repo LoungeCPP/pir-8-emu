@@ -33,20 +33,21 @@ impl MicroOp {
     /// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
     /// # use pir_8_emu::microcode::MicroOp;
     /// # use pir_8_emu::{Memory, Ports};
-    /// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =
+    /// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =
     /// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),
     /// #      SpecialPurposeRegister::new("Program Counter", "PC"), SpecialPurposeRegister::new("Stack Pointer", "SP"),
-    /// #      SpecialPurposeRegister::new("Memory Address", "ADR"));
+    /// #      SpecialPurposeRegister::new("Memory Address", "ADR"), SpecialPurposeRegister::new("Instruction", "INS"));
     /// memory[0x1A00] = 0x69;
     ///
     /// let mut stack = vec![0x1A, 0x00];
     /// assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers,
-    ///                                          &mut pc, &mut sp, &mut adr),
+    ///                                          &mut pc, &mut sp, &mut adr, &mut ins),
     ///            Ok(true));
     /// assert_eq!(stack, &[0x69]);
     /// ```
     pub fn execute(&self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
-                   pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, adr: &mut SpecialPurposeRegister<u16>)
+                   pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, adr: &mut SpecialPurposeRegister<u16>,
+                   _ins: &mut SpecialPurposeRegister<u8>)
                    -> Result<bool, MicrocodeExecutionError> {
         match *self {
             MicroOp::Nop => {}

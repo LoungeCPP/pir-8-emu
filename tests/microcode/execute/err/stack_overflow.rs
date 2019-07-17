@@ -8,12 +8,12 @@ fn stack_push() {
         let addr = 0xFFFF;
 
         let mut uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
         let mut stack = vec![i];
         *sp = addr;
 
-        assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+        assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Err(MicrocodeExecutionError::StackOverflow));
 
         *uni_orig.4 = addr;
@@ -24,6 +24,7 @@ fn stack_push() {
         assert_eq!(pc, uni_orig.3);
         assert_eq!(sp, uni_orig.4);
         assert_eq!(adr, uni_orig.5);
+        assert_eq!(ins, uni_orig.6);
 
         assert_eq!(stack, vec![]);
     }

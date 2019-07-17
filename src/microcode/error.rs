@@ -10,12 +10,12 @@ use std::fmt;
 /// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
 /// # use pir_8_emu::microcode::{MicrocodeExecutionError, MicroOp};
 /// # use pir_8_emu::{Memory, Ports};
-/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) =
+/// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =
 /// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),
 /// #      SpecialPurposeRegister::new("Program Counter", "PC"), SpecialPurposeRegister::new("Stack Pointer", "SP"),
-/// #      SpecialPurposeRegister::new("Memory Address", "ADR"));
+/// #      SpecialPurposeRegister::new("Memory Address", "ADR"), SpecialPurposeRegister::new("Instruction", "INS"));
 /// assert_eq!(MicroOp::StackPush.execute(&mut vec![], &mut memory, &mut ports, &mut registers,
-///                                       &mut pc, &mut sp, &mut adr),
+///                                       &mut pc, &mut sp, &mut adr, &mut ins),
 ///            Err(MicrocodeExecutionError::MicrostackUnderflow));
 /// ```
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

@@ -9,13 +9,13 @@ mod alu;
 #[test]
 fn nop() {
     let uni_orig = universe();
-    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
     let mut stack = vec![];
 
-    assert_eq!(MicroOp::Nop.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+    assert_eq!(MicroOp::Nop.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                Ok(true));
 
-    assert_eq!((memory, ports, registers, pc, sp, adr), uni_orig);
+    assert_eq!((memory, ports, registers, pc, sp, adr, ins), uni_orig);
 
     assert_eq!(stack, vec![]);
 }
@@ -23,13 +23,13 @@ fn nop() {
 #[test]
 fn halt() {
     let uni_orig = universe();
-    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
     let mut stack = vec![];
 
-    assert_eq!(MicroOp::Halt.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+    assert_eq!(MicroOp::Halt.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                Ok(false));
 
-    assert_eq!((memory, ports, registers, pc, sp, adr), uni_orig);
+    assert_eq!((memory, ports, registers, pc, sp, adr, ins), uni_orig);
 
     assert_eq!(stack, vec![]);
 }
@@ -41,12 +41,12 @@ fn stack_push() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![i];
             *sp = addr;
 
-            assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::StackPush.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.0[addr as usize + 1] = i;
@@ -59,6 +59,7 @@ fn stack_push() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -72,13 +73,13 @@ fn stack_pop() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
             memory[addr as usize] = i;
             *sp = addr;
 
-            assert_eq!(MicroOp::StackPop.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::StackPop.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
@@ -91,6 +92,7 @@ fn stack_pop() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![i]);
         }
@@ -102,12 +104,12 @@ fn port_in() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![port];
             ports[port as usize] = i;
 
-            assert_eq!(MicroOp::PortIn.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::PortIn.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.1[port as usize] = i;
@@ -118,6 +120,7 @@ fn port_in() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![i]);
         }
@@ -129,11 +132,11 @@ fn port_out() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![i, port];
 
-            assert_eq!(MicroOp::PortOut.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::PortOut.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.1[port as usize] = i;
@@ -144,6 +147,7 @@ fn port_out() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -157,11 +161,11 @@ fn compare() {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![lhs, rhs, flags_start];
 
-            assert_eq!(MicroOp::Compare.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::Compare.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             assert_eq!(memory, uni_orig.0);
@@ -170,6 +174,7 @@ fn compare() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack,
                        vec![(flags_start & 0b00010) | (if lhs == 0 { 0b00001 } else { 0b00000 }) |
@@ -186,11 +191,11 @@ fn compare() {
 fn make_immediate() {
     for i in 0..=0xFF {
         let uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
         let mut stack = vec![];
 
-        assert_eq!(MicroOp::MakeImmediate(i).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+        assert_eq!(MicroOp::MakeImmediate(i).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Ok(true));
 
         assert_eq!(memory, uni_orig.0);
@@ -199,6 +204,7 @@ fn make_immediate() {
         assert_eq!(pc, uni_orig.3);
         assert_eq!(sp, uni_orig.4);
         assert_eq!(adr, uni_orig.5);
+        assert_eq!(ins, uni_orig.6);
 
         assert_eq!(stack, vec![i]);
     }
@@ -211,13 +217,13 @@ fn load_immediate() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
             *pc = addr;
             memory[addr as usize] = i;
 
-            assert_eq!(MicroOp::LoadImmediate.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::LoadImmediate.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
@@ -230,6 +236,7 @@ fn load_immediate() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![i]);
         }
@@ -243,12 +250,12 @@ fn fetch_address() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![addr as u8 + 1, addr as u8];
             memory[addr as usize] = i;
 
-            assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::FetchAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
@@ -260,6 +267,7 @@ fn fetch_address() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![i]);
         }
@@ -273,11 +281,11 @@ fn write_address() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![i, addr as u8 + 1, addr as u8];
 
-            assert_eq!(MicroOp::WriteAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::WriteAddress.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
@@ -289,6 +297,7 @@ fn write_address() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
@@ -298,14 +307,14 @@ fn write_address() {
 #[test]
 fn read_register() {
     for i in 1..=0xFF {
-        for aaa in 0..0b111 {
+        for aaa in 0..=0b111 {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
             *registers[aaa as usize] = i;
 
-            assert_eq!(MicroOp::ReadRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::ReadRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             *uni_orig.2[aaa as usize] = i;
@@ -316,6 +325,7 @@ fn read_register() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![i]);
         }
@@ -325,13 +335,13 @@ fn read_register() {
 #[test]
 fn write_register() {
     for i in 1..=0xFF {
-        for aaa in 0..0b111 {
+        for aaa in 0..=0b111 {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![i];
 
-            assert_eq!(MicroOp::WriteRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr),
+            assert_eq!(MicroOp::WriteRegister(aaa).execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             *uni_orig.2[aaa as usize] = i;
@@ -342,6 +352,7 @@ fn write_register() {
             assert_eq!(pc, uni_orig.3);
             assert_eq!(sp, uni_orig.4);
             assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
 
             assert_eq!(stack, vec![]);
         }
