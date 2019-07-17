@@ -159,7 +159,7 @@ impl MicroOp {
                 let address = pop_address(stack)?;
 
                 match is_ok {
-                    0 => **pc = pc.checked_add(2).ok_or(MicrocodeExecutionError::ProgramOverflow)?,
+                    0 => {},
                     1 => **pc = address,
                     _ => return Err(MicrocodeExecutionError::InvalidMicrostackTop(is_ok, VALID_IS_OK_VALUES)),
                 }

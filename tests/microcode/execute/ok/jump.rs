@@ -51,7 +51,7 @@ fn not_ok() {
             assert_eq!(MicroOp::Jump.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            *uni_orig.3 = start_addr + 2;
+            *uni_orig.3 = start_addr;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);

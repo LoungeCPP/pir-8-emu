@@ -50,8 +50,8 @@ pub enum MicroOp {
 
     /// Check if the specified jump condition is satisfied by the top of the μstack
     CheckJumpCondition(InstructionJumpCondition),
-    /// If the top of the μstack is `0`, pop two bytes off the top of the μstack and increment PC by 2.
-    /// If it's `1`, pop an two bytes off the top of the μstack and load them into PC.
+    /// If the top of the μstack is `0`, pop two bytes off the top of the μstack.
+    /// If it's `1`, pop two bytes off the top of the μstack and load them into PC.
     /// Otherwise, error out.
     Jump,
 
