@@ -5,30 +5,27 @@ use pir_8_emu::microcode::MicroOp;
 
 #[test]
 fn nop() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::Nop.display(regs).to_string(), "Nop");
-    }
+    constant(MicroOp::Nop, "Nop");
 }
 
 #[test]
 fn halt() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::Halt.display(regs).to_string(), "Halt");
-    }
+    constant(MicroOp::Halt, "Halt");
+}
+
+#[test]
+fn load_instruction() {
+    constant(MicroOp::LoadInstruction, "LoadInstruction");
 }
 
 #[test]
 fn stack_push() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::StackPush.display(regs).to_string(), "StackPush");
-    }
+    constant(MicroOp::StackPush, "StackPush");
 }
 
 #[test]
 fn stack_pop() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::StackPop.display(regs).to_string(), "StackPop");
-    }
+    constant(MicroOp::StackPop, "StackPop");
 }
 
 #[test]
@@ -60,23 +57,17 @@ fn alu_shift_or_rotate() {
 
 #[test]
 fn port_in() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::PortIn.display(regs).to_string(), "PortIn");
-    }
+    constant(MicroOp::PortIn, "PortIn");
 }
 
 #[test]
 fn port_out() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::PortOut.display(regs).to_string(), "PortOut");
-    }
+    constant(MicroOp::PortOut, "PortOut");
 }
 
 #[test]
 fn compare() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::Compare.display(regs).to_string(), "Compare");
-    }
+    constant(MicroOp::Compare, "Compare");
 }
 
 #[test]
@@ -90,36 +81,38 @@ fn make_immediate() {
 
 #[test]
 fn load_immediate() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::LoadImmediate.display(regs).to_string(), "LoadImmediate");
-    }
+    constant(MicroOp::LoadImmediate, "LoadImmediate");
 }
 
 #[test]
 fn fetch_address() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::FetchAddress.display(regs).to_string(), "FetchAddress");
-    }
+    constant(MicroOp::FetchAddress, "FetchAddress");
 }
 
 #[test]
 fn write_address() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::WriteAddress.display(regs).to_string(), "WriteAddress");
-    }
+    constant(MicroOp::WriteAddress, "WriteAddress");
 }
 
 #[test]
 fn check_jump_condition() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpz).display(regs).to_string(), "CheckJumpCondition JMPZ");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpp).display(regs).to_string(), "CheckJumpCondition JMPP");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpg).display(regs).to_string(), "CheckJumpCondition JMPG");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpc).display(regs).to_string(), "CheckJumpCondition JMPC");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmzg).display(regs).to_string(), "CheckJumpCondition JMZG");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmzl).display(regs).to_string(), "CheckJumpCondition JMZL");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpl).display(regs).to_string(), "CheckJumpCondition JMPL");
-        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jump).display(regs).to_string(), "CheckJumpCondition JUMP");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpz).display(regs).to_string(),
+                   "CheckJumpCondition JMPZ");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpp).display(regs).to_string(),
+                   "CheckJumpCondition JMPP");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpg).display(regs).to_string(),
+                   "CheckJumpCondition JMPG");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpc).display(regs).to_string(),
+                   "CheckJumpCondition JMPC");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmzg).display(regs).to_string(),
+                   "CheckJumpCondition JMZG");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmzl).display(regs).to_string(),
+                   "CheckJumpCondition JMZL");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jmpl).display(regs).to_string(),
+                   "CheckJumpCondition JMPL");
+        assert_eq!(MicroOp::CheckJumpCondition(InstructionJumpCondition::Jump).display(regs).to_string(),
+                   "CheckJumpCondition JUMP");
     }
 }
 
@@ -139,6 +132,12 @@ fn single_register(base: &str, op: fn(u8) -> MicroOp) {
         for register in regs {
             assert_eq!(op(register.address()).display(regs).to_string(), format!("{} {}", base, register.letter()));
         }
+    }
+}
+
+fn constant(op: MicroOp, exp: &str) {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
+        assert_eq!(op.display(regs).to_string(), exp);
     }
 }
 

@@ -17,8 +17,10 @@ pub enum MicroOp {
     ///
     /// Also to pad out the returned instruction
     Nop,
-    /// Halt.
+    /// Halt
     Halt,
+    /// Load the top of the stack into INS
+    LoadInstruction,
 
     /// Push a byte from the top of the μstack to the stack
     StackPush,

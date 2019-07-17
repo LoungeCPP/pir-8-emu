@@ -44,14 +44,25 @@ impl MicroOp {
     ///                                          &mut pc, &mut sp, &mut adr, &mut ins),
     ///            Ok(true));
     /// assert_eq!(stack, &[0x69]);
+    ///
+    /// assert_eq!(MicroOp::LoadInstruction.execute(&mut stack, &mut memory, &mut ports, &mut registers,
+    ///                                             &mut pc, &mut sp, &mut adr, &mut ins),
+    ///            Ok(true));
+    /// assert_eq!(stack, &[]);
+    /// assert_eq!(*ins, 0x69);
     /// ```
     pub fn execute(&self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
                    pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, adr: &mut SpecialPurposeRegister<u16>,
-                   _ins: &mut SpecialPurposeRegister<u8>)
+                   ins: &mut SpecialPurposeRegister<u8>)
                    -> Result<bool, MicrocodeExecutionError> {
         match *self {
             MicroOp::Nop => {}
             MicroOp::Halt => return Ok(false),
+            MicroOp::LoadInstruction => {
+                let byte = stack.pop().ok_or(MicrocodeExecutionError::MicrostackUnderflow)?;
+
+                **ins = byte;
+            },
 
             MicroOp::StackPush => {
                 let byte = stack.pop().ok_or(MicrocodeExecutionError::MicrostackUnderflow)?;

@@ -35,6 +35,31 @@ fn halt() {
 }
 
 #[test]
+fn load_instruction() {
+    for i in 1..=0xFF {
+        let mut uni_orig = universe();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+
+        let mut stack = vec![i];
+
+        assert_eq!(MicroOp::LoadInstruction.execute(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
+                   Ok(true));
+
+        *uni_orig.6 = i;
+
+        assert_eq!(memory, uni_orig.0);
+        assert_eq!(ports, uni_orig.1);
+        assert_eq!(registers, uni_orig.2);
+        assert_eq!(pc, uni_orig.3);
+        assert_eq!(sp, uni_orig.4);
+        assert_eq!(adr, uni_orig.5);
+        assert_eq!(ins, uni_orig.6);
+
+        assert_eq!(stack, vec![]);
+    }
+}
+
+#[test]
 fn stack_push() {
     for i in 1..=0xFF {
         for addr in 0..0x11u16 {
