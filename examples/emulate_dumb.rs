@@ -46,7 +46,7 @@ fn main() {
         println!();
         // println!("{:?}", ports);
         for reg in &registers {
-            println!("{:?}", reg);
+            println!("{}", reg);
         }
         println!("{}", pc);
         println!("{}", sp);

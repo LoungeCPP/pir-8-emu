@@ -2,6 +2,7 @@ extern crate num_traits;
 #[macro_use]
 extern crate clap;
 
+mod rw;
 mod cpu;
 mod memory;
 
@@ -11,4 +12,5 @@ pub mod micro;
 pub mod options;
 
 pub use self::cpu::Cpu;
+pub use self::rw::ReadWriteMarker;
 pub use self::memory::{Memory, Ports};
