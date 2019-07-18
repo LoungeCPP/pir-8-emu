@@ -4,6 +4,7 @@ extern crate clap;
 
 mod rw;
 mod cpu;
+mod ports;
 mod memory;
 
 pub mod isa;
@@ -12,5 +13,6 @@ pub mod micro;
 pub mod options;
 
 pub use self::cpu::Cpu;
-pub use self::memory::{Memory, Ports};
+pub use self::ports::Ports;
+pub use self::memory::Memory;
 pub use self::rw::{ReadWriteMarker, ReadWritable};

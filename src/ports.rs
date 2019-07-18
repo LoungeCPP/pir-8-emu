@@ -4,25 +4,25 @@ use std::cmp::Ordering;
 use std::fmt;
 
 
-/// "Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array
+/// "Mostly-transparent wrapper for a heap-allocated 256B `u8` array for I/O ports
 #[derive(Clone)]
 #[repr(transparent)]
-pub struct Memory(Box<[u8; 0xFFFF + 1]>);
+pub struct Ports(Box<[u8; 0xFF + 1]>);
 
-impl Memory {
-    pub fn new() -> Memory {
-        Memory(Box::new([0; 0xFFFF + 1]))
+impl Ports {
+    pub fn new() -> Ports {
+        Ports(Box::new([0; 0xFF + 1]))
     }
 }
 
-impl Default for Memory {
-    fn default() -> Memory {
-        Memory::new()
+impl Default for Ports {
+    fn default() -> Ports {
+        Ports::new()
     }
 }
 
-impl Deref for Memory {
-    type Target = [u8; 0xFFFF + 1];
+impl Deref for Ports {
+    type Target = [u8; 0xFF + 1];
 
     #[inline]
     fn deref(&self) -> &Self::Target {
@@ -30,26 +30,26 @@ impl Deref for Memory {
     }
 }
 
-impl DerefMut for Memory {
+impl DerefMut for Ports {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl fmt::Debug for Memory {
+impl fmt::Debug for Ports {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_list().entries(self.iter()).finish()
     }
 }
 
-impl Hash for Memory {
+impl Hash for Ports {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         Hash::hash(&self[..], state)
     }
 }
 
-impl PartialEq<[u8]> for Memory {
+impl PartialEq<[u8]> for Ports {
     #[inline]
     fn eq(&self, other: &[u8]) -> bool {
         self[..] == other[..]
@@ -61,50 +61,50 @@ impl PartialEq<[u8]> for Memory {
     }
 }
 
-impl PartialEq<Memory> for Memory {
+impl PartialEq<Ports> for Ports {
     #[inline]
-    fn eq(&self, other: &Memory) -> bool {
+    fn eq(&self, other: &Ports) -> bool {
         self[..] == other[..]
     }
 
     #[inline]
-    fn ne(&self, other: &Memory) -> bool {
+    fn ne(&self, other: &Ports) -> bool {
         self[..] != other[..]
     }
 }
 
-impl Eq for Memory {}
+impl Eq for Ports {}
 
-impl PartialOrd for Memory {
+impl PartialOrd for Ports {
     #[inline]
-    fn partial_cmp(&self, other: &Memory) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Ports) -> Option<Ordering> {
         PartialOrd::partial_cmp(&&self[..], &&other[..])
     }
 
     #[inline]
-    fn lt(&self, other: &Memory) -> bool {
+    fn lt(&self, other: &Ports) -> bool {
         PartialOrd::lt(&&self[..], &&other[..])
     }
 
     #[inline]
-    fn le(&self, other: &Memory) -> bool {
+    fn le(&self, other: &Ports) -> bool {
         PartialOrd::le(&&self[..], &&other[..])
     }
 
     #[inline]
-    fn ge(&self, other: &Memory) -> bool {
+    fn ge(&self, other: &Ports) -> bool {
         PartialOrd::ge(&&self[..], &&other[..])
     }
 
     #[inline]
-    fn gt(&self, other: &Memory) -> bool {
+    fn gt(&self, other: &Ports) -> bool {
         PartialOrd::gt(&&self[..], &&other[..])
     }
 }
 
-impl Ord for Memory {
+impl Ord for Ports {
     #[inline]
-    fn cmp(&self, other: &Memory) -> Ordering {
+    fn cmp(&self, other: &Ports) -> Ordering {
         Ord::cmp(&&self[..], &&other[..])
     }
 }
