@@ -158,12 +158,12 @@ fn fetch_address() {
                     1 => vec![addr as u8 + 1],
                     _ => unreachable!(),
                 };
-                memory[addr as usize] = i;
+                memory[addr] = i;
 
                 assert_eq!(MicroOp::FetchAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                            Err(MicroOpPerformError::MicrostackUnderflow));
 
-                uni_orig.0[addr as usize] = i;
+                uni_orig.0[addr] = i;
 
                 assert_eq!(memory, uni_orig.0);
                 assert_eq!(ports, uni_orig.1);

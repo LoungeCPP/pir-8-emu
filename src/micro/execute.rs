@@ -69,11 +69,11 @@ impl MicroOp {
 
                 **sp = sp.checked_add(1).ok_or(MicroOpPerformError::StackOverflow)?;
                 **adr = **sp;
-                memory[**adr as usize] = byte;
+                memory[**adr] = byte;
             }
             MicroOp::StackPop => {
                 **adr = **sp;
-                let byte = memory[**adr as usize];
+                let byte = memory[**adr];
                 **sp = sp.checked_sub(1).ok_or(MicroOpPerformError::StackUnderflow)?;
 
                 stack.push(byte);
@@ -125,7 +125,7 @@ impl MicroOp {
             MicroOp::MakeImmediate(b) => stack.push(b),
             MicroOp::LoadImmediate => {
                 **adr = **pc;
-                let byte = memory[**adr as usize];
+                let byte = memory[**adr];
                 **pc = pc.checked_add(1).ok_or(MicroOpPerformError::ProgramOverflow)?;
 
                 stack.push(byte);
@@ -135,7 +135,7 @@ impl MicroOp {
                 let address = pop_address(stack)?;
 
                 **adr = address;
-                let byte = memory[**adr as usize];
+                let byte = memory[**adr];
 
                 stack.push(byte);
             }
@@ -144,7 +144,7 @@ impl MicroOp {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
                 **adr = address;
-                memory[**adr as usize] = byte;
+                memory[**adr] = byte;
             }
 
             MicroOp::CheckJumpCondition(cond) => {

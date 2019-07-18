@@ -75,7 +75,7 @@ fn stack_push() {
             assert_eq!(MicroOp::StackPush.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            uni_orig.0[addr as usize + 1] = i;
+            uni_orig.0[addr + 1] = i;
             let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr + 1;
             let _read_adr = *uni_orig.5;
@@ -104,14 +104,14 @@ fn stack_pop() {
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
-            memory[addr as usize] = i;
+            memory[addr] = i;
             *sp = addr;
 
             assert_eq!(MicroOp::StackPop.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            let _read_mem = uni_orig.0[addr as usize];
-            uni_orig.0[addr as usize] = i;
+            let _read_mem = uni_orig.0[addr];
+            uni_orig.0[addr] = i;
             let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr - 1;
             let _read_adr = *uni_orig.5;
@@ -252,13 +252,13 @@ fn load_immediate() {
 
             let mut stack = vec![];
             *pc = addr;
-            memory[addr as usize] = i;
+            memory[addr] = i;
 
             assert_eq!(MicroOp::LoadImmediate.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            let _read_mem = uni_orig.0[addr as usize];
-            uni_orig.0[addr as usize] = i;
+            let _read_mem = uni_orig.0[addr];
+            uni_orig.0[addr] = i;
             let _read_pc = *uni_orig.3;
             *uni_orig.3 = addr + 1;
             let _read_adr = *uni_orig.5;
@@ -287,13 +287,13 @@ fn fetch_address() {
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![addr as u8 + 1, addr as u8];
-            memory[addr as usize] = i;
+            memory[addr] = i;
 
             assert_eq!(MicroOp::FetchAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            let _read_mem = uni_orig.0[addr as usize];
-            uni_orig.0[addr as usize] = i;
+            let _read_mem = uni_orig.0[addr];
+            uni_orig.0[addr] = i;
             let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 
@@ -324,7 +324,7 @@ fn write_address() {
             assert_eq!(MicroOp::WriteAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            uni_orig.0[addr as usize] = i;
+            uni_orig.0[addr] = i;
             let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 

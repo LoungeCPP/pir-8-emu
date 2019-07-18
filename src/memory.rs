@@ -4,27 +4,6 @@ use std::cmp::Ordering;
 use std::fmt;
 
 
-macro_rules! index_passthrough {
-    ($idx_tp:ty) => {
-        impl Index<$idx_tp> for Memory {
-            type Output = [u8];
-
-            #[inline(always)]
-            fn index(&self, index: $idx_tp) -> &Self::Output {
-                self.data.index(index)
-            }
-        }
-
-        impl IndexMut<$idx_tp> for Memory {
-            #[inline(always)]
-            fn index_mut(&mut self, index: $idx_tp) -> &mut Self::Output {
-                self.data.index_mut(index)
-            }
-        }
-    };
-}
-
-
 const MEMORY_LEN: usize = 0xFFFF + 1;
 
 
@@ -64,11 +43,13 @@ impl From<&[u8]> for Memory {
     }
 }
 
-impl Index<usize> for Memory {
+impl Index<u16> for Memory {
     type Output = u8;
 
     #[inline]
-    fn index(&self, index: usize) -> &Self::Output {
+    fn index(&self, index: u16) -> &Self::Output {
+        let index = index as usize;
+
         let idx = index / 64;
         let bit = index % 64;
         unsafe {
@@ -79,9 +60,11 @@ impl Index<usize> for Memory {
     }
 }
 
-impl IndexMut<usize> for Memory {
+impl IndexMut<u16> for Memory {
     #[inline]
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+    fn index_mut(&mut self, index: u16) -> &mut Self::Output {
+        let index = index as usize;
+
         let idx = index / 64;
         let bit = index % 64;
         self.written[idx] |= 1 << bit;
@@ -90,12 +73,109 @@ impl IndexMut<usize> for Memory {
     }
 }
 
-index_passthrough!(Range<usize>);
-index_passthrough!(RangeFrom<usize>);
-index_passthrough!(RangeFull);
-index_passthrough!(RangeInclusive<usize>);
-index_passthrough!(RangeTo<usize>);
-index_passthrough!(RangeToInclusive<usize>);
+impl Index<Range<u16>> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: Range<u16>) -> &Self::Output {
+        self.data.index(Range {
+            start: index.start as usize,
+            end: index.end as usize,
+        })
+    }
+}
+
+impl IndexMut<Range<u16>> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: Range<u16>) -> &mut Self::Output {
+        self.data.index_mut(Range {
+            start: index.start as usize,
+            end: index.end as usize,
+        })
+    }
+}
+
+impl Index<RangeFrom<u16>> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: RangeFrom<u16>) -> &Self::Output {
+        self.data.index(RangeFrom { start: index.start as usize })
+    }
+}
+
+impl IndexMut<RangeFrom<u16>> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: RangeFrom<u16>) -> &mut Self::Output {
+        self.data.index_mut(RangeFrom { start: index.start as usize })
+    }
+}
+
+impl Index<RangeFull> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: RangeFull) -> &Self::Output {
+        self.data.index(index)
+    }
+}
+
+impl IndexMut<RangeFull> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: RangeFull) -> &mut Self::Output {
+        self.data.index_mut(index)
+    }
+}
+
+impl Index<RangeInclusive<u16>> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: RangeInclusive<u16>) -> &Self::Output {
+        let (start, end) = index.into_inner();
+        self.data.index(RangeInclusive::new(start as usize, end as usize))
+    }
+}
+
+impl IndexMut<RangeInclusive<u16>> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: RangeInclusive<u16>) -> &mut Self::Output {
+        let (start, end) = index.into_inner();
+        self.data.index_mut(RangeInclusive::new(start as usize, end as usize))
+    }
+}
+
+impl Index<RangeTo<u16>> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: RangeTo<u16>) -> &Self::Output {
+        self.data.index(RangeTo { end: index.end as usize })
+    }
+}
+
+impl IndexMut<RangeTo<u16>> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: RangeTo<u16>) -> &mut Self::Output {
+        self.data.index_mut(RangeTo { end: index.end as usize })
+    }
+}
+
+impl Index<RangeToInclusive<u16>> for Memory {
+    type Output = [u8];
+
+    #[inline(always)]
+    fn index(&self, index: RangeToInclusive<u16>) -> &Self::Output {
+        self.data.index(RangeToInclusive { end: index.end as usize })
+    }
+}
+
+impl IndexMut<RangeToInclusive<u16>> for Memory {
+    #[inline(always)]
+    fn index_mut(&mut self, index: RangeToInclusive<u16>) -> &mut Self::Output {
+        self.data.index_mut(RangeToInclusive { end: index.end as usize })
+    }
+}
 
 impl fmt::Debug for Memory {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
