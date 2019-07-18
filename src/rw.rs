@@ -2,6 +2,19 @@ use std::marker::PhantomData;
 use std::fmt;
 
 
+/// Generic trait for objects that can track whether they've been read from and/or written to.
+pub trait ReadWritable {
+    /// Check if this object was read from.
+    fn was_read(&self) -> bool;
+
+    /// Check if this object was written to.
+    fn was_written(&self) -> bool;
+
+    /// Reset the R/W marking of this object.
+    fn rw_reset(&mut self);
+}
+
+
 /// Marker for wrapper types that need to track when they were read from/written to.
 ///
 /// # Examples

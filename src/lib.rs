@@ -12,5 +12,5 @@ pub mod micro;
 pub mod options;
 
 pub use self::cpu::Cpu;
-pub use self::rw::ReadWriteMarker;
 pub use self::memory::{Memory, Ports};
+pub use self::rw::{ReadWriteMarker, ReadWritable};
