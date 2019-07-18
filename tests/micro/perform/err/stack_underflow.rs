@@ -17,6 +17,7 @@ fn stack_pop() {
         assert_eq!(MicroOp::StackPop.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Err(MicroOpPerformError::StackUnderflow));
 
+        let _read_mem = uni_orig.0[addr as usize];
         uni_orig.0[addr as usize] = i;
         let _read_sp = *uni_orig.4;
         *uni_orig.4 = addr;

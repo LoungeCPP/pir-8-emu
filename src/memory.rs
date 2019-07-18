@@ -1,5 +1,4 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::ReadWriteMarker;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
@@ -8,48 +7,43 @@ use std::fmt;
 macro_rules! index_passthrough {
     ($idx_tp:ty) => {
         impl Index<$idx_tp> for Memory {
-            type Output = [MemoryCell];
+            type Output = [u8];
 
+            #[inline(always)]
             fn index(&self, index: $idx_tp) -> &Self::Output {
-                self.0.index(index)
+                self.data.index(index)
             }
         }
 
         impl IndexMut<$idx_tp> for Memory {
+            #[inline(always)]
             fn index_mut(&mut self, index: $idx_tp) -> &mut Self::Output {
-                self.0.index_mut(index)
+                self.data.index_mut(index)
             }
         }
     };
 }
 
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct MemoryCell {
-    inner: u8,
-    rw: ReadWriteMarker,
-}
-
-impl MemoryCell {
-    pub fn new() -> MemoryCell {
-        MemoryCell {
-            inner: 0,
-            rw: ReadWriteMarker::new(),
-        }
-    }
-}
+const MEMORY_LEN: usize = 0xFFFF + 1;
 
 
-/// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array
-///
-/// TODO: optimise this to not use 2x the memory it needs, because that's a huge performance hit
+/// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array with R/W tracking
 #[derive(Clone)]
-#[repr(transparent)]
-pub struct Memory(Box<[MemoryCell; 0xFFFF + 1]>);
+pub struct Memory {
+    data: Box<[u8; MEMORY_LEN]>,
+    read: Box<[u64; MEMORY_LEN / 64]>,
+    written: Box<[u64; MEMORY_LEN / 64]>,
+}
 
 impl Memory {
+    /// Create fresh zero-initialised unread and unwritten memory
     pub fn new() -> Memory {
-        Memory(Box::new([MemoryCell::new(); 0xFFFF + 1]))
+        Memory {
+            data: Box::new([0; MEMORY_LEN]),
+            read: Box::new([0; MEMORY_LEN / 64]),
+            written: Box::new([0; MEMORY_LEN / 64]),
+        }
     }
 }
 
@@ -63,9 +57,8 @@ impl From<&[u8]> for Memory {
     fn from(data: &[u8]) -> Self {
         let mut ret = Memory::new();
 
-        for (c, d) in ret[..].iter_mut().zip(data.iter()) {
-            c.inner = *d;
-        }
+        let common_len = data.len().min(MEMORY_LEN);
+        ret.data[..common_len].copy_from_slice(&data[..common_len]);
 
         ret
     }
@@ -76,18 +69,24 @@ impl Index<usize> for Memory {
 
     #[inline]
     fn index(&self, index: usize) -> &Self::Output {
-        let cell = &self.0[index];
-        cell.rw.read();
-        &cell.inner
+        let idx = index / 64;
+        let bit = index % 64;
+        unsafe {
+            *(&self.read[idx] as *const u64 as *mut u64) |= 1 << bit;
+        }
+
+        &self.data[index]
     }
 }
 
 impl IndexMut<usize> for Memory {
     #[inline]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        let cell = &mut self.0[index];
-        cell.rw.written();
-        &mut cell.inner
+        let idx = index / 64;
+        let bit = index % 64;
+        self.written[idx] |= 1 << bit;
+
+        &mut self.data[index]
     }
 }
 
@@ -100,7 +99,11 @@ index_passthrough!(RangeToInclusive<usize>);
 
 impl fmt::Debug for Memory {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_list().entries(self.0.iter()).finish()
+        f.debug_struct("Memory")
+            .field("data", &&self.data[..])
+            .field("read", &&self.read[..])
+            .field("written", &&self.written[..])
+            .finish()
     }
 }
 
@@ -113,19 +116,14 @@ impl Hash for Memory {
 impl PartialEq<[u8]> for Memory {
     #[inline]
     fn eq(&self, other: &[u8]) -> bool {
-        self.0.iter().zip(other.iter()).all(|(c, o)| c.inner == *o)
+        &self.data[..] == other
     }
 }
 
 impl PartialEq<Memory> for Memory {
     #[inline]
     fn eq(&self, other: &Memory) -> bool {
-        self[..] == other[..]
-    }
-
-    #[inline]
-    fn ne(&self, other: &Memory) -> bool {
-        self[..] != other[..]
+        self.data[..] == other.data[..] && self.read[..] == other.read[..] && self.written[..] == other.written[..]
     }
 }
 
@@ -134,33 +132,15 @@ impl Eq for Memory {}
 impl PartialOrd for Memory {
     #[inline]
     fn partial_cmp(&self, other: &Memory) -> Option<Ordering> {
-        PartialOrd::partial_cmp(&&self[..], &&other[..])
-    }
-
-    #[inline]
-    fn lt(&self, other: &Memory) -> bool {
-        PartialOrd::lt(&&self[..], &&other[..])
-    }
-
-    #[inline]
-    fn le(&self, other: &Memory) -> bool {
-        PartialOrd::le(&&self[..], &&other[..])
-    }
-
-    #[inline]
-    fn ge(&self, other: &Memory) -> bool {
-        PartialOrd::ge(&&self[..], &&other[..])
-    }
-
-    #[inline]
-    fn gt(&self, other: &Memory) -> bool {
-        PartialOrd::gt(&&self[..], &&other[..])
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Memory {
     #[inline]
     fn cmp(&self, other: &Memory) -> Ordering {
-        Ord::cmp(&&self[..], &&other[..])
+        Ord::cmp(&self.data[..], &other.data[..])
+            .then(Ord::cmp(&self.read[..], &other.read[..]))
+            .then(Ord::cmp(&self.written[..], &other.written[..]))
     }
 }

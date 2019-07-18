@@ -16,9 +16,11 @@ fn load_immediate() {
                Err(MicroOpPerformError::ProgramOverflow));
 
     let _read_pc = *uni_orig.3;
-    let _read_adr = *uni_orig.5;
     *uni_orig.3 = addr;
+    let _read_adr = *uni_orig.5;
     *uni_orig.5 = addr;
+
+    let _read_mem = uni_orig.0[0xFFFF];
 
     assert_eq!(memory, uni_orig.0);
     assert_eq!(ports, uni_orig.1);

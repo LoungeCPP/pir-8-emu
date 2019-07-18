@@ -110,6 +110,7 @@ fn stack_pop() {
             assert_eq!(MicroOp::StackPop.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
+            let _read_mem = uni_orig.0[addr as usize];
             uni_orig.0[addr as usize] = i;
             let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr - 1;
@@ -256,6 +257,7 @@ fn load_immediate() {
             assert_eq!(MicroOp::LoadImmediate.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
+            let _read_mem = uni_orig.0[addr as usize];
             uni_orig.0[addr as usize] = i;
             let _read_pc = *uni_orig.3;
             *uni_orig.3 = addr + 1;
@@ -290,6 +292,7 @@ fn fetch_address() {
             assert_eq!(MicroOp::FetchAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
+            let _read_mem = uni_orig.0[addr as usize];
             uni_orig.0[addr as usize] = i;
             let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
