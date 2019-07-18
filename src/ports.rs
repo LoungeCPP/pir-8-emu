@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use std::fmt;
 
 
-/// "Mostly-transparent wrapper for a heap-allocated 256B `u8` array for I/O ports
+/// Mostly-transparent wrapper for a heap-allocated 256B `u8` array for I/O ports
 #[derive(Clone)]
 #[repr(transparent)]
 pub struct Ports(Box<[u8; 0xFF + 1]>);

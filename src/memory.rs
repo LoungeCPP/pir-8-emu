@@ -1,17 +1,55 @@
-use std::ops::{DerefMut, Deref};
+use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
+use self::super::ReadWriteMarker;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
 
 
-/// "Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array
+macro_rules! index_passthrough {
+    ($idx_tp:ty) => {
+        impl Index<$idx_tp> for Memory {
+            type Output = [MemoryCell];
+
+            fn index(&self, index: $idx_tp) -> &Self::Output {
+                self.0.index(index)
+            }
+        }
+
+        impl IndexMut<$idx_tp> for Memory {
+            fn index_mut(&mut self, index: $idx_tp) -> &mut Self::Output {
+                self.0.index_mut(index)
+            }
+        }
+    };
+}
+
+
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct MemoryCell {
+    inner: u8,
+    rw: ReadWriteMarker,
+}
+
+impl MemoryCell {
+    pub fn new() -> MemoryCell {
+        MemoryCell {
+            inner: 0,
+            rw: ReadWriteMarker::new(),
+        }
+    }
+}
+
+
+/// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array
+///
+/// TODO: optimise this to not use 2x the memory it needs, because that's a huge performance hit
 #[derive(Clone)]
 #[repr(transparent)]
-pub struct Memory(Box<[u8; 0xFFFF + 1]>);
+pub struct Memory(Box<[MemoryCell; 0xFFFF + 1]>);
 
 impl Memory {
     pub fn new() -> Memory {
-        Memory(Box::new([0; 0xFFFF + 1]))
+        Memory(Box::new([MemoryCell::new(); 0xFFFF + 1]))
     }
 }
 
@@ -21,25 +59,48 @@ impl Default for Memory {
     }
 }
 
-impl Deref for Memory {
-    type Target = [u8; 0xFFFF + 1];
+impl From<&[u8]> for Memory {
+    fn from(data: &[u8]) -> Self {
+        let mut ret = Memory::new();
 
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.0
+        for (c, d) in ret[..].iter_mut().zip(data.iter()) {
+            c.inner = *d;
+        }
+
+        ret
     }
 }
 
-impl DerefMut for Memory {
+impl Index<usize> for Memory {
+    type Output = u8;
+
     #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+    fn index(&self, index: usize) -> &Self::Output {
+        let cell = &self.0[index];
+        cell.rw.read();
+        &cell.inner
     }
 }
+
+impl IndexMut<usize> for Memory {
+    #[inline]
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let cell = &mut self.0[index];
+        cell.rw.written();
+        &mut cell.inner
+    }
+}
+
+index_passthrough!(Range<usize>);
+index_passthrough!(RangeFrom<usize>);
+index_passthrough!(RangeFull);
+index_passthrough!(RangeInclusive<usize>);
+index_passthrough!(RangeTo<usize>);
+index_passthrough!(RangeToInclusive<usize>);
 
 impl fmt::Debug for Memory {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
+        f.debug_list().entries(self.0.iter()).finish()
     }
 }
 
@@ -52,12 +113,7 @@ impl Hash for Memory {
 impl PartialEq<[u8]> for Memory {
     #[inline]
     fn eq(&self, other: &[u8]) -> bool {
-        self[..] == other[..]
-    }
-
-    #[inline]
-    fn ne(&self, other: &[u8]) -> bool {
-        self[..] != other[..]
+        self.0.iter().zip(other.iter()).all(|(c, o)| c.inner == *o)
     }
 }
 
