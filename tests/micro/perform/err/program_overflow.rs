@@ -15,6 +15,8 @@ fn load_immediate() {
     assert_eq!(MicroOp::LoadImmediate.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                Err(MicroOpPerformError::ProgramOverflow));
 
+    let _read_pc = *uni_orig.3;
+    let _read_adr = *uni_orig.5;
     *uni_orig.3 = addr;
     *uni_orig.5 = addr;
 

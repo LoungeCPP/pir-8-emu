@@ -1,3 +1,4 @@
+use self::super::super::super::{ReadWriteMarker, ReadWritable};
 use num_traits::{Unsigned, PrimInt, Num};
 use std::ops::{DerefMut, Deref};
 use std::mem::size_of;
@@ -20,6 +21,7 @@ pub struct SpecialPurposeRegister<T: Num + Unsigned + PrimInt> {
     data: T,
     name: &'static str,
     short: &'static str,
+    rw: ReadWriteMarker,
 }
 
 impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
@@ -39,6 +41,7 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
             data: T::zero(),
             name: name,
             short: short,
+            rw: ReadWriteMarker::new(),
         }
     }
 
@@ -59,11 +62,26 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
     }
 }
 
+impl<T: Num + Unsigned + PrimInt> ReadWritable for SpecialPurposeRegister<T> {
+    fn was_read(&self) -> bool {
+        self.rw.was_read()
+    }
+
+    fn was_written(&self) -> bool {
+        self.rw.was_written()
+    }
+
+    fn rw_reset(&mut self) {
+        self.rw.reset()
+    }
+}
+
 impl<T: Num + Unsigned + PrimInt> Deref for SpecialPurposeRegister<T> {
     type Target = T;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
+        self.rw.read();
         &self.data
     }
 }
@@ -71,6 +89,7 @@ impl<T: Num + Unsigned + PrimInt> Deref for SpecialPurposeRegister<T> {
 impl<T: Num + Unsigned + PrimInt> DerefMut for SpecialPurposeRegister<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
+        self.rw.written();
         &mut self.data
     }
 }

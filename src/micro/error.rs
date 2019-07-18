@@ -39,7 +39,7 @@ impl Error for MicroOpPerformError {}
 impl fmt::Display for MicroOpPerformError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MicroOpPerformError::MicrostackUnderflow => f.write_str("μStack underflow"),
+            MicroOpPerformError::MicrostackUnderflow => f.write_str("μstack underflow"),
             MicroOpPerformError::InvalidMicrostackTop(actual, valid) => {
                 write!(f, "Invalid top of the μstack: {:#04x}, expected any of: ", actual)?;
                 write_expected(valid, f)

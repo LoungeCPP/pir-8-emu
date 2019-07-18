@@ -75,7 +75,9 @@ fn stack_push() {
                        Ok(true));
 
             uni_orig.0[addr as usize + 1] = i;
+            let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr + 1;
+            let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr + 1;
 
             assert_eq!(memory, uni_orig.0);
@@ -108,7 +110,9 @@ fn stack_pop() {
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
+            let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr - 1;
+            let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);
@@ -252,7 +256,9 @@ fn load_immediate() {
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
+            let _read_pc = *uni_orig.3;
             *uni_orig.3 = addr + 1;
+            let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);
@@ -284,6 +290,7 @@ fn fetch_address() {
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
+            let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);
@@ -314,6 +321,7 @@ fn write_address() {
                        Ok(true));
 
             uni_orig.0[addr as usize] = i;
+            let _read_adr = *uni_orig.5;
             *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);

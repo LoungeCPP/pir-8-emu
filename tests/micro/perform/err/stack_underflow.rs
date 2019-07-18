@@ -18,7 +18,9 @@ fn stack_pop() {
                    Err(MicroOpPerformError::StackUnderflow));
 
         uni_orig.0[addr as usize] = i;
+        let _read_sp = *uni_orig.4;
         *uni_orig.4 = addr;
+        *uni_orig.5 = *uni_orig.5;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);

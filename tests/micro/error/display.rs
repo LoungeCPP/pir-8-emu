@@ -6,7 +6,7 @@ static EXPECTED: &[u8] = &[0, 1, 2, 3, 4];
 
 #[test]
 fn microstack_underflow() {
-    assert_eq!(MicroOpPerformError::MicrostackUnderflow.to_string(), "μStack underflow");
+    assert_eq!(MicroOpPerformError::MicrostackUnderflow.to_string(), "μstack underflow");
 }
 
 #[test]

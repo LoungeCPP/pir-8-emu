@@ -16,6 +16,7 @@ fn stack_push() {
         assert_eq!(MicroOp::StackPush.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Err(MicroOpPerformError::StackOverflow));
 
+        let _read_sp = *uni_orig.4;
         *uni_orig.4 = addr;
 
         assert_eq!(memory, uni_orig.0);
