@@ -1,4 +1,5 @@
 use pir_8_emu::micro::MicroOp;
+use pir_8_emu::ReadWritable;
 use self::super::universe;
 
 mod check_jump_condition;
@@ -346,11 +347,14 @@ fn read_register() {
 
             let mut stack = vec![];
             *registers[aaa as usize] = i;
+            registers[aaa as usize].rw_reset();
 
             assert_eq!(MicroOp::ReadRegister(aaa).perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
             *uni_orig.2[aaa as usize] = i;
+            uni_orig.2[aaa as usize].rw_reset();
+            let _read_aaa = *uni_orig.2[aaa as usize];
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);

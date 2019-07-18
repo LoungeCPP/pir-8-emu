@@ -1,3 +1,4 @@
+use self::super::super::super::{ReadWriteMarker, ReadWritable};
 use self::super::super::super::util::limit_to_width;
 use self::super::GeneralPurposeRegisterBank;
 use std::ops::{DerefMut, Deref};
@@ -45,6 +46,7 @@ pub struct GeneralPurposeRegister {
     /// Verified to 3 bits at construction time
     address: u8,
     letter: char,
+    rw: ReadWriteMarker,
 }
 
 impl GeneralPurposeRegister {
@@ -70,6 +72,7 @@ impl GeneralPurposeRegister {
             } else {
                 None
             }?,
+            rw: ReadWriteMarker::new(),
         })
     }
 
@@ -133,11 +136,29 @@ impl GeneralPurposeRegister {
     }
 }
 
+impl ReadWritable for GeneralPurposeRegister {
+    #[inline]
+    fn was_read(&self) -> bool {
+        self.rw.was_read()
+    }
+
+    #[inline]
+    fn was_written(&self) -> bool {
+        self.rw.was_written()
+    }
+
+    #[inline]
+    fn rw_reset(&mut self) {
+        self.rw.reset()
+    }
+}
+
 impl Deref for GeneralPurposeRegister {
     type Target = u8;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
+        self.rw.read();
         &self.data
     }
 }
@@ -145,6 +166,7 @@ impl Deref for GeneralPurposeRegister {
 impl DerefMut for GeneralPurposeRegister {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
+        self.rw.written();
         &mut self.data
     }
 }

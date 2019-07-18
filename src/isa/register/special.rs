@@ -63,14 +63,17 @@ impl<T: Num + Unsigned + PrimInt> SpecialPurposeRegister<T> {
 }
 
 impl<T: Num + Unsigned + PrimInt> ReadWritable for SpecialPurposeRegister<T> {
+    #[inline]
     fn was_read(&self) -> bool {
         self.rw.was_read()
     }
 
+    #[inline]
     fn was_written(&self) -> bool {
         self.rw.was_written()
     }
 
+    #[inline]
     fn rw_reset(&mut self) {
         self.rw.reset()
     }
