@@ -265,11 +265,11 @@
 
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span> <span class="op">=</span> <span class="ident">sp</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">StackOverflow</span>)<span class="question-mark">?</span>;
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>;
-                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">byte</span>;
+                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>] <span class="op">=</span> <span class="ident">byte</span>;
             }
             <span class="ident">MicroOp</span>::<span class="ident">StackPop</span> <span class="op">=&gt;</span> {
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="kw">as</span> <span class="ident">usize</span>];
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span> <span class="op">=</span> <span class="ident">sp</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">StackUnderflow</span>)<span class="question-mark">?</span>;
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
@@ -321,7 +321,7 @@
             <span class="ident">MicroOp</span>::<span class="ident">MakeImmediate</span>(<span class="ident">b</span>) <span class="op">=&gt;</span> <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">b</span>),
             <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span> <span class="op">=&gt;</span> {
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="kw">as</span> <span class="ident">usize</span>];
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="ident">pc</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">ProgramOverflow</span>)<span class="question-mark">?</span>;
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
@@ -331,7 +331,7 @@
                 <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>)<span class="question-mark">?</span>;
 
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="ident">address</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="kw">as</span> <span class="ident">usize</span>];
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
             }
@@ -340,7 +340,7 @@
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
 
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="ident">address</span>;
-                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">byte</span>;
+                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>] <span class="op">=</span> <span class="ident">byte</span>;
             }
 
             <span class="ident">MicroOp</span>::<span class="ident">CheckJumpCondition</span>(<span class="ident">cond</span>) <span class="op">=&gt;</span> {
