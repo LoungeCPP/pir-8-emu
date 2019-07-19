@@ -19,7 +19,121 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Microcode implementation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The μOp is the smallest executable atom into sets of which instructions degenerate,</span>
+<span class="doccomment">//! implementing an 8-bit a stack-based language.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Ignoring error handling, a simple emulator without I/O port support can be implemented as such</span>
+<span class="doccomment">//! (as in the `emulate_dumb` example):</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};</span>
+<span class="doccomment">//! # use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};</span>
+<span class="doccomment">//! # use pir_8_emu::isa::instruction::Instruction;</span>
+<span class="doccomment">//! # use pir_8_emu::vm::{Memory, Ports};</span>
+<span class="doccomment">//! let mut ports     = Ports::new();</span>
+<span class="doccomment">//! let mut registers = GeneralPurposeRegister::defaults();</span>
+<span class="doccomment">//! let mut pc        = SpecialPurposeRegister::new(&quot;Program Counter&quot;, &quot;PC&quot;);</span>
+<span class="doccomment">//! let mut sp        = SpecialPurposeRegister::new(&quot;Stack Pointer&quot;, &quot;SP&quot;);</span>
+<span class="doccomment">//! let mut adr       = SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;);</span>
+<span class="doccomment">//! let mut ins       = SpecialPurposeRegister::new(&quot;Instruction&quot;, &quot;INS&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut memory = Memory::from(&amp;[Instruction::LoadIndirect { aaa: 0b100 }.into(),</span>
+<span class="doccomment">//!                                 0x01, 0x10,</span>
+<span class="doccomment">//!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),</span>
+<span class="doccomment">//!                                 0x69,</span>
+<span class="doccomment">//!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Move { aaa: 0b101, bbb: 0b100 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Move { aaa: 0b110, bbb: 0b101 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Halt.into()][..]);</span>
+<span class="doccomment">//! memory[0x0110] = 0xA1;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut stack = vec![];</span>
+<span class="doccomment">//! &#39;outside: loop {</span>
+<span class="doccomment">//!     let ops = NEXT_INSTRUCTION;</span>
+<span class="doccomment">//!     let ops = &amp;ops.0[..ops.1];</span>
+<span class="doccomment">//!     for op in ops {</span>
+<span class="doccomment">//!         if !op.perform(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers, &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins).unwrap() {</span>
+<span class="doccomment">//!             break &#39;outside;</span>
+<span class="doccomment">//!         }</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     let instr = Instruction::from(*ins);</span>
+<span class="doccomment">//!     let ops = MicroOp::from_instruction(instr);</span>
+<span class="doccomment">//!     let ops = &amp;ops.0[..ops.1];</span>
+<span class="doccomment">//!     for op in ops {</span>
+<span class="doccomment">//!         if !op.perform(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers, &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins).unwrap() {</span>
+<span class="doccomment">//!             break &#39;outside;</span>
+<span class="doccomment">//!         }</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(*registers[0b100], 0x69);</span>
+<span class="doccomment">//! assert_eq!(*registers[0b101], 0xA1);</span>
+<span class="doccomment">//! ```</span>
+
+
 <span class="kw">mod</span> <span class="ident">from_instruction</span>;
 <span class="kw">mod</span> <span class="ident">execute</span>;
 <span class="kw">mod</span> <span class="ident">display</span>;
