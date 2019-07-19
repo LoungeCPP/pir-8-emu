@@ -1,5 +1,6 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
 use self::super::MemoryReadWriteIterator;
+use std::marker::PhantomData;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
@@ -50,6 +51,7 @@ impl Memory {
             written: &self.written[..],
             next_idx: 0,
             finished: false,
+            idx: PhantomData,
         }
     }
 
