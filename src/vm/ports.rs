@@ -45,7 +45,9 @@ impl Ports {
     /// ```
     pub fn iter_rw(&self) -> PortsReadWriteIterator {
         PortsReadWriteIterator {
-            ports: &self,
+            data: &self.data[..],
+            read: &self.read[..],
+            written: &self.written[..],
             next_idx: 0,
             finished: false,
         }

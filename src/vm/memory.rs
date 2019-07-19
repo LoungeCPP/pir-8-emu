@@ -45,7 +45,9 @@ impl Memory {
     /// ```
     pub fn iter_rw(&self) -> MemoryReadWriteIterator {
         MemoryReadWriteIterator {
-            memory: &self,
+            data: &self.data[..],
+            read: &self.read[..],
+            written: &self.written[..],
             next_idx: 0,
             finished: false,
         }

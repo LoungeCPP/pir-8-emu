@@ -1,31 +1,29 @@
-use self::super::Ports;
+use num_traits::{Unsigned, NumCast, PrimInt, Num};
 use std::iter::Iterator;
 
 
-/// Iterator over read-from and written-to bytes of `Ports`
-///
-/// Created by the [`iter_rw()`](struct.Ports.html#method.iter_rw) method on [`Ports`](struct.Ports.html)
-///
-/// The item type is `(idx, val, was_read, was_written)`
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PortsReadWriteIterator<'m> {
-    pub(super) ports: &'m Ports,
-    pub(super) next_idx: u8,
+pub struct MemoryPortsReadWriteIterator<'m, IdxT: Num + Unsigned + PrimInt + NumCast> {
+    pub(super) data: &'m [u8],
+    pub(super) read: &'m [u64],
+    pub(super) written: &'m [u64],
+
+    pub(super) next_idx: IdxT,
     pub(super) finished: bool,
 }
 
-impl Iterator for PortsReadWriteIterator<'_> {
-    type Item = (u8, u8, bool, bool);
+impl<IdxT: Num + Unsigned + PrimInt + NumCast> Iterator for MemoryPortsReadWriteIterator<'_, IdxT> {
+    type Item = (IdxT, u8, bool, bool);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.finished {
             return None;
         }
 
-        let mut next_idx = self.next_idx as usize;
+        let mut next_idx = self.next_idx.to_usize().unwrap();
 
         let (was_read, was_written) = loop {
-            if next_idx >= self.ports.data.len() {
+            if next_idx >= self.data.len() {
                 self.finished = true;
                 return None;
             }
@@ -33,8 +31,8 @@ impl Iterator for PortsReadWriteIterator<'_> {
             let idx = next_idx / 64;
             let bit = next_idx % 64;
 
-            let read = self.ports.read[idx];
-            let written = self.ports.written[idx];
+            let read = self.read[idx];
+            let written = self.written[idx];
             if read == 0 && written == 0 {
                 next_idx += 64 - bit;
                 continue;
@@ -51,9 +49,9 @@ impl Iterator for PortsReadWriteIterator<'_> {
             break (was_read, was_written);
         };
 
-        let idx = next_idx as u8;
-        self.next_idx = idx + 1;
+        let idx = IdxT::from(next_idx).unwrap();
+        self.next_idx = idx + IdxT::one();
 
-        Some((idx, self.ports.data[idx as usize], was_read, was_written))
+        Some((idx, self.data[next_idx], was_read, was_written))
     }
 }
