@@ -1,3 +1,62 @@
+//! Microcode implementation
+//!
+//! The μOp is the smallest executable atom into sets of which instructions degenerate,
+//! implementing an 8-bit a stack-based language.
+//!
+//! # Examples
+//!
+//! Ignoring error handling, a simple emulator without I/O port support can be implemented as such
+//! (as in the `emulate_dumb` example):
+//!
+//! ```
+//! # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
+//! # use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};
+//! # use pir_8_emu::isa::instruction::Instruction;
+//! # use pir_8_emu::vm::{Memory, Ports};
+//! let mut ports     = Ports::new();
+//! let mut registers = GeneralPurposeRegister::defaults();
+//! let mut pc        = SpecialPurposeRegister::new("Program Counter", "PC");
+//! let mut sp        = SpecialPurposeRegister::new("Stack Pointer", "SP");
+//! let mut adr       = SpecialPurposeRegister::new("Memory Address", "ADR");
+//! let mut ins       = SpecialPurposeRegister::new("Instruction", "INS");
+//!
+//! let mut memory = Memory::from(&[Instruction::LoadIndirect { aaa: 0b100 }.into(),
+//!                                 0x01, 0x10,
+//!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),
+//!                                 0x69,
+//!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),
+//!                                 Instruction::Move { aaa: 0b101, bbb: 0b100 }.into(),
+//!                                 Instruction::Move { aaa: 0b110, bbb: 0b101 }.into(),
+//!                                 Instruction::Halt.into()][..]);
+//! memory[0x0110] = 0xA1;
+//!
+//! let mut stack = vec![];
+//! 'outside: loop {
+//!     let ops = NEXT_INSTRUCTION;
+//!     let ops = &ops.0[..ops.1];
+//!     for op in ops {
+//!         if !op.perform(&mut stack, &mut memory, &mut ports, &mut registers,
+//!                        &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
+//!             break 'outside;
+//!         }
+//!     }
+//!
+//!     let instr = Instruction::from(*ins);
+//!     let ops = MicroOp::from_instruction(instr);
+//!     let ops = &ops.0[..ops.1];
+//!     for op in ops {
+//!         if !op.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc,
+//!                        &mut sp, &mut adr, &mut ins).unwrap() {
+//!             break 'outside;
+//!         }
+//!     }
+//! }
+//!
+//! assert_eq!(*registers[0b100], 0x69);
+//! assert_eq!(*registers[0b101], 0xA1);
+//! ```
+
+
 mod from_instruction;
 mod execute;
 mod display;
