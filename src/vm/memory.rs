@@ -1,6 +1,5 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::MemoryReadWriteIterator;
-use std::marker::PhantomData;
+use self::super::MemoryReadWrittenIterator;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
@@ -44,15 +43,8 @@ impl Memory {
     ///              (0x4B0B, 0x00, true, true),
     ///              (0xEB0B, 0x12, false, true)]);
     /// ```
-    pub fn iter_rw(&self) -> MemoryReadWriteIterator {
-        MemoryReadWriteIterator {
-            data: &self.data[..],
-            read: &self.read[..],
-            written: &self.written[..],
-            next_idx: 0,
-            finished: false,
-            idx: PhantomData,
-        }
+    pub fn iter_rw(&self) -> MemoryReadWrittenIterator {
+        MemoryReadWrittenIterator::new(&self.data[..], &self.read[..], &self.written[..])
     }
 
     /// Mark all of memory as unread and unwritten

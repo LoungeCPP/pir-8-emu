@@ -1,6 +1,5 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::PortsReadWriteIterator;
-use std::marker::PhantomData;
+use self::super::{PortHandlerInstallError, PortsReadWrittenIterator, PortHandler};
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
@@ -44,15 +43,8 @@ impl Ports {
     ///              (0xA1, 0x00, true, false),
     ///              (0xEB, 0x12, false, true)]);
     /// ```
-    pub fn iter_rw(&self) -> PortsReadWriteIterator {
-        PortsReadWriteIterator {
-            data: &self.data[..],
-            read: &self.read[..],
-            written: &self.written[..],
-            next_idx: 0,
-            finished: false,
-            idx: PhantomData,
-        }
+    pub fn iter_rw(&self) -> PortsReadWrittenIterator {
+        PortsReadWrittenIterator::new(&self.cache[..], &self.read[..], &self.written[..])
     }
 
     /// Mark all ports as unread and unwritten

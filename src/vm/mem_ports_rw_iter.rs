@@ -4,18 +4,32 @@ use std::iter::Iterator;
 
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct MemoryPortsReadWriteIterator<'m, IdxT: Num + Unsigned + PrimInt + NumCast> {
-    pub(super) data: &'m [u8],
-    pub(super) read: &'m [u64],
-    pub(super) written: &'m [u64],
+pub struct MemoryPortsReadWrittenIterator<'m, IdxT: Num + Unsigned + PrimInt + NumCast> {
+    data: &'m [u8],
+    read: &'m [u64],
+    written: &'m [u64],
 
-    pub(super) next_idx: usize,
-    pub(super) finished: bool,
+    next_idx: usize,
+    finished: bool,
 
-    pub(super) idx: PhantomData<IdxT>,
+    idx: PhantomData<IdxT>,
 }
 
-impl<IdxT: Num + Unsigned + PrimInt + NumCast> Iterator for MemoryPortsReadWriteIterator<'_, IdxT> {
+impl<'m, IdxT: Num + Unsigned + PrimInt + NumCast> MemoryPortsReadWrittenIterator<'m, IdxT> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    pub(super) fn new(data: &'m [u8], read: &'m [u64], written: &'m [u64]) -> MemoryPortsReadWrittenIterator<'m, IdxT> {
+        MemoryPortsReadWrittenIterator {
+            data: data,
+            read: read,
+            written: written,
+            next_idx: 0,
+            finished: false,
+            idx: PhantomData,
+        }
+    }
+}
+
+impl<IdxT: Num + Unsigned + PrimInt + NumCast> Iterator for MemoryPortsReadWrittenIterator<'_, IdxT> {
     type Item = (IdxT, u8, bool, bool);
 
     fn next(&mut self) -> Option<Self::Item> {
