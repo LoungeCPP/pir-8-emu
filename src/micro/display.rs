@@ -10,8 +10,8 @@ use std::fmt;
 /// It is created by the [`display()`](enum.MicroOp.html#method.display) method on [`MicroOp`](enum.MicroOp.html).
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DisplayMicroOp<'a> {
-    pub(crate) op: &'a MicroOp,
-    pub(crate) registers: &'a GeneralPurposeRegisterBank,
+    pub(super) op: &'a MicroOp,
+    pub(super) registers: &'a GeneralPurposeRegisterBank,
 }
 
 impl<'a> fmt::Display for DisplayMicroOp<'a> {

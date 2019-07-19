@@ -1,6 +1,6 @@
 use self::super::super::isa::{GeneralPurposeRegisterBank, SpecialPurposeRegister};
 use self::super::{MicroOpPerformError, MicroOp};
-use self::super::super::{Memory, Ports};
+use self::super::super::vm::{Memory, Ports};
 
 
 const FLAG_BIT_ZERO: usize = 0; // Zero flag
@@ -31,7 +31,7 @@ impl MicroOp {
     ///
     /// ```
     /// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
-    /// # use pir_8_emu::{Memory, Ports};
+    /// # use pir_8_emu::vm::{Memory, Ports};
     /// # use pir_8_emu::micro::MicroOp;
     /// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =
     /// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),
@@ -62,7 +62,7 @@ impl MicroOp {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
                 **ins = byte;
-            },
+            }
 
             MicroOp::StackPush => {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
@@ -159,7 +159,7 @@ impl MicroOp {
                 let address = pop_address(stack)?;
 
                 match is_ok {
-                    0 => {},
+                    0 => {}
                     1 => **pc = address,
                     _ => return Err(MicroOpPerformError::InvalidMicrostackTop(is_ok, VALID_IS_OK_VALUES)),
                 }

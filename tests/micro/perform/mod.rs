@@ -1,5 +1,5 @@
 use pir_8_emu::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister, SpecialPurposeRegister};
-use pir_8_emu::{Memory, Ports};
+use pir_8_emu::vm::{Memory, Ports};
 
 
 mod err;

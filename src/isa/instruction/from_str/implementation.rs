@@ -10,7 +10,7 @@ use std::usize;
 
 impl Instruction {
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    pub(crate) fn from_str_impl(s: &str, registers: &GeneralPurposeRegisterBank) -> Result<Instruction, ParseInstructionError> {
+    pub(in self::super::super) fn from_str_impl(s: &str, registers: &GeneralPurposeRegisterBank) -> Result<Instruction, ParseInstructionError> {
         if let Some(idx) = s.find(is_invalid_character) {
             return Err(ParseInstructionError::InvalidCharacter(idx));
         }

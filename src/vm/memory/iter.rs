@@ -9,9 +9,9 @@ use std::iter::Iterator;
 /// The item type is `(idx, val, was_read, was_written)`
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MemoryReadWriteIterator<'m> {
-    pub(crate) memory: &'m Memory,
-    pub(crate) next_idx: u16,
-    pub(crate) finished: bool,
+    pub(super) memory: &'m Memory,
+    pub(super) next_idx: u16,
+    pub(super) finished: bool,
 }
 
 impl Iterator for MemoryReadWriteIterator<'_> {

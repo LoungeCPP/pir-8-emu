@@ -1,11 +1,8 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
+use self::super::MemoryReadWriteIterator;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
-
-mod iter;
-
-pub use self::iter::MemoryReadWriteIterator;
 
 
 const MEMORY_LEN: usize = 0xFFFF + 1;
@@ -14,9 +11,9 @@ const MEMORY_LEN: usize = 0xFFFF + 1;
 /// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array with R/W tracking
 #[derive(Clone)]
 pub struct Memory {
-    data: Box<[u8; MEMORY_LEN]>,
-    read: Box<[u64; MEMORY_LEN / 64]>,
-    written: Box<[u64; MEMORY_LEN / 64]>,
+    pub(super) data: Box<[u8; MEMORY_LEN]>,
+    pub(super) read: Box<[u64; MEMORY_LEN / 64]>,
+    pub(super) written: Box<[u64; MEMORY_LEN / 64]>,
 }
 
 impl Memory {
@@ -34,7 +31,7 @@ impl Memory {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::Memory;
+    /// # use pir_8_emu::vm::Memory;
     /// let mut memory = Memory::new();
     /// memory[0x4B0B] = memory[0x00A1];
     /// println!("{}", memory[0x4B0B]);
@@ -59,7 +56,7 @@ impl Memory {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::Memory;
+    /// # use pir_8_emu::vm::Memory;
     /// let mut memory = Memory::new();
     /// memory[0x4B0B] = memory[0x00A1];
     /// println!("{}", memory[0x4B0B]);

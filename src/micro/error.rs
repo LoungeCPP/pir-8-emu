@@ -9,7 +9,7 @@ use std::fmt;
 /// ```
 /// # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
 /// # use pir_8_emu::micro::{MicroOpPerformError, MicroOp};
-/// # use pir_8_emu::{Memory, Ports};
+/// # use pir_8_emu::vm::{Memory, Ports};
 /// # let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) =
 /// #     (Memory::new(), Ports::new(), GeneralPurposeRegister::defaults(),
 /// #      SpecialPurposeRegister::new("Program Counter", "PC"), SpecialPurposeRegister::new("Stack Pointer", "SP"),

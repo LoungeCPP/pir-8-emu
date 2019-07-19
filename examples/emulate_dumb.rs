@@ -3,7 +3,7 @@ extern crate pir_8_emu;
 use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
 use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};
 use pir_8_emu::isa::instruction::Instruction;
-use pir_8_emu::{Memory, Ports};
+use pir_8_emu::vm::{Memory, Ports};
 use std::{env, fs};
 
 

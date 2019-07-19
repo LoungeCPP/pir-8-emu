@@ -11,8 +11,8 @@ use std::fmt;
 /// It is created by the [`display()`](enum.Instruction.html#method.display) method on [`Instruction`](enum.Instruction.html).
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DisplayInstruction<'a> {
-    pub(crate) instr: &'a Instruction,
-    pub(crate) registers: &'a GeneralPurposeRegisterBank,
+    pub(super) instr: &'a Instruction,
+    pub(super) registers: &'a GeneralPurposeRegisterBank,
 }
 
 impl<'a> fmt::Display for DisplayInstruction<'a> {

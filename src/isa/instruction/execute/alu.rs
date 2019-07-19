@@ -2,7 +2,7 @@ use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOr
 
 
 impl AluOperation {
-    pub(crate) fn perform_impl(&self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
+    pub(in self::super::super) fn perform_impl(&self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
         match *self {
             AluOperation::Reserved(_) => {
                 *carry = true;
