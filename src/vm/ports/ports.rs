@@ -1,4 +1,5 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
+use self::super::PortsReadWriteIterator;
 use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
@@ -16,11 +17,61 @@ pub struct Ports {
 }
 
 impl Ports {
+    /// Create fresh zero-initialised unread and unwritten ports
     pub fn new() -> Ports {
         Ports {
             data: Box::new([0; PORTS_LEN]),
             read: Box::new([0; PORTS_LEN / 64]),
             written: Box::new([0; PORTS_LEN / 64]),
+        }
+    }
+
+    /// Get an iterator over the read and written port cells
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::vm::Ports;
+    /// let mut ports = Ports::new();
+    /// ports[0x4B] = ports[0xA1];
+    /// println!("{}", ports[0x4B]);
+    /// ports[0xEB] = 0x12;
+    ///
+    /// // (address, value, was_read, was_written)
+    /// assert_eq!(ports.iter_rw().collect::<Vec<_>>(),
+    ///            &[(0x4B, 0x00, true, true),
+    ///              (0xA1, 0x00, true, false),
+    ///              (0xEB, 0x12, false, true)]);
+    /// ```
+    pub fn iter_rw(&self) -> PortsReadWriteIterator {
+        PortsReadWriteIterator {
+            ports: &self,
+            next_idx: 0,
+            finished: false,
+        }
+    }
+
+    /// Mark all ports as unread and unwritten
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::vm::Ports;
+    /// let mut ports = Ports::new();
+    /// ports[0x4B] = ports[0xA1];
+    /// println!("{}", ports[0x4B]);
+    /// ports[0xEB] = 0x12;
+    ///
+    /// ports.reset_rw();
+    /// assert_eq!(ports.iter_rw().collect::<Vec<_>>(), &[]);
+    /// ```
+    pub fn reset_rw(&mut self) {
+        for r in &mut self.read[..] {
+            *r = 0;
+        }
+
+        for w in &mut self.written[..] {
+            *w = 0;
         }
     }
 }
