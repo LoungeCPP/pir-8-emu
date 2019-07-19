@@ -265,9 +265,12 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">RangeToInclusive</span>, <span class="ident">RangeInclusive</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeTo</span>, <span class="ident">IndexMut</span>, <span class="ident">Index</span>, <span class="ident">Range</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">PortsReadWriteIterator</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="self">self</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -318,6 +321,7 @@
             <span class="ident">written</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">written</span>[..],
             <span class="ident">next_idx</span>: <span class="number">0</span>,
             <span class="ident">finished</span>: <span class="bool-val">false</span>,
+            <span class="ident">idx</span>: <span class="ident">PhantomData</span>,
         }
     }
 
