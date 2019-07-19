@@ -81,6 +81,12 @@ impl ReadWriteMarker {
     }
 }
 
+impl Default for ReadWriteMarker {
+    fn default() -> ReadWriteMarker {
+        ReadWriteMarker::new()
+    }
+}
+
 impl fmt::Debug for ReadWriteMarker {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ReadWriteMarker")

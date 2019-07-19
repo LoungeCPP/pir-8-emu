@@ -3,6 +3,10 @@ use std::hash::{self, Hash};
 use std::cmp::Ordering;
 use std::fmt;
 
+mod iter;
+
+pub use self::iter::MemoryReadWriteIterator;
+
 
 const MEMORY_LEN: usize = 0xFFFF + 1;
 
@@ -24,6 +28,55 @@ impl Memory {
             written: Box::new([0; MEMORY_LEN / 64]),
         }
     }
+
+    /// Get an iterator over the read and written memory cells
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::Memory;
+    /// let mut memory = Memory::new();
+    /// memory[0x4B0B] = memory[0x00A1];
+    /// println!("{}", memory[0x4B0B]);
+    /// memory[0xEB0B] = 0x12;
+    ///
+    /// // (address, value, was_read, was_written)
+    /// assert_eq!(memory.iter_rw().collect::<Vec<_>>(),
+    ///            &[(0x00A1, 0x00, true, false),
+    ///              (0x4B0B, 0x00, true, true),
+    ///              (0xEB0B, 0x12, false, true)]);
+    /// ```
+    pub fn iter_rw(&self) -> MemoryReadWriteIterator {
+        MemoryReadWriteIterator {
+            memory: &self,
+            next_idx: 0,
+            finished: false,
+        }
+    }
+
+    /// Mark all of memory as unread and unwritten
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::Memory;
+    /// let mut memory = Memory::new();
+    /// memory[0x4B0B] = memory[0x00A1];
+    /// println!("{}", memory[0x4B0B]);
+    /// memory[0xEB0B] = 0x12;
+    ///
+    /// memory.reset_rw();
+    /// assert_eq!(memory.iter_rw().collect::<Vec<_>>(), &[]);
+    /// ```
+    pub fn reset_rw(&mut self) {
+        for r in &mut self.read[..] {
+            *r = 0;
+        }
+
+        for w in &mut self.written[..] {
+            *w = 0;
+        }
+    }
 }
 
 impl Default for Memory {
@@ -33,7 +86,8 @@ impl Default for Memory {
 }
 
 impl From<&[u8]> for Memory {
-    fn from(data: &[u8]) -> Self {
+    /// Read as much data as possible from the specified buffer into this memory
+    fn from(data: &[u8]) -> Memory {
         let mut ret = Memory::new();
 
         let common_len = data.len().min(MEMORY_LEN);
