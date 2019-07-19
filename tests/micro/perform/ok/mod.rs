@@ -138,12 +138,13 @@ fn port_in() {
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![port];
-            ports[port as usize] = i;
+            ports[port] = i;
 
             assert_eq!(MicroOp::PortIn.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            uni_orig.1[port as usize] = i;
+            let _read_port = uni_orig.1[port];
+            uni_orig.1[port] = i;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);
@@ -170,7 +171,7 @@ fn port_out() {
             assert_eq!(MicroOp::PortOut.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
-            uni_orig.1[port as usize] = i;
+            uni_orig.1[port] = i;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);
