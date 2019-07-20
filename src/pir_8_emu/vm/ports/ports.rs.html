@@ -430,9 +430,50 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">RangeToInclusive</span>, <span class="ident">RangeInclusive</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeTo</span>, <span class="ident">IndexMut</span>, <span class="ident">Index</span>, <span class="ident">Range</span>};
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortReadWriteProxy</span>, <span class="ident">PortHandler</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortHandler</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">PortsReadWrittenIterator</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="self">self</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">NonZeroU16</span>;
@@ -452,8 +493,6 @@
 
     <span class="ident">handlers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PortHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
     <span class="ident">handler_mappings</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU16</span><span class="op">&gt;</span>; <span class="ident">PORTS_LEN</span>]<span class="op">&gt;</span>,
-
-    <span class="ident">cur_proxy</span>: <span class="ident">PortReadWriteProxy</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Ports</span> {
@@ -465,7 +504,6 @@
             <span class="ident">written</span>: <span class="ident">Box</span>::<span class="ident">new</span>([<span class="number">0</span>; <span class="ident">PORTS_LEN</span> <span class="op">/</span> <span class="number">64</span>]),
             <span class="ident">handlers</span>: <span class="macro">vec</span><span class="macro">!</span>[],
             <span class="ident">handler_mappings</span>: <span class="ident">Box</span>::<span class="ident">new</span>([<span class="prelude-val">None</span>; <span class="ident">PORTS_LEN</span>]),
-            <span class="ident">cur_proxy</span>: <span class="ident">PortReadWriteProxy</span>::<span class="ident">Read</span>(<span class="number">0</span>),
         }
     }
 
@@ -488,6 +526,8 @@
     <span class="doccomment">/// impl PortHandler for InitableHandler {</span>
     <span class="doccomment">/// #   fn port_count(&amp;self) -&gt; NonZeroU8 { NonZeroU8::new(1).unwrap() }</span>
     <span class="doccomment">///     fn init(&amp;mut self, ports: &amp;[u8]) { self.0 = Some(ports[0]); }</span>
+    <span class="doccomment">/// #   fn handle_read(&amp;mut self, _: u8) -&gt; u8 { 0 }</span>
+    <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
     <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(InitableHandler(self.0)) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -567,6 +607,8 @@
     <span class="doccomment">/// impl PortHandler for InitableHandler {</span>
     <span class="doccomment">/// #   fn port_count(&amp;self) -&gt; NonZeroU8 { NonZeroU8::new(1).unwrap() }</span>
     <span class="doccomment">///     fn init(&amp;mut self, ports: &amp;[u8]) { self.0 = Some(ports[0]); }</span>
+    <span class="doccomment">/// #   fn handle_read(&amp;mut self, _: u8) -&gt; u8 { 0 }</span>
+    <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
     <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(InitableHandler(self.0)) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -602,6 +644,102 @@
         <span class="prelude-val">Some</span>(<span class="ident">handler</span>)
     }
 
+    <span class="doccomment">/// Read from the specified port</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a handler is installed there, delegate thereto and cache the result</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Marks the port read</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};</span>
+    <span class="doccomment">/// # use std::num::NonZeroU8;</span>
+    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
+    <span class="doccomment">/// struct PassthroughHandler;</span>
+    <span class="doccomment">/// impl PortHandler for PassthroughHandler {</span>
+    <span class="doccomment">/// #   fn port_count(&amp;self) -&gt; NonZeroU8 { NonZeroU8::new(1).unwrap() }</span>
+    <span class="doccomment">/// #   fn init(&amp;mut self, _: &amp;[u8]) {}</span>
+    <span class="doccomment">///     fn handle_read(&amp;mut self, port: u8) -&gt; u8 { port }</span>
+    <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
+    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(PassthroughHandler) }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut ports = Ports::new();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ports.install_handler(PassthroughHandler, &amp;[0xA1]).map_err(|(_, e)| e).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(ports.read(0xBE), 0);</span>
+    <span class="doccomment">/// assert_eq!(ports.read(0xA1), 0xA1);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">port</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">port</span> <span class="kw">as</span> <span class="ident">usize</span>;
+
+        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>;
+        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>;
+        <span class="kw">unsafe</span> {
+            <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>[<span class="ident">idx</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u64</span>) <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
+        }
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler_mappings</span>[<span class="ident">index</span>] {
+            <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handlers</span>[<span class="ident">handler_idx</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">handle_read</span>(<span class="ident">port</span>);
+
+            <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="ident">new_val</span>;
+        }
+
+        <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>]
+    }
+
+
+    <span class="doccomment">/// Write to the specified port</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a handler is installed there, delegate thereto</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Caches the specified byte</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Marks the port written</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};</span>
+    <span class="doccomment">/// # use std::num::NonZeroU8;</span>
+    <span class="doccomment">/// # #[derive(Eq, PartialEq, Debug)]</span>
+    <span class="doccomment">/// struct StorageHandler(u8);</span>
+    <span class="doccomment">/// impl PortHandler for StorageHandler {</span>
+    <span class="doccomment">/// #   fn port_count(&amp;self) -&gt; NonZeroU8 { NonZeroU8::new(1).unwrap() }</span>
+    <span class="doccomment">/// #   fn init(&amp;mut self, _: &amp;[u8]) {}</span>
+    <span class="doccomment">///     fn handle_read(&amp;mut self, _: u8) -&gt; u8 { self.0 * 2 }</span>
+    <span class="doccomment">///     fn handle_write(&amp;mut self, _: u8, data: u8) { self.0 = data; }</span>
+    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(StorageHandler(self.0)) }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut ports = Ports::new();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let handler_id = ports.install_handler(StorageHandler(3), &amp;[0xA1])</span>
+    <span class="doccomment">///                       .map_err(|(_, e)| e).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(ports.read(0xA1), 6);</span>
+    <span class="doccomment">/// ports.write(0xA1, 12);</span>
+    <span class="doccomment">/// assert_eq!(ports.read(0xA1), 24);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(ports.get_handler(handler_id).and_then(|h| h.downcast_ref()),</span>
+    <span class="doccomment">///            Some(&amp;StorageHandler(12)));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">port</span>: <span class="ident">u8</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
+        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">port</span> <span class="kw">as</span> <span class="ident">usize</span>;
+
+        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>;
+        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>;
+        <span class="self">self</span>.<span class="ident">written</span>[<span class="ident">idx</span>] <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler_mappings</span>[<span class="ident">index</span>] {
+            <span class="self">self</span>.<span class="ident">handlers</span>[<span class="ident">handler_idx</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">handle_write</span>(<span class="ident">port</span>, <span class="ident">byte</span>);
+        }
+
+        <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="ident">byte</span>;
+    }
+
     <span class="doccomment">/// Get an iterator over the read and written port cells</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -609,9 +747,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use pir_8_emu::vm::Ports;</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
-    <span class="doccomment">/// ports[0x4B] = ports[0xA1];</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, ports[0x4B]);</span>
-    <span class="doccomment">/// ports[0xEB] = 0x12;</span>
+    <span class="doccomment">/// let val = ports.read(0xA1);</span>
+    <span class="doccomment">/// ports.write(0x4B, val);</span>
+    <span class="doccomment">/// println!(&quot;{}&quot;, ports.read(0x4B));</span>
+    <span class="doccomment">/// ports.write(0xEB, 0x12);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // (address, value, was_read, was_written)</span>
     <span class="doccomment">/// assert_eq!(ports.iter_rw().collect::&lt;Vec&lt;_&gt;&gt;(),</span>
@@ -630,9 +769,10 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use pir_8_emu::vm::Ports;</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
-    <span class="doccomment">/// ports[0x4B] = ports[0xA1];</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, ports[0x4B]);</span>
-    <span class="doccomment">/// ports[0xEB] = 0x12;</span>
+    <span class="doccomment">/// let val = ports.read(0xA1);</span>
+    <span class="doccomment">/// ports.write(0x4B, val);</span>
+    <span class="doccomment">/// println!(&quot;{}&quot;, ports.read(0x4B));</span>
+    <span class="doccomment">/// ports.write(0xEB, 0x12);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ports.reset_rw();</span>
     <span class="doccomment">/// assert_eq!(ports.iter_rw().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[]);</span>
@@ -651,64 +791,6 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Ports</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Ports</span> {
         <span class="ident">Ports</span>::<span class="ident">new</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ports</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">PortReadWriteProxy</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">port_index</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Output</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">port_index</span> <span class="kw">as</span> <span class="ident">usize</span>;
-
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>;
-        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>;
-        <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>[<span class="ident">idx</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u64</span>) <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler_mappings</span>[<span class="ident">index</span>] {
-            <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handlers</span>[<span class="ident">handler_idx</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PortHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;&gt;</span>)).<span class="ident">as_mut</span>() }
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">handle_read</span>(<span class="ident">port_index</span>);
-
-            <span class="kw">unsafe</span> {
-                <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>) <span class="op">=</span> <span class="ident">new_val</span>;
-            }
-        }
-
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>];
-        <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cur_proxy</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>) <span class="op">=</span> <span class="ident">PortReadWriteProxy</span>::<span class="ident">Read</span>(<span class="ident">val</span>);
-        }
-
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cur_proxy</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ports</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">port_index</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Output</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">port_index</span> <span class="kw">as</span> <span class="ident">usize</span>;
-
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>;
-        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>;
-        <span class="self">self</span>.<span class="ident">written</span>[<span class="ident">idx</span>] <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
-
-        <span class="self">self</span>.<span class="ident">cur_proxy</span> <span class="op">=</span> <span class="ident">PortReadWriteProxy</span>::<span class="ident">Write</span>(<span class="ident">port_index</span>, <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>], <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Ports</span>);
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">cur_proxy</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Ports</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">handle_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">port_index</span>: <span class="ident">u8</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">port_index</span> <span class="kw">as</span> <span class="ident">usize</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler_mappings</span>[<span class="ident">index</span>] {
-            <span class="self">self</span>.<span class="ident">handlers</span>[<span class="ident">handler_idx</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">handle_write</span>(<span class="ident">port_index</span>, <span class="ident">byte</span>);
-        }
-
-        <span class="self">self</span>.<span class="ident">cache</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="ident">byte</span>;
     }
 }
 
