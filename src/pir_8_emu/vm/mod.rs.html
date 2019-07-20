@@ -24,10 +24,6 @@
 <span id="24">24</span>
 <span id="25">25</span>
 <span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Various parts of the virtual machine implementation</span>
 
@@ -35,15 +31,11 @@
 <span class="kw">mod</span> <span class="ident">cpu</span>;
 <span class="kw">mod</span> <span class="ident">ports</span>;
 <span class="kw">mod</span> <span class="ident">memory</span>;
-<span class="kw">mod</span> <span class="ident">port_handler</span>;
 <span class="kw">mod</span> <span class="ident">mem_ports_rw_iter</span>;
-<span class="kw">mod</span> <span class="ident">port_handler_install_error</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">cpu</span>::<span class="ident">Cpu</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ports</span>::<span class="ident">Ports</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">memory</span>::<span class="ident">Memory</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">port_handler</span>::<span class="ident">PortHandler</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">port_handler_install_error</span>::<span class="ident">PortHandlerInstallError</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ports</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortHandler</span>, <span class="ident">Ports</span>};
 
 
 <span class="doccomment">/// Iterator over read-from and written-to parts of `Ports`</span>
