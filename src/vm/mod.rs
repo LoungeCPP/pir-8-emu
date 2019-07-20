@@ -1,12 +1,10 @@
 //! Various parts of the virtual machine implementation
 
 
-mod cpu;
 mod ports;
 mod memory;
 mod mem_ports_rw_iter;
 
-pub use self::cpu::Cpu;
 pub use self::memory::Memory;
 pub use self::ports::{PortHandlerInstallError, PortHandler, Ports};
 
