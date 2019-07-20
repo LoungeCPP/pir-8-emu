@@ -203,9 +203,7 @@ impl Ports {
 
         let idx = index / 64;
         let bit = index % 64;
-        unsafe {
-            *(&self.read[idx] as *const u64 as *mut u64) |= 1 << bit;
-        }
+        self.read[idx] |= 1 << bit;
 
         if let Some(handler_idx) = self.handler_mappings[index] {
             let new_val = self.handlers[handler_idx.get() as usize - 1].as_mut().unwrap().handle_read(port);

@@ -86,7 +86,7 @@ impl GeneralPurposeRegister {
     ///
     /// Limited to 3 bits' width
     #[inline]
-    pub fn address(&self) -> u8 {
+    pub fn address(self) -> u8 {
         self.address
     }
 
@@ -94,7 +94,7 @@ impl GeneralPurposeRegister {
     ///
     /// E.g. "X"
     #[inline]
-    pub fn letter(&self) -> char {
+    pub fn letter(self) -> char {
         self.letter
     }
 }

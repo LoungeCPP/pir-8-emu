@@ -144,7 +144,7 @@ impl Instruction {
     /// assert!(!Instruction::Reserved(0).is_valid());
     /// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());
     /// ```
-    pub fn is_valid(&self) -> bool {
+    pub fn is_valid(self) -> bool {
         match self {
             Instruction::Reserved(_) => false,
             Instruction::Alu(op) => op.is_valid(),
@@ -164,7 +164,7 @@ impl Instruction {
     /// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);
     /// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);
     /// ```
-    pub fn data_length(&self) -> usize {
+    pub fn data_length(self) -> usize {
         match self {
             Instruction::LoadImmediate { .. } => 1,
             Instruction::LoadIndirect { .. } |
@@ -464,7 +464,7 @@ impl AluOperation {
     ///
     /// assert!(!AluOperation::Reserved(0b0011).is_valid());
     /// ```
-    pub fn is_valid(&self) -> bool {
+    pub fn is_valid(self) -> bool {
         match self {
             AluOperation::Reserved(_) => false,
             _ => true,
@@ -495,7 +495,7 @@ impl AluOperation {
     /// assert_eq!(carry, true);
     /// ```
     #[inline]
-    pub fn perform(&self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
+    pub fn perform(self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
         self.perform_impl(lhs, rhs, carry)
     }
 }

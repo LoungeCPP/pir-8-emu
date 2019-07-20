@@ -23,8 +23,8 @@ impl InstructionJumpCondition {
     ///
     /// assert!(!InstructionJumpCondition::Jmpl.is_satisfied(0b00101));
     /// ```
-    pub fn is_satisfied(&self, flags: u8) -> bool {
-        match *self {
+    pub fn is_satisfied(self, flags: u8) -> bool {
+        match self {
             // Zero flag
             InstructionJumpCondition::Jmpz => (flags & FLAG_MASK_ZERO) != 0,
             // Parity flag

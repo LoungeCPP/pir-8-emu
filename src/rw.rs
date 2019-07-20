@@ -66,13 +66,13 @@ impl ReadWriteMarker {
 
 
     /// Check if this marker was marked read.
-    pub fn was_read(&self) -> bool {
-        return (self.mask & 0b01) != 0;
+    pub fn was_read(self) -> bool {
+        (self.mask & 0b01) != 0
     }
 
     /// Check if this marker was marked written.
-    pub fn was_written(&self) -> bool {
-        return (self.mask & 0b10) != 0;
+    pub fn was_written(self) -> bool {
+        (self.mask & 0b10) != 0
     }
 
     /// Reset the marker to its original unread and unwritten state.

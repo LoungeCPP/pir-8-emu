@@ -51,11 +51,11 @@ impl MicroOp {
     /// assert_eq!(stack, &[]);
     /// assert_eq!(*ins, 0x69);
     /// ```
-    pub fn perform(&self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
+    pub fn perform(self, stack: &mut Vec<u8>, memory: &mut Memory, ports: &mut Ports, registers: &mut GeneralPurposeRegisterBank,
                    pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>, adr: &mut SpecialPurposeRegister<u16>,
                    ins: &mut SpecialPurposeRegister<u8>)
                    -> Result<bool, MicroOpPerformError> {
-        match *self {
+        match self {
             MicroOp::Nop => {}
             MicroOp::Halt => return Ok(false),
             MicroOp::LoadInstruction => {
