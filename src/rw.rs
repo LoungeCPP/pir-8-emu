@@ -11,7 +11,7 @@ pub trait ReadWritable {
     fn was_written(&self) -> bool;
 
     /// Reset the R/W marking of this object.
-    fn rw_reset(&mut self);
+    fn reset_rw(&mut self);
 }
 
 

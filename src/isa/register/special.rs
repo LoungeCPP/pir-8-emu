@@ -74,7 +74,7 @@ impl<T: Num + Unsigned + PrimInt> ReadWritable for SpecialPurposeRegister<T> {
     }
 
     #[inline]
-    fn rw_reset(&mut self) {
+    fn reset_rw(&mut self) {
         self.rw.reset()
     }
 }

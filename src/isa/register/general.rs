@@ -148,7 +148,7 @@ impl ReadWritable for GeneralPurposeRegister {
     }
 
     #[inline]
-    fn rw_reset(&mut self) {
+    fn reset_rw(&mut self) {
         self.rw.reset()
     }
 }
