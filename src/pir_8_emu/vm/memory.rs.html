@@ -271,18 +271,9 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">RangeToInclusive</span>, <span class="ident">RangeInclusive</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeTo</span>, <span class="ident">IndexMut</span>, <span class="ident">Index</span>, <span class="ident">Range</span>};
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MemoryReadWriteIterator</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MemoryReadWrittenIterator</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="self">self</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -326,15 +317,8 @@
     <span class="doccomment">///              (0x4B0B, 0x00, true, true),</span>
     <span class="doccomment">///              (0xEB0B, 0x12, false, true)]);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_rw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">MemoryReadWriteIterator</span> {
-        <span class="ident">MemoryReadWriteIterator</span> {
-            <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..],
-            <span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>[..],
-            <span class="ident">written</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">written</span>[..],
-            <span class="ident">next_idx</span>: <span class="number">0</span>,
-            <span class="ident">finished</span>: <span class="bool-val">false</span>,
-            <span class="ident">idx</span>: <span class="ident">PhantomData</span>,
-        }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_rw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">MemoryReadWrittenIterator</span> {
+        <span class="ident">MemoryReadWrittenIterator</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>[..], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">written</span>[..])
     }
 
     <span class="doccomment">/// Mark all of memory as unread and unwritten</span>
