@@ -1,5 +1,6 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::{PortHandlerInstallError, PortsReadWrittenIterator, PortHandler};
+use self::super::{PortHandlerInstallError, PortHandler};
+use self::super::super::PortsReadWrittenIterator;
 use std::hash::{self, Hash};
 use std::num::NonZeroU16;
 use std::cmp::Ordering;

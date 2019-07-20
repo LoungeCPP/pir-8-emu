@@ -4,15 +4,11 @@
 mod cpu;
 mod ports;
 mod memory;
-mod port_handler;
 mod mem_ports_rw_iter;
-mod port_handler_install_error;
 
 pub use self::cpu::Cpu;
-pub use self::ports::Ports;
 pub use self::memory::Memory;
-pub use self::port_handler::PortHandler;
-pub use self::port_handler_install_error::PortHandlerInstallError;
+pub use self::ports::{PortHandlerInstallError, PortHandler, Ports};
 
 
 /// Iterator over read-from and written-to parts of `Ports`
