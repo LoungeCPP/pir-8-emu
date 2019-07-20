@@ -11,7 +11,6 @@ const PORTS_LEN: usize = 0xFF + 1;
 
 
 /// 256B of I/O ports with R/W tracking and per-port handler logic
-#[derive(Clone)]
 pub struct Ports {
     pub(super) cache: Box<[u8; PORTS_LEN]>,
     pub(super) read: Box<[u64; PORTS_LEN / 64]>,
@@ -54,7 +53,6 @@ impl Ports {
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
     /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
-    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(InitableHandler(self.0)) }
     /// }
     ///
     /// let mut ports = Ports::new();
@@ -135,7 +133,6 @@ impl Ports {
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
     /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
-    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(InitableHandler(self.0)) }
     /// }
     ///
     /// let mut ports = Ports::new();
@@ -188,7 +185,6 @@ impl Ports {
     /// #   fn init(&mut self, _: &[u8]) {}
     ///     fn handle_read(&mut self, port: u8) -> u8 { port }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
-    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(PassthroughHandler) }
     /// }
     ///
     /// let mut ports = Ports::new();
@@ -237,7 +233,6 @@ impl Ports {
     /// #   fn init(&mut self, _: &[u8]) {}
     ///     fn handle_read(&mut self, _: u8) -> u8 { self.0 * 2 }
     ///     fn handle_write(&mut self, _: u8, data: u8) { self.0 = data; }
-    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(StorageHandler(self.0)) }
     /// }
     ///
     /// let mut ports = Ports::new();

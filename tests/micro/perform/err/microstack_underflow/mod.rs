@@ -8,7 +8,7 @@ mod alu;
 #[test]
 fn load_instruction() {
     let uni_orig = universe();
-    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
     let mut stack = vec![];
 
@@ -32,7 +32,7 @@ fn stack_push() {
         let addr = addr | ((addr + 1) << 8);
 
         let mut uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
         let mut stack = vec![];
         *sp = addr;
@@ -59,7 +59,7 @@ fn port_in() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![];
             ports.write(port, i);
@@ -87,7 +87,7 @@ fn port_out() {
     for stack_depth in 0..2 {
         for i in 1..=0xFF {
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = match stack_depth {
                 0 => vec![],
@@ -118,7 +118,7 @@ fn compare() {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = match stack_depth {
                 0 => vec![],
@@ -151,7 +151,7 @@ fn fetch_address() {
                 let addr = addr | ((addr + 1) << 8);
 
                 let mut uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -187,7 +187,7 @@ fn write_address() {
                 let addr = addr | ((addr + 1) << 8);
 
                 let uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -223,7 +223,7 @@ fn jump() {
                 let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
                 let mut uni_orig = universe();
-                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+                let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
                 let mut stack = match stack_depth {
                     0 => vec![],
@@ -256,7 +256,7 @@ fn jump() {
 fn write_register() {
     for aaa in 0..0b111 {
         let uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
         let mut stack = vec![];
 

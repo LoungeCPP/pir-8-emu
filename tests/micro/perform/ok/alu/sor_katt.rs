@@ -177,7 +177,7 @@ fn check_shift(expected_value: u8, expected_carry: bool, test_value: u8, shift: 
 
         for rhs in 0..=0xFF {
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![test_value, rhs, flags_start];
 

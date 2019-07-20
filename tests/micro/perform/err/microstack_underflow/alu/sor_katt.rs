@@ -135,7 +135,7 @@ fn check_shift(test_value: u8, shift: AluOperation) {
     for stack_depth in 0..3 {
         for rhs in 0..=0xFF {
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = match stack_depth {
                 0 => vec![],

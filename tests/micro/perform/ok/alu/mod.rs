@@ -32,7 +32,7 @@ fn binary_nocarry(op: AluOperation, exp: fn(u8, u8) -> u8) {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![lhs, rhs, flags_start];
 

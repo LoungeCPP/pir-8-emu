@@ -10,7 +10,7 @@ mod alu;
 #[test]
 fn nop() {
     let uni_orig = universe();
-    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
     let mut stack = vec![];
 
     assert_eq!(MicroOp::Nop.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
@@ -24,7 +24,7 @@ fn nop() {
 #[test]
 fn halt() {
     let uni_orig = universe();
-    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
     let mut stack = vec![];
 
     assert_eq!(MicroOp::Halt.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
@@ -39,7 +39,7 @@ fn halt() {
 fn load_instruction() {
     for i in 1..=0xFF {
         let mut uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
         let mut stack = vec![i];
 
@@ -67,7 +67,7 @@ fn stack_push() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![i];
             *sp = addr;
@@ -101,7 +101,7 @@ fn stack_pop() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![];
             memory[addr] = i;
@@ -135,7 +135,7 @@ fn port_in() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![port];
             ports.write(port, i);
@@ -164,7 +164,7 @@ fn port_out() {
     for i in 1..=0xFF {
         for port in 0..=0xFF {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![i, port];
 
@@ -193,7 +193,7 @@ fn compare() {
             let rhs = lhs.wrapping_mul(3);
 
             let uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![lhs, rhs, flags_start];
 
@@ -223,7 +223,7 @@ fn compare() {
 fn make_immediate() {
     for i in 0..=0xFF {
         let uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
         let mut stack = vec![];
 
@@ -249,7 +249,7 @@ fn load_immediate() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![];
             *pc = addr;
@@ -285,7 +285,7 @@ fn fetch_address() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![addr as u8 + 1, addr as u8];
             memory[addr] = i;
@@ -318,7 +318,7 @@ fn write_address() {
             let addr = addr | ((addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![i, addr as u8 + 1, addr as u8];
 
@@ -347,7 +347,7 @@ fn read_register() {
     for i in 1..=0xFF {
         for aaa in 0..=0b111 {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![];
             *registers[aaa as usize] = i;
@@ -378,7 +378,7 @@ fn write_register() {
     for i in 1..=0xFF {
         for aaa in 0..=0b111 {
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![i];
 

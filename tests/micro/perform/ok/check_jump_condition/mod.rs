@@ -11,7 +11,7 @@ fn satisfy(cond: InstructionJumpCondition, constant: u8, variable: u8, exp: bool
         let flags = constant | (var & variable);
 
         let uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
         let mut stack = vec![flags];
 
         assert_eq!(MicroOp::CheckJumpCondition(cond).perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),

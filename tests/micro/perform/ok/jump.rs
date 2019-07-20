@@ -11,7 +11,7 @@ fn ok() {
             let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 1];
             *pc = start_addr;
@@ -43,7 +43,7 @@ fn not_ok() {
             let dest_addr = dest_addr | ((dest_addr + 1) << 8);
 
             let mut uni_orig = universe();
-            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
             let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 0];
             *pc = start_addr;

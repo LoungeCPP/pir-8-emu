@@ -8,7 +8,7 @@ fn stack_push() {
         let addr = 0xFFFF;
 
         let mut uni_orig = universe();
-        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
+        let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
         let mut stack = vec![i];
         *sp = addr;

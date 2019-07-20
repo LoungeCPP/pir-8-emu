@@ -8,15 +8,7 @@ pub trait PortHandler: Downcast {
 
     fn handle_read(&mut self, port: u8) -> u8;
     fn handle_write(&mut self, port: u8, byte: u8);
-
-    fn clone(&self) -> Box<PortHandler>;
 }
 
 // `Any` is very good
 impl_downcast!(PortHandler);
-
-impl Clone for Box<PortHandler> {
-    fn clone(&self) -> Box<PortHandler> {
-        self.as_ref().clone()
-    }
-}
