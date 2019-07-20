@@ -62,12 +62,12 @@ fn port_in() {
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = uni_orig.clone();
 
             let mut stack = vec![];
-            *ports[port] = i;
+            ports.write(port, i);
 
             assert_eq!(MicroOp::PortIn.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Err(MicroOpPerformError::MicrostackUnderflow));
 
-            *uni_orig.1[port] = i;
+            uni_orig.1.write(port, i);
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);

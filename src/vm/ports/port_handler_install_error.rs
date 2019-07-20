@@ -13,7 +13,9 @@ use std::fmt;
 /// struct NopHandler;
 /// impl PortHandler for NopHandler {
 ///     fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(3).unwrap() }
-/// #   fn init(&mut self, _: &[u8]) { }
+/// #   fn init(&mut self, _: &[u8]) {}
+/// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
+/// #   fn handle_write(&mut self, _: u8, _: u8) {}
 /// #   fn clone(&self) -> Box<PortHandler> { Box::new(NopHandler) }
 /// }
 ///

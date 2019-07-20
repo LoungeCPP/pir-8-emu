@@ -1,5 +1,5 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::{PortHandlerInstallError, PortReadWriteProxy, PortHandler};
+use self::super::{PortHandlerInstallError, PortHandler};
 use self::super::super::PortsReadWrittenIterator;
 use std::hash::{self, Hash};
 use std::num::NonZeroU16;
@@ -19,8 +19,6 @@ pub struct Ports {
 
     handlers: Vec<Option<Box<PortHandler + 'static>>>,
     handler_mappings: Box<[Option<NonZeroU16>; PORTS_LEN]>,
-
-    cur_proxy: PortReadWriteProxy,
 }
 
 impl Ports {
@@ -32,7 +30,6 @@ impl Ports {
             written: Box::new([0; PORTS_LEN / 64]),
             handlers: vec![],
             handler_mappings: Box::new([None; PORTS_LEN]),
-            cur_proxy: PortReadWriteProxy::Read(0),
         }
     }
 
@@ -55,6 +52,8 @@ impl Ports {
     /// impl PortHandler for InitableHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
+    /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
+    /// #   fn handle_write(&mut self, _: u8, _: u8) {}
     /// #   fn clone(&self) -> Box<PortHandler> { Box::new(InitableHandler(self.0)) }
     /// }
     ///
@@ -134,6 +133,8 @@ impl Ports {
     /// impl PortHandler for InitableHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
+    /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
+    /// #   fn handle_write(&mut self, _: u8, _: u8) {}
     /// #   fn clone(&self) -> Box<PortHandler> { Box::new(InitableHandler(self.0)) }
     /// }
     ///
@@ -169,6 +170,102 @@ impl Ports {
         Some(handler)
     }
 
+    /// Read from the specified port
+    ///
+    /// If a handler is installed there, delegate thereto and cache the result
+    ///
+    /// Marks the port read
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};
+    /// # use std::num::NonZeroU8;
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// struct PassthroughHandler;
+    /// impl PortHandler for PassthroughHandler {
+    /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
+    /// #   fn init(&mut self, _: &[u8]) {}
+    ///     fn handle_read(&mut self, port: u8) -> u8 { port }
+    /// #   fn handle_write(&mut self, _: u8, _: u8) {}
+    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(PassthroughHandler) }
+    /// }
+    ///
+    /// let mut ports = Ports::new();
+    ///
+    /// ports.install_handler(PassthroughHandler, &[0xA1]).map_err(|(_, e)| e).unwrap();
+    ///
+    /// assert_eq!(ports.read(0xBE), 0);
+    /// assert_eq!(ports.read(0xA1), 0xA1);
+    /// ```
+    pub fn read(&mut self, port: u8) -> u8 {
+        let index = port as usize;
+
+        let idx = index / 64;
+        let bit = index % 64;
+        unsafe {
+            *(&self.read[idx] as *const u64 as *mut u64) |= 1 << bit;
+        }
+
+        if let Some(handler_idx) = self.handler_mappings[index] {
+            let new_val = self.handlers[handler_idx.get() as usize - 1].as_mut().unwrap().handle_read(port);
+
+            self.cache[index] = new_val;
+        }
+
+        self.cache[index]
+    }
+
+
+    /// Write to the specified port
+    ///
+    /// If a handler is installed there, delegate thereto
+    ///
+    /// Caches the specified byte
+    ///
+    /// Marks the port written
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};
+    /// # use std::num::NonZeroU8;
+    /// # #[derive(Eq, PartialEq, Debug)]
+    /// struct StorageHandler(u8);
+    /// impl PortHandler for StorageHandler {
+    /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
+    /// #   fn init(&mut self, _: &[u8]) {}
+    ///     fn handle_read(&mut self, _: u8) -> u8 { self.0 * 2 }
+    ///     fn handle_write(&mut self, _: u8, data: u8) { self.0 = data; }
+    /// #   fn clone(&self) -> Box<PortHandler> { Box::new(StorageHandler(self.0)) }
+    /// }
+    ///
+    /// let mut ports = Ports::new();
+    ///
+    /// let handler_id = ports.install_handler(StorageHandler(3), &[0xA1])
+    ///                       .map_err(|(_, e)| e).unwrap();
+    ///
+    /// assert_eq!(ports.read(0xA1), 6);
+    /// ports.write(0xA1, 12);
+    /// assert_eq!(ports.read(0xA1), 24);
+    ///
+    /// assert_eq!(ports.get_handler(handler_id).and_then(|h| h.downcast_ref()),
+    ///            Some(&StorageHandler(12)));
+    /// ```
+    pub fn write(&mut self, port: u8, byte: u8) {
+        let index = port as usize;
+
+        let idx = index / 64;
+        let bit = index % 64;
+        self.written[idx] |= 1 << bit;
+
+        if let Some(handler_idx) = self.handler_mappings[index] {
+            self.handlers[handler_idx.get() as usize - 1].as_mut().unwrap().handle_write(port, byte);
+        }
+
+        self.cache[index] = byte;
+    }
+
     /// Get an iterator over the read and written port cells
     ///
     /// # Examples
@@ -176,9 +273,10 @@ impl Ports {
     /// ```
     /// # use pir_8_emu::vm::Ports;
     /// let mut ports = Ports::new();
-    /// ports[0x4B] = ports[0xA1];
-    /// println!("{}", ports[0x4B]);
-    /// ports[0xEB] = 0x12;
+    /// let val = ports.read(0xA1);
+    /// ports.write(0x4B, val);
+    /// println!("{}", ports.read(0x4B));
+    /// ports.write(0xEB, 0x12);
     ///
     /// // (address, value, was_read, was_written)
     /// assert_eq!(ports.iter_rw().collect::<Vec<_>>(),
@@ -197,9 +295,10 @@ impl Ports {
     /// ```
     /// # use pir_8_emu::vm::Ports;
     /// let mut ports = Ports::new();
-    /// ports[0x4B] = ports[0xA1];
-    /// println!("{}", ports[0x4B]);
-    /// ports[0xEB] = 0x12;
+    /// let val = ports.read(0xA1);
+    /// ports.write(0x4B, val);
+    /// println!("{}", ports.read(0x4B));
+    /// ports.write(0xEB, 0x12);
     ///
     /// ports.reset_rw();
     /// assert_eq!(ports.iter_rw().collect::<Vec<_>>(), &[]);
@@ -218,64 +317,6 @@ impl Ports {
 impl Default for Ports {
     fn default() -> Ports {
         Ports::new()
-    }
-}
-
-impl Index<u8> for Ports {
-    type Output = PortReadWriteProxy;
-
-    #[inline]
-    fn index(&self, port_index: u8) -> &Self::Output {
-        let index = port_index as usize;
-
-        let idx = index / 64;
-        let bit = index % 64;
-        unsafe {
-            *(&self.read[idx] as *const u64 as *mut u64) |= 1 << bit;
-        }
-
-        if let Some(handler_idx) = self.handler_mappings[index] {
-            let new_val = unsafe { (*(&self.handlers[handler_idx.get() as usize - 1] as *const _ as *mut Option<Box<PortHandler + 'static>>)).as_mut() }
-                .unwrap()
-                .handle_read(port_index);
-
-            unsafe {
-                *(&self.cache[index] as *const u8 as *mut u8) = new_val;
-            }
-        }
-
-        let val = self.cache[index];
-        unsafe {
-            *(&self.cur_proxy as *const _ as *mut _) = PortReadWriteProxy::Read(val);
-        }
-
-        &self.cur_proxy
-    }
-}
-
-impl IndexMut<u8> for Ports {
-    #[inline]
-    fn index_mut(&mut self, port_index: u8) -> &mut Self::Output {
-        let index = port_index as usize;
-
-        let idx = index / 64;
-        let bit = index % 64;
-        self.written[idx] |= 1 << bit;
-
-        self.cur_proxy = PortReadWriteProxy::Write(port_index, self.cache[index], self as *mut Ports);
-        &mut self.cur_proxy
-    }
-}
-
-impl Ports {
-    pub(super) fn handle_write(&mut self, port_index: u8, byte: u8) {
-        let index = port_index as usize;
-
-        if let Some(handler_idx) = self.handler_mappings[index] {
-            self.handlers[handler_idx.get() as usize - 1].as_mut().unwrap().handle_write(port_index, byte);
-        }
-
-        self.cache[index] = byte;
     }
 }
 
