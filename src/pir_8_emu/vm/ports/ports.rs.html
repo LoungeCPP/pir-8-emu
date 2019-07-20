@@ -466,11 +466,6 @@
 <span id="466">466</span>
 <span id="467">467</span>
 <span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">RangeToInclusive</span>, <span class="ident">RangeInclusive</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeTo</span>, <span class="ident">IndexMut</span>, <span class="ident">Index</span>, <span class="ident">Range</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortHandler</span>};
@@ -485,7 +480,6 @@
 
 
 <span class="doccomment">/// 256B of I/O ports with R/W tracking and per-port handler logic</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ports</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">cache</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">PORTS_LEN</span>]<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">read</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="ident">PORTS_LEN</span> <span class="op">/</span> <span class="number">64</span>]<span class="op">&gt;</span>,
@@ -528,7 +522,6 @@
     <span class="doccomment">///     fn init(&amp;mut self, ports: &amp;[u8]) { self.0 = Some(ports[0]); }</span>
     <span class="doccomment">/// #   fn handle_read(&amp;mut self, _: u8) -&gt; u8 { 0 }</span>
     <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
-    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(InitableHandler(self.0)) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
@@ -609,7 +602,6 @@
     <span class="doccomment">///     fn init(&amp;mut self, ports: &amp;[u8]) { self.0 = Some(ports[0]); }</span>
     <span class="doccomment">/// #   fn handle_read(&amp;mut self, _: u8) -&gt; u8 { 0 }</span>
     <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
-    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(InitableHandler(self.0)) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
@@ -662,7 +654,6 @@
     <span class="doccomment">/// #   fn init(&amp;mut self, _: &amp;[u8]) {}</span>
     <span class="doccomment">///     fn handle_read(&amp;mut self, port: u8) -&gt; u8 { port }</span>
     <span class="doccomment">/// #   fn handle_write(&amp;mut self, _: u8, _: u8) {}</span>
-    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(PassthroughHandler) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
@@ -711,7 +702,6 @@
     <span class="doccomment">/// #   fn init(&amp;mut self, _: &amp;[u8]) {}</span>
     <span class="doccomment">///     fn handle_read(&amp;mut self, _: u8) -&gt; u8 { self.0 * 2 }</span>
     <span class="doccomment">///     fn handle_write(&amp;mut self, _: u8, data: u8) { self.0 = data; }</span>
-    <span class="doccomment">/// #   fn clone(&amp;self) -&gt; Box&lt;PortHandler&gt; { Box::new(StorageHandler(self.0)) }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut ports = Ports::new();</span>
