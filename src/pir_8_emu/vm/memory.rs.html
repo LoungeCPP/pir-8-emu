@@ -285,9 +285,9 @@
 <span class="doccomment">/// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array with R/W tracking</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Memory</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">MEMORY_LEN</span>]<span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">read</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="ident">MEMORY_LEN</span> <span class="op">/</span> <span class="number">64</span>]<span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">written</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="ident">MEMORY_LEN</span> <span class="op">/</span> <span class="number">64</span>]<span class="op">&gt;</span>,
+    <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">MEMORY_LEN</span>]<span class="op">&gt;</span>,
+    <span class="ident">read</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="ident">MEMORY_LEN</span> <span class="op">/</span> <span class="number">64</span>]<span class="op">&gt;</span>,
+    <span class="ident">written</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="ident">MEMORY_LEN</span> <span class="op">/</span> <span class="number">64</span>]<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Memory</span> {
