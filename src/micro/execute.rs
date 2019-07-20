@@ -98,7 +98,7 @@ impl MicroOp {
             MicroOp::PortIn => {
                 let port = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
-                let data = ports[port];
+                let data = *ports[port];
 
                 stack.push(data);
             }
@@ -106,7 +106,7 @@ impl MicroOp {
                 let port = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
                 let data = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
-                ports[port] = data;
+                *ports[port] = data;
             }
 
             MicroOp::Compare => {

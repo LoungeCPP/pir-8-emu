@@ -1,5 +1,5 @@
 use std::ops::{RangeToInclusive, RangeInclusive, RangeFull, RangeFrom, RangeTo, IndexMut, Index, Range};
-use self::super::{PortHandlerInstallError, PortHandler};
+use self::super::{PortHandlerInstallError, PortReadWriteProxy, PortHandler};
 use self::super::super::PortsReadWrittenIterator;
 use std::hash::{self, Hash};
 use std::num::NonZeroU16;
@@ -19,10 +19,12 @@ pub struct Ports {
 
     handlers: Vec<Option<Box<PortHandler + 'static>>>,
     handler_mappings: Box<[Option<NonZeroU16>; PORTS_LEN]>,
+
+    cur_proxy: PortReadWriteProxy,
 }
 
 impl Ports {
-    /// Create fresh zero-initialised unread and unwritten ports
+    /// Create fresh zero-initialised unread and unwritten ports with no handlers
     pub fn new() -> Ports {
         Ports {
             cache: Box::new([0; PORTS_LEN]),
@@ -30,6 +32,7 @@ impl Ports {
             written: Box::new([0; PORTS_LEN / 64]),
             handlers: vec![],
             handler_mappings: Box::new([None; PORTS_LEN]),
+            cur_proxy: PortReadWriteProxy::Read(0),
         }
     }
 
@@ -219,11 +222,11 @@ impl Default for Ports {
 }
 
 impl Index<u8> for Ports {
-    type Output = u8;
+    type Output = PortReadWriteProxy;
 
     #[inline]
-    fn index(&self, index: u8) -> &Self::Output {
-        let index = index as usize;
+    fn index(&self, port_index: u8) -> &Self::Output {
+        let index = port_index as usize;
 
         let idx = index / 64;
         let bit = index % 64;
@@ -231,20 +234,48 @@ impl Index<u8> for Ports {
             *(&self.read[idx] as *const u64 as *mut u64) |= 1 << bit;
         }
 
-        &self.cache[index]
+        if let Some(handler_idx) = self.handler_mappings[index] {
+            let new_val = unsafe { (*(&self.handlers[handler_idx.get() as usize - 1] as *const _ as *mut Option<Box<PortHandler + 'static>>)).as_mut() }
+                .unwrap()
+                .handle_read(port_index);
+
+            unsafe {
+                *(&self.cache[index] as *const u8 as *mut u8) = new_val;
+            }
+        }
+
+        let val = self.cache[index];
+        unsafe {
+            *(&self.cur_proxy as *const _ as *mut _) = PortReadWriteProxy::Read(val);
+        }
+
+        &self.cur_proxy
     }
 }
 
 impl IndexMut<u8> for Ports {
     #[inline]
-    fn index_mut(&mut self, index: u8) -> &mut Self::Output {
-        let index = index as usize;
+    fn index_mut(&mut self, port_index: u8) -> &mut Self::Output {
+        let index = port_index as usize;
 
         let idx = index / 64;
         let bit = index % 64;
         self.written[idx] |= 1 << bit;
 
-        &mut self.cache[index]
+        self.cur_proxy = PortReadWriteProxy::Write(port_index, self.cache[index], self as *mut Ports);
+        &mut self.cur_proxy
+    }
+}
+
+impl Ports {
+    pub(super) fn handle_write(&mut self, port_index: u8, byte: u8) {
+        let index = port_index as usize;
+
+        if let Some(handler_idx) = self.handler_mappings[index] {
+            self.handlers[handler_idx.get() as usize - 1].as_mut().unwrap().handle_write(port_index, byte);
+        }
+
+        self.cache[index] = byte;
     }
 }
 
