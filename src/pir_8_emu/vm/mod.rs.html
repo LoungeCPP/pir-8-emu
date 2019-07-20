@@ -22,18 +22,14 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Various parts of the virtual machine implementation</span>
 
 
-<span class="kw">mod</span> <span class="ident">cpu</span>;
 <span class="kw">mod</span> <span class="ident">ports</span>;
 <span class="kw">mod</span> <span class="ident">memory</span>;
 <span class="kw">mod</span> <span class="ident">mem_ports_rw_iter</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">cpu</span>::<span class="ident">Cpu</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">memory</span>::<span class="ident">Memory</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ports</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortHandler</span>, <span class="ident">Ports</span>};
 

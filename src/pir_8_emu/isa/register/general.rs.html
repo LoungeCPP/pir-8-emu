@@ -176,6 +176,12 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">ReadWriteMarker</span>, <span class="ident">ReadWritable</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -189,7 +195,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like</span>
 <span class="doccomment">/// &#39;MOVE&#39; and &#39;LOAD&#39; can use these addresses. The first five registers have some special functionality, as described, the last</span>
-<span class="doccomment">/// three have no special functionality. The last four registers can also be used with the stack.</span>
+<span class="doccomment">/// three have no special functionality.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The last four registers can also be used with the stack.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Address | Letter | Description</span>
 <span class="doccomment">/// --------|--------|------------</span>
@@ -205,9 +213,13 @@
 <span class="doccomment">/// ## Flag register</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The flag register can be be read and written to as a general purpose register, though keep in mind that ALU and Compare</span>
-<span class="doccomment">/// instructions can effect the value of the flags. Not all of the bits have a specified role (yet), though the CLRF operation</span>
-<span class="doccomment">/// will still clear them. A value of `1` denotes the flag as &#39;set&#39;, whilst a value of `0` denotes  the flag is &#39;unset&#39;. Below</span>
-<span class="doccomment">/// is a description of what each bit in the flag register denotes.</span>
+<span class="doccomment">/// instructions can effect the value of the flags.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Not all of the bits have a specified role (yet), though the CLRF operation will still clear them.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A value of `1` denotes the flag as &#39;set&#39;, whilst a value of `0` denotes  the flag is &#39;unset&#39;.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Below is a description of what each bit in the flag register denotes.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Bit | Letter | Description</span>
 <span class="doccomment">/// ----|--------|------------</span>
