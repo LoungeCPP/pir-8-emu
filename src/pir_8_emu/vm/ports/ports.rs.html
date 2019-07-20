@@ -477,8 +477,6 @@
 <span id="477">477</span>
 <span id="478">478</span>
 <span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">RangeToInclusive</span>, <span class="ident">RangeInclusive</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeTo</span>, <span class="ident">IndexMut</span>, <span class="ident">Index</span>, <span class="ident">Range</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">PortHandlerInstallError</span>, <span class="ident">PortHandler</span>};
@@ -685,9 +683,7 @@
 
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>;
         <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>;
-        <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>[<span class="ident">idx</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u64</span>) <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
-        }
+        <span class="self">self</span>.<span class="ident">read</span>[<span class="ident">idx</span>] <span class="op">|=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="ident">bit</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler_mappings</span>[<span class="ident">index</span>] {
             <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handlers</span>[<span class="ident">handler_idx</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">handle_read</span>(<span class="ident">port</span>);

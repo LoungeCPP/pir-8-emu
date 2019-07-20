@@ -767,7 +767,7 @@
     <span class="doccomment">/// assert!(!Instruction::Reserved(0).is_valid());</span>
     <span class="doccomment">/// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
@@ -787,7 +787,7 @@
     <span class="doccomment">/// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);</span>
     <span class="doccomment">/// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=&gt;</span> <span class="number">1</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { .. } <span class="op">|</span>
@@ -1087,7 +1087,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(!AluOperation::Reserved(0b0011).is_valid());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
@@ -1118,7 +1118,7 @@
     <span class="doccomment">/// assert_eq!(carry, true);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">perform_impl</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>)
     }
 }
