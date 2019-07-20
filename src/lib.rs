@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate downcast_rs;
 extern crate num_traits;
 #[macro_use]
 extern crate clap;

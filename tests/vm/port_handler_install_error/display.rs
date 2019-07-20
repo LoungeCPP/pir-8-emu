@@ -26,3 +26,8 @@ fn wrong_port_count() {
         }
     }
 }
+
+#[test]
+fn too_many_handlers() {
+    assert_eq!(PortHandlerInstallError::TooManyHandlers.to_string(), "Too many handlers");
+}

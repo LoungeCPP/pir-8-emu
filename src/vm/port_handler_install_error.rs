@@ -2,27 +2,29 @@ use std::error::Error;
 use std::fmt;
 
 
-/// An error that could've occurred when performing a [μOp](enum.MicroOp.html).
+/// An error that could've occurred when [installing a port handler](struct.Ports.html#method.install_handler).
 ///
 /// # Examples
 ///
 /// ```
 /// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};
+/// # use std::num::NonZeroU8;
+/// # #[derive(Debug, PartialEq, Eq)]
 /// struct NopHandler;
 /// impl PortHandler for NopHandler {
-///     fn port_count(&self) -> u8 { 3 }
+///     fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(3).unwrap() }
 /// #   fn init(&mut self, _: &[u8]) { }
 /// #   fn clone(&self) -> Box<PortHandler> { Box::new(NopHandler) }
 /// }
 ///
 /// let mut ports = Ports::new();
-/// assert_eq!(ports.install_handler(NopHandler, &[0, 1]).map_err(|(_, e)| e),
-///            Err(PortHandlerInstallError::WrongPortCount(2, 3)));
+/// assert_eq!(ports.install_handler(NopHandler, &[0, 1]),
+///            Err((NopHandler, PortHandlerInstallError::WrongPortCount(2, 3))));
 ///
-/// ports.install_handler(NopHandler, &[0, 1, 2]).map_err(|(_, e)| e).unwrap();
+/// ports.install_handler(NopHandler, &[0, 1, 2]).unwrap();
 ///
-/// assert_eq!(ports.install_handler(NopHandler, &[1, 2, 3]).map_err(|(_, e)| e),
-///            Err(PortHandlerInstallError::PortsTaken(vec![1, 2])));
+/// assert_eq!(ports.install_handler(NopHandler, &[1, 2, 3]),
+///            Err((NopHandler, PortHandlerInstallError::PortsTaken(vec![1, 2]))));
 /// ```
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PortHandlerInstallError {
@@ -31,6 +33,9 @@ pub enum PortHandlerInstallError {
 
     /// The specified port count was specified, but the handler takes only the specified amount of ports
     WrongPortCount(usize, u8),
+
+    /// Installing this handler would overflow
+    TooManyHandlers,
 }
 
 impl Error for PortHandlerInstallError {}
@@ -44,6 +49,8 @@ impl fmt::Display for PortHandlerInstallError {
             }
 
             PortHandlerInstallError::WrongPortCount(provided, supported) => write!(f, "Provided {} ports, handler supports {}", provided, supported),
+
+            PortHandlerInstallError::TooManyHandlers => f.write_str("Too many handlers"),
         }
     }
 }
