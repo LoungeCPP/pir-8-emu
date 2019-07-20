@@ -10,7 +10,9 @@ use std::fmt;
 ///
 /// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
 /// 'MOVE' and 'LOAD' can use these addresses. The first five registers have some special functionality, as described, the last
-/// three have no special functionality. The last four registers can also be used with the stack.
+/// three have no special functionality.
+///
+/// The last four registers can also be used with the stack.
 ///
 /// Address | Letter | Description
 /// --------|--------|------------
@@ -26,9 +28,13 @@ use std::fmt;
 /// ## Flag register
 ///
 /// The flag register can be be read and written to as a general purpose register, though keep in mind that ALU and Compare
-/// instructions can effect the value of the flags. Not all of the bits have a specified role (yet), though the CLRF operation
-/// will still clear them. A value of `1` denotes the flag as 'set', whilst a value of `0` denotes  the flag is 'unset'. Below
-/// is a description of what each bit in the flag register denotes.
+/// instructions can effect the value of the flags.
+///
+/// Not all of the bits have a specified role (yet), though the CLRF operation will still clear them.
+///
+/// A value of `1` denotes the flag as 'set', whilst a value of `0` denotes  the flag is 'unset'.
+///
+/// Below is a description of what each bit in the flag register denotes.
 ///
 /// Bit | Letter | Description
 /// ----|--------|------------
