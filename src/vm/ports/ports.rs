@@ -12,9 +12,9 @@ const PORTS_LEN: usize = 0xFF + 1;
 
 /// 256B of I/O ports with R/W tracking and per-port handler logic
 pub struct Ports {
-    pub(super) cache: Box<[u8; PORTS_LEN]>,
-    pub(super) read: Box<[u64; PORTS_LEN / 64]>,
-    pub(super) written: Box<[u64; PORTS_LEN / 64]>,
+    cache: Box<[u8; PORTS_LEN]>,
+    read: Box<[u64; PORTS_LEN / 64]>,
+    written: Box<[u64; PORTS_LEN / 64]>,
 
     handlers: Vec<Option<Box<PortHandler + 'static>>>,
     handler_mappings: Box<[Option<NonZeroU16>; PORTS_LEN]>,
@@ -51,6 +51,7 @@ impl Ports {
     /// impl PortHandler for InitableHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
+    /// #   fn uninit(&mut self) {}
     /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
     /// }
@@ -119,7 +120,7 @@ impl Ports {
         self.handlers.get_mut(idx).and_then(|h| h.as_mut()).map(|h| h.as_mut())
     }
 
-    /// Remove and unregister the handler with the specified ID and return it, if exists
+    /// Remove, unregister, and deinitialise the handler with the specified ID and return it, if exists
     ///
     /// # Examples
     ///
@@ -127,20 +128,21 @@ impl Ports {
     /// # use pir_8_emu::vm::{PortHandlerInstallError, PortHandler, Ports};
     /// # use std::num::NonZeroU8;
     /// # #[derive(Eq, PartialEq, Debug)]
-    /// struct InitableHandler(Option<u8>);
-    /// impl PortHandler for InitableHandler {
+    /// struct DeInitableHandler(Option<u8>, bool);
+    /// impl PortHandler for DeInitableHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     ///     fn init(&mut self, ports: &[u8]) { self.0 = Some(ports[0]); }
+    ///     fn uninit(&mut self) { self.1 = true; }
     /// #   fn handle_read(&mut self, _: u8) -> u8 { 0 }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
     /// }
     ///
     /// let mut ports = Ports::new();
     ///
-    /// let handler_id = ports.install_handler(InitableHandler(None), &[0xA1])
+    /// let handler_id = ports.install_handler(DeInitableHandler(None, false), &[0xA1])
     ///                       .map_err(|(_, e)| e).unwrap();
     /// assert_eq!(ports.uninstall_handler(handler_id).and_then(|h| h.downcast().ok()),
-    ///            Some(Box::new(InitableHandler(Some(0xA1)))));
+    ///            Some(Box::new(DeInitableHandler(Some(0xA1), true))));
     ///
     /// assert!(ports.get_handler(handler_id).is_none());
     /// ```
@@ -149,7 +151,8 @@ impl Ports {
             return None;
         }
 
-        let handler = self.handlers[idx].take()?;
+        let mut handler = self.handlers[idx].take()?;
+        handler.uninit();
 
         let mut ports_left = handler.port_count().get();
         let mapping = NonZeroU16::new(idx as u16 + 1);
@@ -183,6 +186,7 @@ impl Ports {
     /// impl PortHandler for PassthroughHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     /// #   fn init(&mut self, _: &[u8]) {}
+    /// #   fn uninit(&mut self) {}
     ///     fn handle_read(&mut self, port: u8) -> u8 { port }
     /// #   fn handle_write(&mut self, _: u8, _: u8) {}
     /// }
@@ -231,6 +235,7 @@ impl Ports {
     /// impl PortHandler for StorageHandler {
     /// #   fn port_count(&self) -> NonZeroU8 { NonZeroU8::new(1).unwrap() }
     /// #   fn init(&mut self, _: &[u8]) {}
+    /// #   fn uninit(&mut self) {}
     ///     fn handle_read(&mut self, _: u8) -> u8 { self.0 * 2 }
     ///     fn handle_write(&mut self, _: u8, data: u8) { self.0 = data; }
     /// }
@@ -312,6 +317,14 @@ impl Ports {
 impl Default for Ports {
     fn default() -> Ports {
         Ports::new()
+    }
+}
+
+impl Drop for Ports {
+    fn drop(&mut self) {
+        for mut handler in self.handlers.drain(..).flatten() {
+            handler.uninit();
+        }
     }
 }
 

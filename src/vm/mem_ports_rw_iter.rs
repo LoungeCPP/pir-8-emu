@@ -1,6 +1,6 @@
 use num_traits::{Unsigned, NumCast, PrimInt, Num};
+use std::iter::{FusedIterator, Iterator};
 use std::marker::PhantomData;
-use std::iter::Iterator;
 
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -36,6 +36,8 @@ impl<IdxT: Num + Unsigned + PrimInt + NumCast> Iterator for MemoryPortsReadWritt
         next(self.data, self.read, self.written, &mut self.next_idx, &mut self.finished).map(|(idx, dt, wr, ww)| (IdxT::from(idx).unwrap(), dt, wr, ww))
     }
 }
+
+impl<IdxT: Num + Unsigned + PrimInt + NumCast> FusedIterator for MemoryPortsReadWrittenIterator<'_, IdxT> {}
 
 
 fn next(self_data: &[u8], self_read: &[u64], self_written: &[u64], next_idx: &mut usize, self_finished: &mut bool) -> Option<(usize, u8, bool, bool)> {

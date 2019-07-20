@@ -11,9 +11,9 @@ const MEMORY_LEN: usize = 0xFFFF + 1;
 /// Mostly-transparent wrapper for a heap-allocated 64KiB `u8` array with R/W tracking
 #[derive(Clone)]
 pub struct Memory {
-    pub(super) data: Box<[u8; MEMORY_LEN]>,
-    pub(super) read: Box<[u64; MEMORY_LEN / 64]>,
-    pub(super) written: Box<[u64; MEMORY_LEN / 64]>,
+    data: Box<[u8; MEMORY_LEN]>,
+    read: Box<[u64; MEMORY_LEN / 64]>,
+    written: Box<[u64; MEMORY_LEN / 64]>,
 }
 
 impl Memory {

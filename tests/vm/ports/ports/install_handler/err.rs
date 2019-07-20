@@ -14,6 +14,8 @@ impl PortHandler for Handler {
 
     fn init(&mut self, _: &[u8]) {}
 
+    fn uninit(&mut self) {}
+
     fn handle_read(&mut self, _: u8) -> u8 {
         0
     }
