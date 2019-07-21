@@ -4,9 +4,9 @@ use std::str::FromStr;
 use rand::thread_rng;
 use std::ops::Range;
 
-mod missing_token_operation;
 mod unrecognised_token;
 mod too_many_tokens;
+mod missing_token;
 
 
 #[test]

@@ -5,3 +5,4 @@ mod rw;
 mod vm;
 mod isa;
 mod micro;
+mod binutils;

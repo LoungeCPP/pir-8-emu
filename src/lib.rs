@@ -11,5 +11,6 @@ pub mod isa;
 pub mod util;
 pub mod micro;
 pub mod options;
+pub mod binutils;
 
 pub use self::rw::{ReadWriteMarker, ReadWritable};
