@@ -15,7 +15,8 @@ use std::convert::{TryFrom, From};
 /// there is no hardware level protection or detection if this happens.
 ///
 /// An example of how this can happen is if you perform a jump to `0xFFFF`,
-/// as the instruction at `0xFFFF` is loaded, the PC will incremented to `0x0000`.
+/// as the instruction at `0xFFFF` is loaded, the PC would be incremented to `0x10000`,
+/// but as it's only 16 bits wide, it becomes just `0x0000`.
 ///
 ///
 /// The 'Bit Mask' shows a pattern which denotes an instruction or group of instructions, the letters denoting where any value
