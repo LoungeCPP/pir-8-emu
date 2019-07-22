@@ -1,17 +1,11 @@
-use self::super::super::super::isa::instruction::ParseInstructionError;
-use self::super::super::super::util::parse_with_prefix;
+use self::super::super::super::super::isa::instruction::ParseInstructionError;
+use self::super::super::super::super::util::parse_with_prefix;
+use self::super::AssemblerDirective;
 
-
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AssemblerDirective<'s> {
-    SetOrigin(u16),
-
-    SaveLabel(&'s str),
-    LoadLabel(&'s str),
-}
 
 impl<'s> AssemblerDirective<'s> {
-    pub fn from_str(s: &'s str) -> Result<Option<Self>, ParseInstructionError> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    pub(in super::super) fn from_str_impl(s: &'s str) -> Result<Option<Self>, ParseInstructionError> {
         let mut tokens = s.split_whitespace().peekable();
         let has_colon = tokens.peek() == Some(&":");
         if has_colon {
@@ -29,6 +23,7 @@ impl<'s> AssemblerDirective<'s> {
         Ok(operation)
     }
 }
+
 
 fn parse_directive<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i str, had_colon: bool)
                                                     -> Result<Option<AssemblerDirective<'i>>, ParseInstructionError> {
