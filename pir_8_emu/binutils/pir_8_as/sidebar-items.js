@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["AssemblerDirective",""]]});
+initSidebarItems({"enum":[["AssemblerDirective","An assembler directive, extending the normal assembly syntax"],["AssemblerDirectiveObeyError","An error that could've occurred when obeying an pasembly directive."],["LabelLoad","How to handle a label load directive"]],"struct":[["OutputWithQueue","Output sink which transparently waits for labels to be saved"]]});

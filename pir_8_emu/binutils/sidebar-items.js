@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["pir_8_as",""]]});
+initSidebarItems({"mod":[["pir_8_as","`pir-8-as`'s output and directive handling"]]});
