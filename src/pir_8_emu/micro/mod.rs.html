@@ -139,8 +139,8 @@
 
 
 <span class="kw">mod</span> <span class="ident">from_instruction</span>;
-<span class="kw">mod</span> <span class="ident">execute</span>;
 <span class="kw">mod</span> <span class="ident">display</span>;
+<span class="kw">mod</span> <span class="ident">perform</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">op</span>;
 
@@ -150,7 +150,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">op</span>::<span class="ident">MicroOp</span>;
 
 
-<span class="doccomment">/// μOps to execute to get to the next instruction.</span>
+<span class="doccomment">/// μOps to perform to get to the next instruction.</span>
 <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">NEXT_INSTRUCTION</span>: (<span class="ident">MicroOpBlock</span>, <span class="ident">usize</span>) <span class="op">=</span> ([<span class="comment">// forcebreak</span>
                                                        <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
                                                        <span class="ident">MicroOp</span>::<span class="ident">LoadInstruction</span>,
