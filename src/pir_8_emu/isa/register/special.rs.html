@@ -102,6 +102,8 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">ReadWriteMarker</span>, <span class="ident">ReadWritable</span>};
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Unsigned</span>, <span class="ident">PrimInt</span>, <span class="ident">Num</span>};
@@ -112,6 +114,8 @@
 
 <span class="doccomment">/// There are some special purpose registers that you cannot directly read/write from, these are used by the CPU for its</span>
 <span class="doccomment">/// internal state.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// All the registers will start with an initial value of `0`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are three 16 bit registers for holding significant memory addresses and a single 8 bit register.</span>
 <span class="doccomment">///</span>

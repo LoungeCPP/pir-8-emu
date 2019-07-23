@@ -632,6 +632,21 @@
 <span id="632">632</span>
 <span id="633">633</span>
 <span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -730,17 +745,32 @@
 <span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// When PUSHing B or D will go to the address of the SP, whilst A or C will go to address one less than the SP.</span>
+<span class="doccomment">/// When PUSHing B/D will go to the address one less than the current SP, whilst A/C will go to address two less than the SP.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// After PUSHing, the SP will have been decremented by two.</span>
+<span class="doccomment">/// After PUSHing, the SP will have been decremented by two, with the SP containg the address of A/C (now in memory).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read from the same pair of registers, and the SP</span>
-<span class="doccomment">/// increased by two.</span>
-<span class="doccomment">///</span>
+<span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased by two.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,</span>
 <span class="doccomment">/// just like with the PC incrememnting during instruction execution.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In fact, by design, POPing the final value from the stack will result in an overflow bringing the SP back to `0x0000`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In terms of pseudocode, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// # PUSH</span>
+<span class="doccomment">/// SP -= 1</span>
+<span class="doccomment">/// *SP = B</span>
+<span class="doccomment">/// SP -= 1</span>
+<span class="doccomment">/// *SP = A</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # POP</span>
+<span class="doccomment">/// A = *SP</span>
+<span class="doccomment">/// SP += 1</span>
+<span class="doccomment">/// B = *SP</span>
+<span class="doccomment">/// SP += 1</span>
+<span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle</span>
 <span class="doccomment">/// calling and returning functions</span>
