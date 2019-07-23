@@ -631,6 +631,7 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
+<span id="634">634</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -649,7 +650,8 @@
 <span class="doccomment">/// there is no hardware level protection or detection if this happens.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An example of how this can happen is if you perform a jump to `0xFFFF`,</span>
-<span class="doccomment">/// as the instruction at `0xFFFF` is loaded, the PC will incremented to `0x0000`.</span>
+<span class="doccomment">/// as the instruction at `0xFFFF` is loaded, the PC would be incremented to `0x10000`,</span>
+<span class="doccomment">/// but as it&#39;s only 16 bits wide, it becomes just `0x0000`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The &#39;Bit Mask&#39; shows a pattern which denotes an instruction or group of instructions, the letters denoting where any value</span>
