@@ -620,6 +620,17 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -632,6 +643,14 @@
 <span class="doccomment">/// The PC is incremented as the instruction is loaded from RAM.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An instruction is a single byte, and can include some following immediate values purely for data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It is possible that the PC will overflow and wrap arround as you load an instruction,</span>
+<span class="doccomment">/// there is no hardware level protection or detection if this happens.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// An example of how this can happen is if you perform a jump to `0xFFFF`,</span>
+<span class="doccomment">/// as the instruction at `0xFFFF` is loaded, the PC will incremented to `0x0000`.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The &#39;Bit Mask&#39; shows a pattern which denotes an instruction or group of instructions, the letters denoting where any value</span>
 <span class="doccomment">/// can be used and still be considered part of the same instruction.</span>
@@ -717,6 +736,9 @@
 <span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read from the same pair of registers, and the SP</span>
 <span class="doccomment">/// increased by two.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,</span>
+<span class="doccomment">/// just like with the PC incrememnting during instruction execution.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle</span>
 <span class="doccomment">/// calling and returning functions</span>
