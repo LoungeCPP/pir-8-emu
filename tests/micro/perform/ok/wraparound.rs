@@ -5,7 +5,7 @@ use pir_8_emu::micro::MicroOp;
 #[test]
 fn stack_push() {
     for i in 0..=0xFF {
-        let addr = 0xFFFF;
+        let addr = 0x0000;
 
         let mut uni_orig = universe();
         let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
@@ -16,11 +16,11 @@ fn stack_push() {
         assert_eq!(MicroOp::StackPush.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                    Ok(true));
 
-        uni_orig.0[0x0000] = i;
+        uni_orig.0[0xFFFF] = i;
         let _read_sp = *uni_orig.4;
-        *uni_orig.4 = 0x0000;
+        *uni_orig.4 = 0xFFFF;
         let _read_adr = *uni_orig.5;
-        *uni_orig.5 = 0x0000;
+        *uni_orig.5 = 0xFFFF;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);
@@ -37,7 +37,7 @@ fn stack_push() {
 #[test]
 fn stack_pop() {
     for i in 0..=0xFF {
-        let addr = 0x0000;
+        let addr = 0xFFFF;
 
         let mut uni_orig = universe();
         let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
@@ -52,8 +52,9 @@ fn stack_pop() {
         let _read_mem = uni_orig.0[addr];
         uni_orig.0[addr] = i;
         let _read_sp = *uni_orig.4;
-        *uni_orig.4 = 0xFFFF;
-        *uni_orig.5 = *uni_orig.5;
+        *uni_orig.4 = 0x0000;
+        let _read_adr = *uni_orig.5;
+        *uni_orig.5 = addr;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);

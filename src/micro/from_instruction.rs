@@ -150,9 +150,9 @@ impl MicroOp {
                 let [f, s] = stck_address_pair(r);
 
                 ([// forcebreak
-                  MicroOp::ReadRegister(f),
-                  MicroOp::StackPush,
                   MicroOp::ReadRegister(s),
+                  MicroOp::StackPush,
+                  MicroOp::ReadRegister(f),
                   MicroOp::StackPush,
                   MicroOp::Nop,
                   MicroOp::Nop],
@@ -163,9 +163,9 @@ impl MicroOp {
 
                 ([// forcebreak
                   MicroOp::StackPop,
-                  MicroOp::WriteRegister(s),
-                  MicroOp::StackPop,
                   MicroOp::WriteRegister(f),
+                  MicroOp::StackPop,
+                  MicroOp::WriteRegister(s),
                   MicroOp::Nop,
                   MicroOp::Nop],
                  4)

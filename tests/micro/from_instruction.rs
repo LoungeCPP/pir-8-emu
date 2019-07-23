@@ -164,7 +164,7 @@ fn stck_push() {
     let ops = &ops.0[..ops.1];
 
     assert_eq!(ops,
-               &[MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::StackPush, MicroOp::ReadRegister(B_REGISTER_ADDRESS), MicroOp::StackPush]);
+               &[MicroOp::ReadRegister(B_REGISTER_ADDRESS), MicroOp::StackPush, MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::StackPush]);
 
 
     let ops = MicroOp::from_instruction(Instruction::Stck {
@@ -174,7 +174,7 @@ fn stck_push() {
     let ops = &ops.0[..ops.1];
 
     assert_eq!(ops,
-               &[MicroOp::ReadRegister(C_REGISTER_ADDRESS), MicroOp::StackPush, MicroOp::ReadRegister(D_REGISTER_ADDRESS), MicroOp::StackPush]);
+               &[MicroOp::ReadRegister(D_REGISTER_ADDRESS), MicroOp::StackPush, MicroOp::ReadRegister(C_REGISTER_ADDRESS), MicroOp::StackPush]);
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn stck_pop() {
     let ops = &ops.0[..ops.1];
 
     assert_eq!(ops,
-               &[MicroOp::StackPop, MicroOp::WriteRegister(B_REGISTER_ADDRESS), MicroOp::StackPop, MicroOp::WriteRegister(A_REGISTER_ADDRESS)]);
+               &[MicroOp::StackPop, MicroOp::WriteRegister(A_REGISTER_ADDRESS), MicroOp::StackPop, MicroOp::WriteRegister(B_REGISTER_ADDRESS)]);
 
 
     let ops = MicroOp::from_instruction(Instruction::Stck {
@@ -196,7 +196,7 @@ fn stck_pop() {
     let ops = &ops.0[..ops.1];
 
     assert_eq!(ops,
-               &[MicroOp::StackPop, MicroOp::WriteRegister(D_REGISTER_ADDRESS), MicroOp::StackPop, MicroOp::WriteRegister(C_REGISTER_ADDRESS)]);
+               &[MicroOp::StackPop, MicroOp::WriteRegister(C_REGISTER_ADDRESS), MicroOp::StackPop, MicroOp::WriteRegister(D_REGISTER_ADDRESS)]);
 }
 
 #[test]
