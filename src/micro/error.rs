@@ -24,14 +24,6 @@ pub enum MicroOpPerformError {
     MicrostackUnderflow,
     /// The top of the microstack had a value outside the domain of the μOp being performed
     InvalidMicrostackTop(u8, &'static [u8]),
-
-    /// Stack Pointer would overflow
-    StackOverflow,
-    /// Stack Pointer would underflow
-    StackUnderflow,
-
-    /// Program Counter would overflow
-    ProgramOverflow,
 }
 
 impl Error for MicroOpPerformError {}
@@ -44,11 +36,6 @@ impl fmt::Display for MicroOpPerformError {
                 write!(f, "Invalid top of the μstack: {:#04x}, expected any of: ", actual)?;
                 write_expected(valid, f)
             }
-
-            MicroOpPerformError::StackOverflow => f.write_str("Stack overflow"),
-            MicroOpPerformError::StackUnderflow => f.write_str("Stack underflow"),
-
-            MicroOpPerformError::ProgramOverflow => f.write_str("Program overflow"),
         }
     }
 }

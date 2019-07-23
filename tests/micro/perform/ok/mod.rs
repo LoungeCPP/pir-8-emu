@@ -3,6 +3,7 @@ use pir_8_emu::ReadWritable;
 use self::super::universe;
 
 mod check_jump_condition;
+mod wraparound;
 mod jump;
 mod alu;
 

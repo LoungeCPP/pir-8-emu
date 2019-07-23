@@ -16,18 +16,3 @@ fn invalid_microstack_top() {
                    format!("Invalid top of the μstack: {:#04x}, expected any of: 0x00, 0x01, 0x02, 0x03, 0x04", top));
     }
 }
-
-#[test]
-fn stack_overflow() {
-    assert_eq!(MicroOpPerformError::StackOverflow.to_string(), "Stack overflow");
-}
-
-#[test]
-fn stack_underflow() {
-    assert_eq!(MicroOpPerformError::StackUnderflow.to_string(), "Stack underflow");
-}
-
-#[test]
-fn program_overflow() {
-    assert_eq!(MicroOpPerformError::ProgramOverflow.to_string(), "Program overflow");
-}

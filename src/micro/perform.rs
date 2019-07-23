@@ -67,14 +67,14 @@ impl MicroOp {
             MicroOp::StackPush => {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
-                **sp = sp.checked_add(1).ok_or(MicroOpPerformError::StackOverflow)?;
+                **sp = sp.wrapping_add(1);
                 **adr = **sp;
                 memory[**adr] = byte;
             }
             MicroOp::StackPop => {
                 **adr = **sp;
                 let byte = memory[**adr];
-                **sp = sp.checked_sub(1).ok_or(MicroOpPerformError::StackUnderflow)?;
+                **sp = sp.wrapping_sub(1);
 
                 stack.push(byte);
             }
@@ -126,7 +126,7 @@ impl MicroOp {
             MicroOp::LoadImmediate => {
                 **adr = **pc;
                 let byte = memory[**adr];
-                **pc = pc.checked_add(1).ok_or(MicroOpPerformError::ProgramOverflow)?;
+                **pc = pc.wrapping_add(1);
 
                 stack.push(byte);
             }

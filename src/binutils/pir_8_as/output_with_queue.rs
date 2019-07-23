@@ -103,7 +103,7 @@ impl OutputWithQueue {
 
     /// Get all remaining queued labels not present in the specified labelset, or `None` if all were
     pub fn unfound_labels(mut self, labels: &BTreeMap<String, u16>) -> Option<BTreeSet<String>> {
-        let lbls = self.buffer.drain(..).map(|d| d.label).filter(|l| !labels.contains_key(l)).collect();
+        let lbls: BTreeSet<_> = self.buffer.drain(..).map(|d| d.label).filter(|l| !labels.contains_key(l)).collect();
 
         if !lbls.is_empty() { Some(lbls) } else { None }
     }
