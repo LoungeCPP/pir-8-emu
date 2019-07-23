@@ -51,6 +51,8 @@ The output consists of four columns:
     5 - input read failure
     6 - unused
     7 - insufficient instruction data
+    8 - unused
+    9 - unused
 
 ## EXAMPLES
 
