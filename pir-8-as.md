@@ -33,6 +33,30 @@ And so, all of these are equivalent:
     36
     272
 
+## DIRECTIVES
+
+Start with a colon, not limited to ASCII:
+
+  :origin <ADDRESS>
+
+    The first instruction starts at ADDRESS, all previous bytes are zeroed
+
+    Using this more than once or after having already processed an instruction will yield an error
+
+  :label save <NAME>
+
+    Save the current output address to be recalled anywhere else in the program assembly
+
+  :label load <NAME>
+
+    Substitute the output address of previously saved label called NAME in this place
+
+    If the NAME label wasn't yet specified, output will be buffered until it's declared
+
+    Using this when the current instruction isn't expecting two data bytes will yield an error
+
+    Having specified this with a NAME without a corresponding :label save directive will yield an error
+
 ## OPTIONS
 
   -o BINFILE
@@ -60,6 +84,8 @@ And so, all of these are equivalent:
     5 - input read failure
     6 - instruction parse error
     7 - instruction data parse error
+    8 - invalid directive or directive obey error
+    9 - unfound labels remain
 
 ## AUTHOR
 
