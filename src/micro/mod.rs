@@ -58,8 +58,8 @@
 
 
 mod from_instruction;
-mod execute;
 mod display;
+mod perform;
 mod error;
 mod op;
 
@@ -69,7 +69,7 @@ pub use self::display::DisplayMicroOp;
 pub use self::op::MicroOp;
 
 
-/// μOps to execute to get to the next instruction.
+/// μOps to perform to get to the next instruction.
 pub static NEXT_INSTRUCTION: (MicroOpBlock, usize) = ([// forcebreak
                                                        MicroOp::LoadImmediate,
                                                        MicroOp::LoadInstruction,

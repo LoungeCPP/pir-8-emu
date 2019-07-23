@@ -20,9 +20,9 @@ use std::fmt;
 /// ```
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MicroOpPerformError {
-    /// The microstack had too few elements for the μOp being executed
+    /// The microstack had too few elements for the μOp being performed
     MicrostackUnderflow,
-    /// The top of the microstack had a value outside the domain of the μOp being executed
+    /// The top of the microstack had a value outside the domain of the μOp being performed
     InvalidMicrostackTop(u8, &'static [u8]),
 
     /// Stack Pointer would overflow
