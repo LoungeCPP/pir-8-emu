@@ -8,6 +8,8 @@ use std::fmt;
 /// There are some special purpose registers that you cannot directly read/write from, these are used by the CPU for its
 /// internal state.
 ///
+/// All the registers will start with an initial value of `0`.
+///
 /// There are three 16 bit registers for holding significant memory addresses and a single 8 bit register.
 ///
 /// Name            | Short | Bits | Description

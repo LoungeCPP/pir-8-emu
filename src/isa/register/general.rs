@@ -8,6 +8,8 @@ use std::fmt;
 /// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
 /// 'MOVE' and 'LOAD' can use these addresses.
 ///
+/// All the registers will start with an initial value of `0`.
+///
 /// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like
 /// 'MOVE' and 'LOAD' can use these addresses. The first five registers have some special functionality, as described, the last
 /// three have no special functionality.
