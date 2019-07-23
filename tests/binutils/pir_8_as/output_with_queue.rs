@@ -12,7 +12,7 @@ fn wait_for_label_write_no() {
     output.wait_for_label("eWe".to_string());
     output.write_all(&['O' as u8, 'm' as u8, 'O' as u8], &BTreeMap::new()).unwrap();
 
-    assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()]));
+    assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()].into_iter().collect()));
     assert_eq!(&dest, &[]);
 }
 
@@ -28,7 +28,7 @@ fn wait_for_label_write_yes() {
     output.wait_for_label("eWe".to_string());
     output.write_all(&['O' as u8, 'm' as u8, 'O' as u8], &labels).unwrap();
 
-    assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()]));
+    assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
     assert_eq!(&dest, &[0x01, 0x10, 'U' as u8, 'w' as u8, 'U' as u8]);
 }
 
@@ -41,7 +41,7 @@ fn flush_no() {
     output.wait_for_label("eWe".to_string());
     output.flush(&BTreeMap::new()).unwrap();
 
-    assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()]));
+    assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()].into_iter().collect()));
     assert_eq!(&dest, &[]);
 }
 
@@ -56,6 +56,6 @@ fn flush_yes() {
     output.wait_for_label("eWe".to_string());
     output.flush(&labels).unwrap();
 
-    assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()]));
+    assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
     assert_eq!(&dest, &[0x01u8, 0x10]);
 }
