@@ -1,0 +1,47 @@
+; impl stolen from https://computationstructures.org/lectures/compilers/slides/Slide03.png
+;
+; A initial @ 0x0000
+; B initial @ 0x0001
+;
+; return in D
+
+
+:origin 2
+
+
+LOAD IND A
+0x0000
+
+LOAD IND B
+0x0001
+
+:label save top
+MOVE A X
+MOVE B Y
+ALU SUB
+
+JMPZ
+:label load end
+
+MOVE A S
+COMP B
+
+JMPL
+:label load lt
+
+ALU SUB
+MOVE S A
+JUMP
+:label load top
+
+:label save lt
+MOVE A Y
+MOVE B X
+ALU SUB
+MOVE S B
+JUMP
+:label load top
+
+:label save end
+MOVE A D
+HALT
