@@ -1,3 +1,4 @@
+extern crate bear_lib_terminal;
 extern crate pir_8_emu;
 extern crate rand;
 
