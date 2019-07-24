@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["gp_update",""],["gp_write","`plaintext  General-purpose registers F 0x00 S 0x00 X 0x00 Y 0x00 `"],["sp_update",""],["sp_write","`plaintext  Special-purpose registers PC  0x0000       SP  0x0000 ADR 0x0000       INS 0x00 `"]]});

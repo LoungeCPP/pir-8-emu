@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["geometry","Helper `struct`s for abstracting on-screen geometry."],["terminal","Rusticized interface for the FFI."]],"struct":[["Color","An RGBA colour repr."]]});
