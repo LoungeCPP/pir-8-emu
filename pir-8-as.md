@@ -57,6 +57,12 @@ Start with a colon, not limited to ASCII:
 
     Having specified this with a NAME without a corresponding :label save directive will yield an error
 
+  :label load-offset <NAME> <OFFSET>
+
+    Like :label load NAME, but add (signed) OFFSET afterwards
+
+    The resulting address will wrap around both sides
+
 ## OPTIONS
 
   -o BINFILE

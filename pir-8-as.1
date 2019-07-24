@@ -102,6 +102,21 @@ Having specified this with a NAME without a corresponding :label save directive 
 .
 .IP "" 0
 .
+.P
+:label load\-offset \fINAME\fR \fIOFFSET\fR
+.
+.IP "" 4
+.
+.nf
+
+Like :label load NAME, but add (signed) OFFSET afterwards
+
+The resulting address will wrap around both sides
+.
+.fi
+.
+.IP "" 0
+.
 .SH "OPTIONS"
 \-o BINFILE
 .
