@@ -290,8 +290,8 @@
 
                     <span class="kw">match</span> <span class="ident">ll</span> {
                         <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">HaveImmediately</span>(<span class="ident">addr</span>) <span class="op">=&gt;</span> <span class="ident">label_data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>),
-                        <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">WaitFor</span>(<span class="ident">lbl</span>) <span class="op">=&gt;</span> {
-                            <span class="ident">output</span>.<span class="ident">wait_for_label</span>(<span class="ident">lbl</span>);
+                        <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">WaitFor</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>) <span class="op">=&gt;</span> {
+                            <span class="ident">output</span>.<span class="ident">wait_for_label</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>);
                             <span class="ident">data_remaining</span> <span class="op">=</span> <span class="number">0</span>;
                             <span class="ident">next_output_address</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next_output_address</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">+</span> <span class="number">2</span>);
                             <span class="kw">continue</span>;
