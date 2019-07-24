@@ -13,6 +13,6 @@ pub use self::output_with_queue::OutputWithQueue;
 pub enum LabelLoad {
     /// The label is present with the specified address
     HaveImmediately(u16),
-    /// The label isn't present and needs to be waited for under the specified name
-    WaitFor(String),
+    /// The label isn't present and needs to be waited for under the specified name, adding the specified offset afterward
+    WaitFor(String, i16),
 }

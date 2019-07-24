@@ -90,8 +90,8 @@ fn actual_main() -> Result<(), i32> {
 
                     match ll {
                         pir_8_emu::binutils::pir_8_as::LabelLoad::HaveImmediately(addr) => label_data = Some(addr),
-                        pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl) => {
-                            output.wait_for_label(lbl);
+                        pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl, offset) => {
+                            output.wait_for_label(lbl, offset);
                             data_remaining = 0;
                             next_output_address = Some(next_output_address.unwrap_or(0) + 2);
                             continue;

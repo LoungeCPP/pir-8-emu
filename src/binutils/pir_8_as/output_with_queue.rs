@@ -19,22 +19,26 @@ use std::io::{self, Write};
 /// output.write_all(&[0xFE], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("OwO".to_string());
+/// output.wait_for_label("OwO".to_string(), 0);
 /// output.write_all(&[0xFF], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("eWe".to_string());
+/// output.wait_for_label("OwO".to_string(), 0x0F);
+/// output.write_all(&[0xFF], &labels).unwrap();
+/// assert_eq!(&dest, &[0xFEu8]);
+///
+/// output.wait_for_label("eWe".to_string(), 0);
 /// output.write_all(&[0x4C], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("ЦшЦ".to_string());
+/// output.wait_for_label("ЦшЦ".to_string(), 0);
 /// output.write_all(&[0xEC], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
 /// labels.insert("OwO".to_string(), 0x0110);
 /// labels.insert("ЦшЦ".to_string(), 0x0420);
 /// output.write_all(&[0xFA], &labels).unwrap();
-/// assert_eq!(&dest, &[0xFEu8, 0x01, 0x10, 0xFF]);
+/// assert_eq!(&dest, &[0xFEu8, 0x01, 0x10, 0xFF, 0x01, 0x1F, 0xFF]);
 ///
 /// assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
 /// ```
@@ -56,9 +60,9 @@ impl OutputWithQueue {
         }
     }
 
-    /// Queue all output going forward until a label with the specified name shows up
-    pub fn wait_for_label(&mut self, label: String) {
-        self.buffer.push_back(BufferedData::new(label))
+    /// Queue all output going forward until a label with the specified name shows up, and offset it by the specified amount
+    pub fn wait_for_label(&mut self, label: String, offset: i16) {
+        self.buffer.push_back(BufferedData::new(label, offset))
     }
 
     /// Write the specified bytes to the output or queue them
@@ -113,13 +117,15 @@ impl OutputWithQueue {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct BufferedData {
     pub label: String,
+    pub offset: i16,
     pub byte_stream: Vec<u8>,
 }
 
 impl BufferedData {
-    pub fn new(label: String) -> BufferedData {
+    pub fn new(label: String, offset: i16) -> BufferedData {
         BufferedData {
             label: label,
+            offset: offset,
             byte_stream: vec![],
         }
     }
@@ -127,6 +133,12 @@ impl BufferedData {
     pub fn write_if_ready(&self, to: &mut Box<Write>, labels: &BTreeMap<String, u16>) -> io::Result<bool> {
         match labels.get(&self.label) {
             Some(addr) => {
+                let addr = if self.offset < 0 {
+                    addr.wrapping_sub(-self.offset as u16)
+                } else {
+                    addr.wrapping_add(self.offset as u16)
+                };
+
                 to.write_all(&[(addr >> 8) as u8, (addr & 0b1111_1111) as u8])?;
                 to.write_all(&self.byte_stream)?;
 

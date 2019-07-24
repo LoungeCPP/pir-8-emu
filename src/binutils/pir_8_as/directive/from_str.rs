@@ -72,7 +72,7 @@ fn parse_directive_origin<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
 }
 
 fn parse_directive_label<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i str, pos: usize) -> Result<AssemblerDirective<'i>, ParseInstructionError> {
-    static VALID_TOKENS: &[&str] = &["save", "load"];
+    static VALID_TOKENS: &[&str] = &["save", "load", "load-offset"];
 
     match itr.next() {
         Some(tok) => {
@@ -81,7 +81,10 @@ fn parse_directive_label<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str:
             if tok.eq_ignore_ascii_case("save") {
                 Ok(AssemblerDirective::SaveLabel(parse_directive_label_name(itr, start_pos + 4 + 1)?))
             } else if tok.eq_ignore_ascii_case("load") {
-                Ok(AssemblerDirective::LoadLabel(parse_directive_label_name(itr, start_pos + 4 + 1)?))
+                Ok(AssemblerDirective::LoadLabel(parse_directive_label_name(itr, start_pos + 4 + 1)?, 0))
+            } else if tok.eq_ignore_ascii_case("load-offset") {
+                let lbl = parse_directive_label_name(itr, start_pos + 11 + 1)?;
+                Ok(AssemblerDirective::LoadLabel(lbl, parse_label_offset(itr, orig_str, (lbl.as_ptr() as usize) - (orig_str.as_ptr() as usize) + lbl.len() + 1)?))
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }
@@ -95,6 +98,33 @@ fn parse_directive_label_name<'i, I: Iterator<Item = &'i str>>(itr: &mut I, pos:
 
     match itr.next() {
         Some(tok) => Ok(tok),
+        None => Err(ParseInstructionError::MissingToken(pos, VALID_TOKENS)),
+    }
+}
+
+fn parse_label_offset<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i str, pos: usize) -> Result<i16, ParseInstructionError> {
+    static VALID_TOKENS: &[&str] = &["[signed 16-bit label offset]"];
+
+    match itr.next() {
+        Some(mut tok) => {
+            let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
+
+            let mut negative = false;
+            if tok.chars().next() == Some('-') {
+                tok = &tok[1..];
+                negative = true;
+            }
+
+            if let Some(offset) = parse_with_prefix::<u16>(tok) {
+                Ok(if negative {
+                    -(offset as i16)
+                } else {
+                    offset as i16
+                })
+            } else {
+                Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
+            }
+        }
         None => Err(ParseInstructionError::MissingToken(pos, VALID_TOKENS)),
     }
 }

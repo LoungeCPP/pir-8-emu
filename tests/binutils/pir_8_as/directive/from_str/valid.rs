@@ -21,16 +21,24 @@ fn set_origin() {
 
 #[test]
 fn save_label() {
-    label("save", |l| AssemblerDirective::SaveLabel(l));
+    label("save", "", |l| AssemblerDirective::SaveLabel(l));
 }
 
 #[test]
 fn load_label() {
-    label("load", |l| AssemblerDirective::LoadLabel(l));
+    label("load", "", |l| AssemblerDirective::LoadLabel(l, 0));
+}
+
+#[test]
+fn load_label_offset() {
+    for i in -0x10..0x10 {
+        label("load-offset", &format!("{}", i), |l| AssemblerDirective::LoadLabel(l, i));
+        label("load-offset", &format!("{:#x}", i), |l| AssemblerDirective::LoadLabel(l, i));
+    }
 }
 
 
-fn label(op: &str, dir: fn(&str) -> AssemblerDirective<'_>) {
+fn label<F: Fn(&str) -> AssemblerDirective<'_>>(op: &str, suff: &str, dir: F) {
     for pad_lleft in 0..5 {
         for pad_left in 0..5 {
             for pad_center in 1..5 {
@@ -40,9 +48,10 @@ fn label(op: &str, dir: fn(&str) -> AssemblerDirective<'_>) {
                             for _ in 0..5 {
                                 let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect();
 
-                                let dir_str = format!("{e:wll$}:{e:wl$}label{e:wc$}{}{e:wr$}{}{e:wrr$}",
+                                let dir_str = format!("{e:wll$}:{e:wl$}label{e:wc$}{}{e:wr$}{}{e:wrr$}{}",
                                                       op,
                                                       label,
+                                                      suff,
                                                       e = "",
                                                       wll = pad_lleft,
                                                       wl = pad_left,
@@ -50,7 +59,7 @@ fn label(op: &str, dir: fn(&str) -> AssemblerDirective<'_>) {
                                                       wr = pad_right,
                                                       wrr = pad_rright);
 
-                                assert_eq!(AssemblerDirective::from_str(&dir_str), Ok(Some(dir(&label))));
+                                assert_eq!(AssemblerDirective::from_str(&dir_str), Ok(Some(dir(&label))), "{}", dir_str);
                             }
                         }
                     }

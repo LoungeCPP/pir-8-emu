@@ -49,36 +49,40 @@ fn save_label() {
 
 #[test]
 fn load_label_present() {
-    for token_len in 1..5 {
-        for _ in 0..5 {
-            let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
+    for offset in -0x10..0x10 {
+        for token_len in 1..5 {
+            for _ in 0..5 {
+                let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
 
-            let mut labels = vec![(label.clone(), token_len * 0x1A)].into_iter().collect();
-            let mut next_output_address = None;
+                let mut labels = vec![(label.clone(), token_len * 0x1A)].into_iter().collect();
+                let mut next_output_address = None;
 
-            assert_eq!(AssemblerDirective::LoadLabel(&label).obey(&mut next_output_address, &mut labels),
-                       Ok(Some(LabelLoad::HaveImmediately(token_len * 0x1A))));
+                assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
+                           Ok(Some(LabelLoad::HaveImmediately((((token_len * 0x1A) as i16).wrapping_add(offset)) as u16))));
 
-            assert_eq!(next_output_address, None);
-            assert_eq!(labels, vec![(label, token_len * 0x1A)].into_iter().collect());
+                assert_eq!(next_output_address, None);
+                assert_eq!(labels, vec![(label, token_len * 0x1A)].into_iter().collect());
+            }
         }
     }
 }
 
 #[test]
 fn load_label_missing() {
-    for token_len in 1..5 {
-        for _ in 0..5 {
-            let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
+    for offset in -0x10..0x10 {
+        for token_len in 1..5 {
+            for _ in 0..5 {
+                let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
 
-            let mut labels = BTreeMap::new();
-            let mut next_output_address = None;
+                let mut labels = BTreeMap::new();
+                let mut next_output_address = None;
 
-            assert_eq!(AssemblerDirective::LoadLabel(&label).obey(&mut next_output_address, &mut labels),
-                       Ok(Some(LabelLoad::WaitFor(label.clone()))));
+                assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
+                           Ok(Some(LabelLoad::WaitFor(label.clone(), offset))));
 
-            assert_eq!(next_output_address, None);
-            assert_eq!(labels, BTreeMap::new());
+                assert_eq!(next_output_address, None);
+                assert_eq!(labels, BTreeMap::new());
+            }
         }
     }
 }
