@@ -3,6 +3,7 @@ extern crate pir_8_emu;
 
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
 use bear_lib_terminal::Color;
+use pir_8_emu::ReadWritable;
 use std::process::exit;
 use std::{env, fs};
 
@@ -13,13 +14,13 @@ fn main() {
 }
 
 fn actual_main() -> Result<(), i32> {
-    let (_, _, mut registers, mut pc, mut sp, mut adr, mut ins) = (pir_8_emu::vm::Memory::new(),
-                                                                   pir_8_emu::vm::Ports::new(),
-                                                                   pir_8_emu::isa::GeneralPurposeRegister::defaults(),
-                                                                   pir_8_emu::isa::SpecialPurposeRegister::new("Program Counter", "PC"),
-                                                                   pir_8_emu::isa::SpecialPurposeRegister::new("Stack Pointer", "SP"),
-                                                                   pir_8_emu::isa::SpecialPurposeRegister::new("Memory Address", "ADR"),
-                                                                   pir_8_emu::isa::SpecialPurposeRegister::new("Instruction", "INS"));
+    let (_, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = (pir_8_emu::vm::Memory::new(),
+                                                                           pir_8_emu::vm::Ports::new(),
+                                                                           pir_8_emu::isa::GeneralPurposeRegister::defaults(),
+                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Program Counter", "PC"),
+                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Stack Pointer", "SP"),
+                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Memory Address", "ADR"),
+                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Instruction", "INS"));
 
     terminal::open("pir-8-emu", 80, 24);
     terminal::set_colors(Color::from_rgb(0xFF, 0xFF, 0xFF), Color::from_rgb(0x00, 0x00, 0x00));
@@ -38,26 +39,67 @@ fn actual_main() -> Result<(), i32> {
 
     pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut registers);
     pir_8_emu::binutils::pir_8_emu::display::register::sp_write(0, 5, &mut pc, &mut sp, &mut adr, &mut ins);
+    pir_8_emu::binutils::pir_8_emu::display::instruction_write(0, 9);
+    pir_8_emu::binutils::pir_8_emu::display::micro::stack::write(0, 12);
+    pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
     terminal::refresh();
 
+    let mut memory = pir_8_emu::vm::Memory::from(&fs::read(env::args().skip(1).next().expect("File argument not passed")).expect("Passed file nonexistant")
+                                                      [..]);
+
+    let mut ops = pir_8_emu::micro::NEXT_INSTRUCTION;
+    let mut curr_op = 0;
+
+    let mut instr = pir_8_emu::isa::instruction::Instruction::Halt;
+    let mut instr_valid = false;
+
+    let mut stack = vec![];
+
+    pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &ops, &registers);
     for ev in terminal::events() {
+        let mut new_ops = false;
         match ev {
             Event::Close |
             Event::KeyPressed { key: KeyCode::C, ctrl: true, .. } => break,
+            Event::KeyPressed { key: KeyCode::Space, .. } => {
+                if !ops.0[curr_op].perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
+                    break;
+                }
+                curr_op += 1;
+
+                if curr_op >= ops.1 {
+                    if ins.was_written() {
+                        instr = pir_8_emu::isa::instruction::Instruction::from(*ins);
+                        ops = pir_8_emu::micro::MicroOp::from_instruction(instr);
+                        instr_valid = true;
+                    } else {
+                        ops = pir_8_emu::micro::NEXT_INSTRUCTION;
+                        instr_valid = false;
+                    }
+
+                    curr_op = 0;
+                    new_ops = true;
+                }
+            }
             _ => {}
         }
 
-        *registers[1] = *registers[0] + 12;
-        *registers[2] = *registers[1] + 0x69;
-        *sp = *pc + 12;
-        *adr = *sp + 0x69;
         pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut registers);
         pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut pc, &mut sp, &mut adr, &mut ins);
+        pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, instr_valid, &instr, &registers);
+        pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &stack);
+        if new_ops || curr_op == 0 {
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &ops, &registers);
+        } else {
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, curr_op);
+        }
         terminal::print_xy(0, 0, &format!("{:?}", ev));
 
         terminal::refresh();
     }
 
+    terminal::refresh();
+    terminal::delay(1000);
     terminal::close();
 
     if let Some(icon_path) = icon_path {
