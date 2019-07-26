@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["colours_for_rw",""]],"mod":[["register",""]]});
+initSidebarItems({"fn":[["colours_for_rw",""],["instruction_update",""],["instruction_write",""]],"mod":[["micro",""],["register",""]]});
