@@ -57,7 +57,7 @@ pub fn gp_update(x_start: usize, y_start: usize, registers: &mut GeneralPurposeR
 /// ADR 0x0000       INS 0x00
 /// ```
 pub fn sp_write(x_start: usize, y_start: usize, pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>,
-                          adr: &mut SpecialPurposeRegister<u16>, ins: &mut SpecialPurposeRegister<u8>) {
+                adr: &mut SpecialPurposeRegister<u16>, ins: &mut SpecialPurposeRegister<u8>) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
 
@@ -82,7 +82,7 @@ fn write_sp_register<T: Num + Unsigned + PrimInt + UpperHex>(x: i32, y: i32, reg
 }
 
 pub fn sp_update(x_start: usize, y_start: usize, pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>,
-                           adr: &mut SpecialPurposeRegister<u16>, ins: &mut SpecialPurposeRegister<u8>) {
+                 adr: &mut SpecialPurposeRegister<u16>, ins: &mut SpecialPurposeRegister<u8>) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
 

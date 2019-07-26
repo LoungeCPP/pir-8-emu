@@ -2,11 +2,9 @@ extern crate bear_lib_terminal;
 extern crate pir_8_emu;
 
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
-use std::io::{self, Write, Read, stdout, stdin};
 use bear_lib_terminal::Color;
 use std::process::exit;
-use std::borrow::Cow;
-use std::fs::File;
+use std::{env, fs};
 
 
 fn main() {
@@ -25,6 +23,17 @@ fn actual_main() -> Result<(), i32> {
 
     terminal::open("pir-8-emu", 80, 24);
     terminal::set_colors(Color::from_rgb(0xFF, 0xFF, 0xFF), Color::from_rgb(0x00, 0x00, 0x00));
+
+    let icon_path = env::temp_dir().join("pir-8-emu.ico");
+    let icon_path = if let Err(err) = fs::write(&icon_path, pir_8_emu::binutils::pir_8_emu::ICON) {
+        eprintln!("warning: failed to write window icon to temporary file {}: {}", icon_path.display(), err);
+        None
+    } else if !terminal::set(terminal::config::Window::empty().icon(&icon_path)) {
+        eprintln!("warning: failed to set window icon to temporary file");
+        None
+    } else {
+        Some(icon_path)
+    };
 
 
     pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut registers);
@@ -50,6 +59,12 @@ fn actual_main() -> Result<(), i32> {
     }
 
     terminal::close();
+
+    if let Some(icon_path) = icon_path {
+        if let Err(err) = fs::remove_file(&icon_path) {
+            eprintln!("warning: failed to remove temporary icon file {}: {}", icon_path.display(), err);
+        }
+    }
 
     Ok(())
 }
