@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["display",""]]});
+initSidebarItems({"mod":[["display",""]],"static":[["ICON","Contents of the icon to use for the `pir-8-emu` window"]]});
