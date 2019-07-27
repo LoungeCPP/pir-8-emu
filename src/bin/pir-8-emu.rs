@@ -1,6 +1,8 @@
 extern crate bear_lib_terminal;
 extern crate pir_8_emu;
+extern crate nfd;
 
+use nfd::{Response as OpenFileResponse, open_file_dialog};
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
 use bear_lib_terminal::Color;
 use pir_8_emu::ReadWritable;
@@ -14,13 +16,13 @@ fn main() {
 }
 
 fn actual_main() -> Result<(), i32> {
-    let (_, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = (pir_8_emu::vm::Memory::new(),
-                                                                           pir_8_emu::vm::Ports::new(),
-                                                                           pir_8_emu::isa::GeneralPurposeRegister::defaults(),
-                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Program Counter", "PC"),
-                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Stack Pointer", "SP"),
-                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Memory Address", "ADR"),
-                                                                           pir_8_emu::isa::SpecialPurposeRegister::new("Instruction", "INS"));
+    let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = (pir_8_emu::vm::Memory::new(),
+                                                                                    pir_8_emu::vm::Ports::new(),
+                                                                                    pir_8_emu::isa::GeneralPurposeRegister::defaults(),
+                                                                                    pir_8_emu::isa::SpecialPurposeRegister::new("Program Counter", "PC"),
+                                                                                    pir_8_emu::isa::SpecialPurposeRegister::new("Stack Pointer", "SP"),
+                                                                                    pir_8_emu::isa::SpecialPurposeRegister::new("Memory Address", "ADR"),
+                                                                                    pir_8_emu::isa::SpecialPurposeRegister::new("Instruction", "INS"));
 
     terminal::open("pir-8-emu", 80, 24);
     terminal::set_colors(Color::from_rgb(0xFF, 0xFF, 0xFF), Color::from_rgb(0x00, 0x00, 0x00));
@@ -44,8 +46,6 @@ fn actual_main() -> Result<(), i32> {
     pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
     terminal::refresh();
 
-    let mut memory = pir_8_emu::vm::Memory::from(&fs::read(env::args().skip(1).next().expect("File argument not passed")).expect("Passed file nonexistant")
-                                                      [..]);
 
     let mut ops = pir_8_emu::micro::NEXT_INSTRUCTION;
     let mut curr_op = 0;
@@ -61,6 +61,37 @@ fn actual_main() -> Result<(), i32> {
         match ev {
             Event::Close |
             Event::KeyPressed { key: KeyCode::C, ctrl: true, .. } => break,
+            Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } => {
+                match open_file_dialog(Some("p8b,bin"), None) {
+                    Ok(OpenFileResponse::Okay(fname)) => {
+                        match fs::read(&fname) {
+                            Ok(mem) => {
+                                if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu - {}", fname))) {
+                                    eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
+                                }
+
+                                memory = pir_8_emu::vm::Memory::from(&mem[..]);
+
+                                ports = pir_8_emu::vm::Ports::new();
+                                registers = pir_8_emu::isa::GeneralPurposeRegister::defaults();
+                                pc = pir_8_emu::isa::SpecialPurposeRegister::new("Program Counter", "PC");
+                                sp = pir_8_emu::isa::SpecialPurposeRegister::new("Stack Pointer", "SP");
+                                adr = pir_8_emu::isa::SpecialPurposeRegister::new("Memory Address", "ADR");
+                                ins = pir_8_emu::isa::SpecialPurposeRegister::new("Instruction", "INS");
+
+                                ops = pir_8_emu::micro::NEXT_INSTRUCTION;
+                                curr_op = 0;
+                                instr_valid = false;
+                                stack.clear();
+                            }
+                            Err(err) => eprintln!("error: failed to read memory image from {}: {}", fname, err),
+                        }
+                    }
+                    Ok(OpenFileResponse::OkayMultiple(_)) => unreachable!(),
+                    Ok(OpenFileResponse::Cancel) => {}
+                    Err(err) => eprintln!("error: failed to open file open dialog: {}", err),
+                }
+            }
             Event::KeyPressed { key: KeyCode::Space, .. } => {
                 if !ops.0[curr_op].perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins).unwrap() {
                     break;
