@@ -37,3 +37,12 @@ pub fn update(x_start: usize, y_start: usize, current_op: usize) {
     clear(Some(Rect::from_values(x_start, y_start + 1 + current_op - 1, 1, 1)));
     put_xy(x_start, y_start + 1 + current_op, '>');
 }
+
+pub fn finished(x_start: usize, y_start: usize) {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+
+    clear(Some(Rect::from_values(x_start, y_start + 1, COLUMN_WIDTH, MAX_HEIGHT as i32)));
+
+    print_xy(x_start, y_start + 1, "{execution finished}");
+}

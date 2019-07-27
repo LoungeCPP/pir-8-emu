@@ -32,11 +32,13 @@ pub fn instruction_write(x_start: usize, y_start: usize) {
     print_xy(x_start, y_start + 1, "{undecoded}");
 }
 
-pub fn instruction_update(x_start: usize, y_start: usize, valid: bool, instr: &Instruction, registers: &GeneralPurposeRegisterBank) {
+pub fn instruction_update(x_start: usize, y_start: usize, valid: bool, execution_finished: bool, instr: &Instruction, registers: &GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
 
-    let disp = if valid {
+    let disp = if execution_finished {
+        Cow::Borrowed("{execution finished}")
+    } else if valid {
         Cow::Owned(instr.display(registers).to_string())
     } else {
         Cow::Borrowed("{undecoded}")

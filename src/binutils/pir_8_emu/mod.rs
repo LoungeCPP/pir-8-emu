@@ -1,3 +1,7 @@
+mod vm;
+
+pub use self::vm::Vm;
+
 pub mod display;
 
 
