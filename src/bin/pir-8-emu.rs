@@ -16,7 +16,10 @@ fn main() {
 
 fn actual_main() -> Result<(), i32> {
     terminal::open("pir-8-emu", 80, 24);
+    let _bear_lib_terminal_destructor = pir_8_emu::binutils::pir_8_emu::QuickscopeWrapper(Some(|| terminal::close()));
+
     terminal::set_colors(Color::from_rgb(0xFF, 0xFF, 0xFF), Color::from_rgb(0x00, 0x00, 0x00));
+
 
     let icon_path = env::temp_dir().join("pir-8-emu.ico");
     let icon_path = if let Err(err) = fs::write(&icon_path, pir_8_emu::binutils::pir_8_emu::ICON) {
@@ -28,6 +31,12 @@ fn actual_main() -> Result<(), i32> {
     } else {
         Some(icon_path)
     };
+
+    let _icon_path_destructor = pir_8_emu::binutils::pir_8_emu::QuickscopeWrapper(Some(move || if let Some(icon_path) = icon_path {
+        if let Err(err) = fs::remove_file(&icon_path) {
+            eprintln!("warning: failed to remove temporary icon file {}: {}", icon_path.display(), err);
+        }
+    }));
 
 
     let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new();
@@ -91,13 +100,6 @@ fn actual_main() -> Result<(), i32> {
         terminal::refresh();
     }
 
-    terminal::close();
-
-    if let Some(icon_path) = icon_path {
-        if let Err(err) = fs::remove_file(&icon_path) {
-            eprintln!("warning: failed to remove temporary icon file {}: {}", icon_path.display(), err);
-        }
-    }
 
     Ok(())
 }

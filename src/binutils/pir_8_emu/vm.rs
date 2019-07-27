@@ -81,10 +81,6 @@ impl Vm {
                      &mut self.ins)?;
         self.curr_op += 1;
 
-        if self.curr_op == 5 {
-            return Err(MicroOpPerformError::MicrostackUnderflow);
-        }
-
         if self.curr_op >= self.ops.1 {
             if self.ins.was_written() {
                 self.instruction = Instruction::from(*self.ins);
