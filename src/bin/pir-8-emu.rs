@@ -58,20 +58,39 @@ fn actual_main() -> Result<(), i32> {
         Ok(new_ops)
     };
 
-    pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut vm.registers);
-    pir_8_emu::binutils::pir_8_emu::display::register::sp_write(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
-    pir_8_emu::binutils::pir_8_emu::display::instruction_write(0, 9);
-    pir_8_emu::binutils::pir_8_emu::display::micro::stack::write(0, 12);
-    pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
+    let write_main_screen = |vm: &mut pir_8_emu::binutils::pir_8_emu::Vm| {
+        pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut vm.registers);
+        pir_8_emu::binutils::pir_8_emu::display::register::sp_write(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
+        pir_8_emu::binutils::pir_8_emu::display::instruction_write(0, 9);
+        pir_8_emu::binutils::pir_8_emu::display::micro::stack::write(0, 12);
+        pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
+        pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+    };
+
+    write_main_screen(&mut vm);
     terminal::refresh();
 
-    pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+    let mut showing_help = false;
+
     for ev in terminal::events() {
         let mut new_ops = false;
         match ev {
             Event::Close |
             Event::KeyPressed { key: KeyCode::C, ctrl: true, .. } => break,
-            Event::KeyPressed { key: KeyCode::A, ctrl: true, shift: true } => {
+            Event::KeyPressed { key: KeyCode::Escape, .. } if showing_help => {
+                showing_help = false;
+
+                terminal::clear(None);
+                write_main_screen(&mut vm);
+            }
+            Event::KeyPressed { key: KeyCode::F1, .. } => {
+                showing_help = true;
+
+                terminal::clear(None);
+                terminal::print_xy(0, 0, pir_8_emu::binutils::pir_8_emu::HELP_TEXT);
+                terminal::refresh();
+            }
+            Event::KeyPressed { key: KeyCode::A, ctrl: true, shift: true } if !showing_help => {
                 config.auto_load_next_instruction = !config.auto_load_next_instruction;
 
                 terminal::clear(Some(Rect::from_values(0, 0, 80, 1)));
@@ -86,7 +105,7 @@ fn actual_main() -> Result<(), i32> {
 
                 new_ops = flush_instruction_load(&mut vm, &config)?;
             }
-            Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } => {
+            Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } if !showing_help => {
                 match open_file_dialog(Some("p8b,bin"), None) {
                     Ok(OpenFileResponse::Okay(fname)) => {
                         match fs::read(&fname) {
@@ -96,6 +115,7 @@ fn actual_main() -> Result<(), i32> {
                                 }
 
                                 vm.reset(&mem);
+                                new_ops = flush_instruction_load(&mut vm, &config)?;
                             }
                             Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),
                         }
@@ -105,28 +125,30 @@ fn actual_main() -> Result<(), i32> {
                     Err(err) => eprintln!("warning: failed to open file open dialog: {}", err),
                 }
             }
-            Event::KeyPressed { key: KeyCode::Space, .. } => {
+            Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
                 new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
                 new_ops |= flush_instruction_load(&mut vm, &config)?;
             }
             _ => {}
         }
 
-        pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut vm.registers);
-        pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
-        if new_ops {
-            pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
-        }
-        pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &vm.stack);
-        if vm.execution_finished {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
-        } else if new_ops || vm.curr_op == 0 {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
-        } else {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
-        }
+        if !showing_help {
+            pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut vm.registers);
+            pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
+            if new_ops {
+                pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
+            }
+            pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &vm.stack);
+            if vm.execution_finished {
+                pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
+            } else if new_ops || vm.curr_op == 0 {
+                pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+            } else {
+                pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
+            }
 
-        terminal::refresh();
+            terminal::refresh();
+        }
     }
 
 
