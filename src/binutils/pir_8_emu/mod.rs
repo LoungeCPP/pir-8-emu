@@ -1,6 +1,8 @@
 mod vm;
+mod execution_config;
 
 pub use self::vm::Vm;
+pub use self::execution_config::ExecutionConfig;
 
 pub mod display;
 
