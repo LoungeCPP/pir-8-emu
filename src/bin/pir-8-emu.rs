@@ -40,6 +40,12 @@ fn actual_main() -> Result<(), i32> {
 
 
     let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new();
+    let vm_perform_err = |err: pir_8_emu::micro::MicroOpPerformError, vm: &mut pir_8_emu::binutils::pir_8_emu::Vm| {
+        eprintln!("error: failed to perform micro-op: {}", err);
+        eprintln!("VM state follows");
+        eprintln!("{:?}", vm);
+        1
+    };
 
     pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut vm.registers);
     pir_8_emu::binutils::pir_8_emu::display::register::sp_write(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
@@ -73,21 +79,15 @@ fn actual_main() -> Result<(), i32> {
                     Err(err) => eprintln!("warning: failed to open file open dialog: {}", err),
                 }
             }
-            Event::KeyPressed { key: KeyCode::Space, .. } => {
-                new_ops = vm.perform_next_op()
-                    .map_err(|err| {
-                        eprintln!("error: failed to perform micro-op: {}", err);
-                        eprintln!("VM state follows");
-                        eprintln!("{:?}", vm);
-                        1
-                    })?
-            }
+            Event::KeyPressed { key: KeyCode::Space, .. } => new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?,
             _ => {}
         }
 
         pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut vm.registers);
         pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
-        pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
+        if new_ops {
+            pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
+        }
         pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &vm.stack);
         if vm.execution_finished {
             pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
