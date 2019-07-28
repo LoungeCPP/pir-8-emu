@@ -12,6 +12,9 @@ pub mod display;
 /// Cropped and scaled down version of [this](https://twitter.com/nabijaczleweli/status/1154176483730100224)
 pub static ICON: &[u8] = include_bytes!("../../../assets/pir-8-emu.ico");
 
+/// Contents of the help text to display after for the `pir-8-emu` window
+pub static HELP_TEXT: &str = include_str!("../../../assets/pir-8-emu.hlp");
+
 
 /// Execute the contained funxion when this object is dropped
 ///
