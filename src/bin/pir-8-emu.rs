@@ -4,7 +4,6 @@ extern crate nfd;
 
 use nfd::{Response as OpenFileResponse, open_file_dialog};
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
-use bear_lib_terminal::geometry::Rect;
 use bear_lib_terminal::Color;
 use std::process::exit;
 use std::{env, fs};
@@ -93,17 +92,14 @@ fn actual_main() -> Result<(), i32> {
             Event::KeyPressed { key: KeyCode::A, ctrl: true, shift: true } if !showing_help => {
                 config.auto_load_next_instruction = !config.auto_load_next_instruction;
 
-                terminal::clear(Some(Rect::from_values(0, 0, 80, 1)));
-                terminal::print_xy(0, 0, "Auto load next instruction:");
-                terminal::print_xy(27 + 1,
-                                   0,
-                                   if config.auto_load_next_instruction {
-                                       "ON"
-                                   } else {
-                                       "OFF"
-                                   });
+                pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Auto load next instruction", config.auto_load_next_instruction);
 
                 new_ops = flush_instruction_load(&mut vm, &config)?;
+            }
+            Event::KeyPressed { key: KeyCode::F, ctrl: true, shift: true } if !showing_help => {
+                config.execute_full_instructions = !config.execute_full_instructions;
+
+                pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Execute full instructions", config.execute_full_instructions);
             }
             Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } if !showing_help => {
                 match open_file_dialog(Some("p8b,bin"), None) {
@@ -126,7 +122,13 @@ fn actual_main() -> Result<(), i32> {
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
-                new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
+                if config.execute_full_instructions && vm.instruction_valid {
+                    for _ in vm.curr_op..vm.ops.1 {
+                        new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
+                    }
+                } else {
+                    new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
+                }
                 new_ops |= flush_instruction_load(&mut vm, &config)?;
             }
             _ => {}

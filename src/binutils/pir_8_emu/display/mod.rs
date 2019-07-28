@@ -1,6 +1,6 @@
 use self::super::super::super::isa::GeneralPurposeRegisterBank;
 use self::super::super::super::isa::instruction::Instruction;
-use bear_lib_terminal::terminal::{print_xy, clear};
+use bear_lib_terminal::terminal::{print_xy, put_xy, clear};
 use bear_lib_terminal::geometry::Rect;
 use bear_lib_terminal::Color;
 use std::borrow::Cow;
@@ -46,4 +46,16 @@ pub fn instruction_update(x_start: usize, y_start: usize, valid: bool, execution
     print_xy(x_start, y_start + 1, &disp);
 
     clear(Some(Rect::from_values(x_start + disp.len() as i32, y_start + 1, COLUMN_WIDTH - disp.len() as i32, 1)));
+}
+
+pub fn config(x_start: usize, y_start: usize, name: &str, is_on: bool) {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+    let name_len = name.len() as i32;
+
+    clear(Some(Rect::from_values(x_start, y_start, 80, 1)));
+
+    print_xy(x_start, y_start, name);
+    put_xy(x_start + name_len, y_start, ':');
+    print_xy(x_start + name_len + 1 + 1, y_start, if is_on { "ON" } else { "OFF" });
 }
