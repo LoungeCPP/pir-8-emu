@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["display",""]],"static":[["ICON","Contents of the icon to use for the `pir-8-emu` window"]]});
+initSidebarItems({"mod":[["display",""]],"static":[["HELP_TEXT","Contents of the help text to display after for the `pir-8-emu` window"],["ICON","Contents of the icon to use for the `pir-8-emu` window"]],"struct":[["ExecutionConfig","A configuration set, specifying various execution tunings"],["QuickscopeWrapper","Execute the contained funxion when this object is dropped"],["Vm",""]]});
