@@ -8,7 +8,13 @@ configuration: Release
 clone_folder: C:\pir-8-emu
 
 install:
+  - curl -SL https://api.github.com/repos/nabijaczleweli/BearLibTerminal.rs/releases/latest | grep _url | grep BearLibTerminal.dll | sed "s/ /\n/g" | grep . | tail -1 | sed s/\x22//g > TEMP
+  - set/p BLT_LINK=<TEMP
+  - curl -L %BLT_LINK% -oC:\BearLibTerminal.dll
+  -
   - set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%;C:\Users\appveyor\.cargo\bin
+  - set LIBRARY_PATH=C:\
+  -
   - bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
   - bash -lc "pacman --noconfirm -Sy"
   - bash -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain"

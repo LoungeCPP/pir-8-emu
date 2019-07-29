@@ -94,7 +94,7 @@ fn actual_main() -> Result<(), i32> {
 
                 pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Auto load next instruction", config.auto_load_next_instruction);
 
-                new_ops = flush_instruction_load(&mut vm, &config)?;
+                new_ops |= flush_instruction_load(&mut vm, &config)?;
             }
             Event::KeyPressed { key: KeyCode::F, ctrl: true, shift: true } if !showing_help => {
                 config.execute_full_instructions = !config.execute_full_instructions;
@@ -111,7 +111,7 @@ fn actual_main() -> Result<(), i32> {
                                 }
 
                                 vm.reset(&mem);
-                                new_ops = flush_instruction_load(&mut vm, &config)?;
+                                new_ops |= flush_instruction_load(&mut vm, &config)?;
                             }
                             Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),
                         }
@@ -124,10 +124,10 @@ fn actual_main() -> Result<(), i32> {
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
                 if config.execute_full_instructions && vm.instruction_valid {
                     for _ in vm.curr_op..vm.ops.1 {
-                        new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
+                        new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
                     }
                 } else {
-                    new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
+                    new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
                 }
                 new_ops |= flush_instruction_load(&mut vm, &config)?;
             }

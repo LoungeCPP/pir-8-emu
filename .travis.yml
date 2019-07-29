@@ -7,12 +7,28 @@ matrix:
     - env: LANGUAGE=Rust DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../pir-8-emu-$TRAVIS_TAG.tbz2"
       language: rust
       rust: stable
+      addons:
+        apt:
+          packages:
+            - libgtk-3-dev
+          sources: &sources
+            - r-packages-trusty
     - env: LANGUAGE=Rust
       language: rust
       rust: beta
+      addons:
+        apt:
+          packages:
+            - libgtk-3-dev
+          sources: *sources
     - env: LANGUAGE=Rust CLIPPY=true
       language: rust
       rust: nightly
+      addons:
+        apt:
+          packages:
+            - libgtk-3-dev
+          sources: *sources
     - env: LANGUAGE=Ruby DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../pir-8-emu-man-$TRAVIS_TAG.tbz2"
       language: ruby
       rust: []
@@ -20,6 +36,11 @@ matrix:
     - env: LANGUAGE=Rust-doc DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../pir-8-emu-doc-$TRAVIS_TAG.tbz2"
       language: rust
       rust: stable
+      addons:
+        apt:
+          packages:
+            - libgtk-3-dev
+          sources: *sources
   allow_failures:
     - rust: beta
     - rust: nightly
