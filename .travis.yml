@@ -60,6 +60,15 @@ install:
   - if [ "$CLIPPY" ]; then
       CLIPPY_INSTALLED=0 && (rustup component add clippy-preview || cargo install --git https://github.com/rust-lang/rust-clippy clippy -f) && CLIPPY_INSTALLED=1;
     fi
+  -
+  - if [ "$LANGUAGE" == "Rust" ]; then
+      BEARLIBTERMINAL_URL="$(curl -SL 'https://api.github.com/repos/nabijaczleweli/BearLibTerminal.rs/releases/latest' | grep '_url' | grep 'libBearLibTerminal.so' | sed 's/ /\n/g' | grep '.' | grep '//' | sed 's/"//g')";
+      mkdir ~/lib/ && pushd ~/lib/;
+      curl -SOL "$BEARLIBTERMINAL_URL";
+      popd;
+      export LD_LIBRARY_PATH=~/lib/;
+      export LIBRARY_PATH=~/lib/;
+    fi
 
 script:
   - if [ "$LANGUAGE" == "Rust" ]; then cargo build --verbose; fi
@@ -67,9 +76,7 @@ script:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$CLIPPY_INSTALLED" == 1 ]; then cargo clippy; fi
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then cargo build --verbose --release; fi
   -
-  - if [ "$LANGUAGE" == "Ruby" ]; then
-      ronn --organization="Lounge<C++>" man/*.md;
-    fi
+  - if [ "$LANGUAGE" == "Ruby" ]; then ronn --organization="Lounge<C++>" man/*.md; fi
 
 after_success:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
