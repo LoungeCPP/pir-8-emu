@@ -1,6 +1,16 @@
 sudo: false
 language: generic
-cache: cargo
+cache:
+  cargo: true
+  apt: true
+  directories:
+    - /tmp/tools
+
+env:
+  global:
+    - PATH="$HOME/bin:$PATH"
+    - CMAKE_VERSION_PREFIX=3.7
+    - CMAKE_VERSION_FULL=3.7.2
 
 matrix:
   include:
@@ -11,6 +21,8 @@ matrix:
         apt:
           packages:
             - libgtk-3-dev
+            - libxmu-dev
+            - libgl1-mesa-dev
           sources: &sources
             - r-packages-trusty
     - env: LANGUAGE=Rust
@@ -20,6 +32,8 @@ matrix:
         apt:
           packages:
             - libgtk-3-dev
+            - libxmu-dev
+            - libgl1-mesa-dev
           sources: *sources
     - env: LANGUAGE=Rust CLIPPY=true
       language: rust
@@ -28,6 +42,8 @@ matrix:
         apt:
           packages:
             - libgtk-3-dev
+            - libxmu-dev
+            - libgl1-mesa-dev
           sources: *sources
     - env: LANGUAGE=Ruby DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../pir-8-emu-man-$TRAVIS_TAG.tbz2"
       language: ruby
@@ -40,6 +56,8 @@ matrix:
         apt:
           packages:
             - libgtk-3-dev
+            - libxmu-dev
+            - libgl1-mesa-dev
           sources: *sources
   allow_failures:
     - rust: beta
@@ -61,13 +79,20 @@ install:
       CLIPPY_INSTALLED=0 && (rustup component add clippy-preview || cargo install --git https://github.com/rust-lang/rust-clippy clippy -f) && CLIPPY_INSTALLED=1;
     fi
   -
-  - if [ "$LANGUAGE" == "Rust" ]; then
-      BEARLIBTERMINAL_URL="$(curl -SL 'https://api.github.com/repos/nabijaczleweli/BearLibTerminal.rs/releases/latest' | grep '_url' | grep 'libBearLibTerminal.so' | sed 's/ /\n/g' | grep '.' | grep '//' | sed 's/"//g')";
-      mkdir ~/lib/ && pushd ~/lib/;
-      curl -SOL "$BEARLIBTERMINAL_URL";
+  - if [ "$LANGUAGE" == "Rust" ] || [ "$LANGUAGE" == "Rust-doc" ]; then
+      mkdir -p /tmp/tools && pushd /tmp/tools;
+      if [[ ! -f "cmake-$CMAKE_VERSION_FULL-Linux-x86_64.sh" ]]; then
+        curl -SOL "https://cmake.org/files/v$CMAKE_VERSION_PREFIX/cmake-$CMAKE_VERSION_FULL-Linux-x86_64.sh";
+        chmod +x "cmake-$CMAKE_VERSION_FULL-Linux-x86_64.sh";
+      fi;
+      ./"cmake-$CMAKE_VERSION_FULL-Linux-x86_64.sh" --prefix="$HOME" --exclude-subdir --skip-license;
       popd;
-      export LD_LIBRARY_PATH=~/lib/;
-      export LIBRARY_PATH=~/lib/;
+    fi
+  - if [ "$LANGUAGE" == "Rust" ] || [ "$LANGUAGE" == "Rust-doc" ]; then
+      git clone https://github.com/nabijaczleweli/BearLibTerminal ~/BearLibTerminal;
+      pushd ~/BearLibTerminal/Build && cmake -G"Unix Makefiles" .. && make BearLibTerminal && popd;
+      mkdir -p ~/lib/ && cp ~/BearLibTerminal/Output/Linux64/libBearLibTerminal.so ~/lib/;
+      export LD_LIBRARY_PATH=~/lib/ LIBRARY_PATH=~/lib/;
     fi
 
 script:
