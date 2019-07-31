@@ -32,7 +32,7 @@ fn parse_directive<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i s
     match itr.next() {
         Some(mut tok) => {
             if !had_colon {
-                if tok.chars().next().unwrap() != ':' {
+                if !tok.starts_with(':') {
                     return Ok(None);
                 }
 
@@ -110,7 +110,7 @@ fn parse_label_offset<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'
             let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
 
             let mut negative = false;
-            if tok.chars().next() == Some('-') {
+            if tok.starts_with('-') {
                 tok = &tok[1..];
                 negative = true;
             }
