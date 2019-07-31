@@ -17,6 +17,7 @@ exclude = ["*.enc"]
 
 [dependencies]
 bear-lib-terminal = "2.0"
+tinyfiledialogs = "3.3"
 downcast-rs = "1.0"
 num-traits = "0.2"
 clap = "2.33"

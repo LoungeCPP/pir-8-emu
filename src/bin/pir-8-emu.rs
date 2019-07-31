@@ -1,9 +1,9 @@
 extern crate bear_lib_terminal;
+extern crate tinyfiledialogs;
 extern crate pir_8_emu;
-extern crate nfd;
 
-use nfd::{Response as OpenFileResponse, open_file_dialog};
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
+use tinyfiledialogs::open_file_dialog;
 use bear_lib_terminal::Color;
 use std::process::exit;
 use std::{env, fs};
@@ -102,23 +102,18 @@ fn actual_main() -> Result<(), i32> {
                 pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Execute full instructions", config.execute_full_instructions);
             }
             Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } if !showing_help => {
-                match open_file_dialog(Some("p8b,bin"), None) {
-                    Ok(OpenFileResponse::Okay(fname)) => {
-                        match fs::read(&fname) {
-                            Ok(mem) => {
-                                if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu – {}", fname))) {
-                                    eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
-                                }
-
-                                vm.reset(&mem);
-                                new_ops |= flush_instruction_load(&mut vm, &config)?;
+                if let Some(fname) = open_file_dialog("Open memory image", "", Some((&["*.p8b", "*.bin"], "Memory image files (*.p8b, *.bin)"))) {
+                    match fs::read(&fname) {
+                        Ok(mem) => {
+                            if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu – {}", fname))) {
+                                eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
                             }
-                            Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),
+
+                            vm.reset(&mem);
+                            new_ops |= flush_instruction_load(&mut vm, &config)?;
                         }
+                        Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),
                     }
-                    Ok(OpenFileResponse::OkayMultiple(_)) => unreachable!(),
-                    Ok(OpenFileResponse::Cancel) => {}
-                    Err(err) => eprintln!("warning: failed to open file open dialog: {}", err),
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
