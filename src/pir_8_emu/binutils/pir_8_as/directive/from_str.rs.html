@@ -163,7 +163,7 @@
     <span class="kw">match</span> <span class="ident">itr</span>.<span class="ident">next</span>() {
         <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">tok</span>) <span class="op">=&gt;</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">had_colon</span> {
-                <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">starts_with</span>(<span class="string">&#39;:&#39;</span>) {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">tok</span>.<span class="ident">starts_with</span>(<span class="string">&#39;:&#39;</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
 
