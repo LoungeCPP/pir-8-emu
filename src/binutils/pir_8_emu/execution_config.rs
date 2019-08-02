@@ -1,13 +1,14 @@
+use serde::de::{Deserializer, Deserialize, MapAccess as DeserialiserMapAccess, Visitor as DeserialisationVisitor};
 use toml::de::{Error as TomlError, from_str as from_toml_str};
-use serde::{Deserialize, Serialize};
 use std::io::Error as IoError;
 use toml::Value as TomlValue;
 use std::path::PathBuf;
-use std::fs;
+use serde::Serialize;
+use std::{fmt, fs};
 
 
 /// A configuration set, specifying various execution tunings
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExecutionConfig {
     /// Automatically load the next instruction, silently performing the
     /// [`NEXT_INSTRUCTION`](../../micro/static.NEXT_INSTRUCTION.html) microops
@@ -31,7 +32,8 @@ impl ExecutionConfig {
     /// Returns `Err(Err(te))` if parsing the read file failed with `te`.<br />
     /// Returns `Ok(None)` if the file didn't exist.<br />
     /// Returns `Ok(Some(ec))`, if the file was correctly read and parsed as TOML,
-    /// the contents of `ec` start off as `ExecutionConfig::new()`, and are then updated with each valid key.
+    /// the contents of `ec` start off as `ExecutionConfig::new()`, and are then updated with each valid key,
+    /// this behaviour is consistent with the `Deserialize` implementation.
     ///
     /// # Examples
     ///
@@ -78,19 +80,15 @@ impl ExecutionConfig {
         }
 
         let data = fs::read_to_string(cfg).map_err(Ok)?;
-        let val: TomlValue = from_toml_str(&data).map_err(Err)?;
+        from_toml_str(&data).map(Some).map_err(Err)
+    }
+}
 
-        let mut ret = ExecutionConfig::new();
-
-        if let Some(auto_load_next_instruction) = val.get("auto_load_next_instruction").and_then(|v| v.as_bool()) {
-            ret.auto_load_next_instruction = auto_load_next_instruction;
-        }
-
-        if let Some(execute_full_instructions) = val.get("execute_full_instructions").and_then(|v| v.as_bool()) {
-            ret.execute_full_instructions = execute_full_instructions;
-        }
-
-        Ok(Some(ret))
+impl<'de> Deserialize<'de> for ExecutionConfig {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        deserializer.deserialize_struct("ExecutionConfig",
+                                        &["auto_load_next_instruction", "execute_full_instructions"],
+                                        ExecutionConfigVisitor)
     }
 }
 
@@ -98,5 +96,30 @@ impl Default for ExecutionConfig {
     #[inline]
     fn default() -> ExecutionConfig {
         ExecutionConfig::new()
+    }
+}
+
+
+struct ExecutionConfigVisitor;
+
+impl<'de> DeserialisationVisitor<'de> for ExecutionConfigVisitor {
+    type Value = ExecutionConfig;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("struct ExecutionConfig")
+    }
+
+    fn visit_map<V: DeserialiserMapAccess<'de>>(self, mut map: V) -> Result<ExecutionConfig, V::Error> {
+        let mut ret = ExecutionConfig::new();
+
+        while let Some(key) = map.next_key()? {
+            match key {
+                "auto_load_next_instruction" => ret.auto_load_next_instruction = map.next_value()?,
+                "execute_full_instructions" => ret.execute_full_instructions = map.next_value()?,
+                _ => {}
+            }
+        }
+
+        Ok(ret)
     }
 }
