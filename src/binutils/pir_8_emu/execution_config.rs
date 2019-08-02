@@ -1,7 +1,6 @@
 use serde::de::{Deserializer, Deserialize, MapAccess as DeserialiserMapAccess, Visitor as DeserialisationVisitor};
 use toml::de::{Error as TomlError, from_str as from_toml_str};
 use std::io::Error as IoError;
-use toml::Value as TomlValue;
 use std::path::PathBuf;
 use serde::Serialize;
 use std::{fmt, fs};
@@ -116,7 +115,7 @@ impl<'de> DeserialisationVisitor<'de> for ExecutionConfigVisitor {
             match key {
                 "auto_load_next_instruction" => ret.auto_load_next_instruction = map.next_value()?,
                 "execute_full_instructions" => ret.execute_full_instructions = map.next_value()?,
-                _ => {}
+                _ => drop(map.next_value::<()>()),
             }
         }
 
