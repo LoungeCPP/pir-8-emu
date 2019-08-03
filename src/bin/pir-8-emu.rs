@@ -15,6 +15,9 @@ fn main() {
 }
 
 fn actual_main() -> Result<(), i32> {
+    let mut opts = pir_8_emu::options::EmulatorOptions::parse();
+    println!("{:#?}", opts);
+
     terminal::open("pir-8-emu", 80, 24);
     let _bear_lib_terminal_destructor = pir_8_emu::binutils::pir_8_emu::QuickscopeWrapper(Some(|| terminal::close()));
 

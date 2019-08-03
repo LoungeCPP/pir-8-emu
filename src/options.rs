@@ -17,6 +17,7 @@ use self::super::util::parse_with_prefix;
 use clap::{AppSettings, App, Arg};
 use std::path::PathBuf;
 use std::fs;
+use dirs;
 
 
 /// Representation of the assembler's all configurable values.
@@ -63,6 +64,17 @@ pub struct DisassemblerOptions {
     ///
     /// Default: `None`
     pub register_lettters: Option<String>,
+}
+
+/// Representation of the emulator's all configurable values.
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct EmulatorOptions {
+    /// The directory containing config files
+    ///
+    /// Parent directory must exist
+    ///
+    /// Default: `"$HOME/.pir-8-emu/"`
+    pub config_dir: (String, PathBuf),
 }
 
 
@@ -142,6 +154,34 @@ impl DisassemblerOptions {
     }
 }
 
+impl EmulatorOptions {
+    /// Parse `env`-wide command-line arguments into an `EmulatorOptions` instance
+    pub fn parse() -> EmulatorOptions {
+        let config_dir_default = dirs::home_dir().map(|mut hd| {
+            hd.push(".pir-8-emu");
+            hd.display().to_string()
+        });
+
+        let matches = App::new("pir-8-emu")
+            .version(crate_version!())
+            .author(crate_authors!())
+            .about("Emulator of the pir-8")
+            .setting(AppSettings::ColoredHelp)
+            .args(&[{
+                            let cd = Arg::from_usage("[CONFIG_DIR] 'Directory containing configuration files'");
+                            if let Some(config_dir_default) = config_dir_default.as_ref() {
+                                cd.default_value(config_dir_default)
+                            } else {
+                                cd
+                            }
+                        }
+                        .validator(config_dir_validator)])
+            .get_matches();
+
+        EmulatorOptions { config_dir: output_file_process(matches.value_of("CONFIG_DIR").unwrap()) }
+    }
+}
+
 
 fn filesystem_validator(label: &str, directory: bool, s: &str) -> Result<(), String> {
     fs::canonicalize(&s).map_err(|_| format!("{} \"{}\" not found", label, s)).and_then(|f| if f.is_dir() == directory {
@@ -167,6 +207,22 @@ fn output_file_validator(s: String) -> Result<(), String> {
             Ok(())
         } else {
             buf.canonicalize().map(|_| ()).map_err(|e| format!("Output file: {}", e))
+        }
+    }
+}
+
+fn config_dir_validator(s: String) -> Result<(), String> {
+    let mut buf = PathBuf::from(s);
+    if buf.exists() && !buf.is_dir() {
+        Err(format!("Config dir \"{}\" is a file", buf.display()))
+    } else {
+        buf.pop();
+
+        // Handle pathless filename
+        if buf.as_os_str().is_empty() {
+            Ok(())
+        } else {
+            buf.canonicalize().map(|_| ()).map_err(|e| format!("Config dir: {}", e))
         }
     }
 }

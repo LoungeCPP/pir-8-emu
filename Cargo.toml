@@ -21,6 +21,7 @@ tinyfiledialogs = "3.3"
 downcast-rs = "1.0"
 num-traits = "0.2"
 clap = "2.33"
+dirs = "2.0"
 toml = "0.5"
 
 [dependencies.serde]
