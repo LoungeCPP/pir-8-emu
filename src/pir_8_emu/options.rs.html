@@ -283,6 +283,10 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Executable option parsing and management.</span>
 <span class="doccomment">//!</span>
@@ -298,10 +302,10 @@
 <span class="doccomment">//! ```</span>
 
 
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">PathBuf</span>, <span class="ident">is_separator</span> <span class="kw">as</span> <span class="ident">is_path_separator</span>, <span class="ident">MAIN_SEPARATOR</span> <span class="kw">as</span> <span class="ident">MAIN_PATH_SEPARATOR</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegister</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>;
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">AppSettings</span>, <span class="ident">App</span>, <span class="ident">Arg</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
 <span class="kw">use</span> <span class="ident">dirs</span>;
 
@@ -561,7 +565,11 @@
         <span class="ident">file</span>.<span class="ident">push</span>(<span class="string">&quot;.&quot;</span>);
     }
 
-    (<span class="ident">file_s</span>.<span class="ident">to_string</span>(),
+    (<span class="kw">if</span> <span class="op">!</span><span class="ident">file_s</span>.<span class="ident">ends_with</span>(<span class="ident">is_path_separator</span>) {
+         <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">file_s</span>, <span class="ident">MAIN_PATH_SEPARATOR</span>)
+     } <span class="kw">else</span> {
+         <span class="ident">file_s</span>.<span class="ident">to_string</span>()
+     },
      <span class="ident">file</span>.<span class="ident">canonicalize</span>()
          .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">p</span><span class="op">|</span> {
              <span class="ident">p</span>.<span class="ident">push</span>(<span class="ident">file_name</span>);
