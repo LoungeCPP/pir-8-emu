@@ -178,7 +178,7 @@ impl EmulatorOptions {
                         .validator(config_dir_validator)])
             .get_matches();
 
-        EmulatorOptions { config_dir: output_file_process(matches.value_of("CONFIG_DIR").unwrap()) }
+        EmulatorOptions { config_dir: config_dir_process(matches.value_of("CONFIG_DIR").unwrap()) }
     }
 }
 
@@ -257,6 +257,25 @@ fn output_file_process(file: &str) -> (String, PathBuf) {
     }
 
     (file_name.to_str().unwrap().to_string(),
+     file.canonicalize()
+         .map(|mut p| {
+             p.push(file_name);
+             p
+         })
+         .unwrap())
+}
+
+fn config_dir_process(file_s: &str) -> (String, PathBuf) {
+    let mut file = PathBuf::from(file_s);
+    let file_name = file.file_name().unwrap().to_os_string();
+
+    file.pop();
+    // Handle pathless filename
+    if file.as_os_str().is_empty() {
+        file.push(".");
+    }
+
+    (file_s.to_string(),
      file.canonicalize()
          .map(|mut p| {
              p.push(file_name);

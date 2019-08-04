@@ -15,7 +15,7 @@ fn main() {
 }
 
 fn actual_main() -> Result<(), i32> {
-    let mut opts = pir_8_emu::options::EmulatorOptions::parse();
+    let opts = pir_8_emu::options::EmulatorOptions::parse();
     println!("{:#?}", opts);
 
     terminal::open("pir-8-emu", 80, 24);
@@ -42,7 +42,31 @@ fn actual_main() -> Result<(), i32> {
     }));
 
 
-    let mut config = pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new();
+    let mut config = match pir_8_emu::binutils::pir_8_emu::ExecutionConfig::read_from_config_dir(&opts.config_dir.1) {
+        Ok(Some(cfg)) => {
+            terminal::print_xy(0, 0, "Loaded configuration from");
+            terminal::print_xy(25 + 1, 0, &opts.config_dir.0);
+
+            cfg
+        }
+        Ok(None) => {
+            terminal::print_xy(0, 0, "This looks like the first start-up; press [bkcolor=darker grey]F1[/bkcolor] for help");
+
+            pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new()
+        }
+        Err(err) => {
+            let err_s = match err {
+                Ok(ioe) => ioe.to_string(),
+                Err(te) => te.to_string(),
+            };
+
+            terminal::print_xy(0, 0, "Failed to load configuration:");
+            terminal::print_xy(29 + 1, 0, &err_s);
+
+            pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new()
+        }
+    };
+
     let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new();
     let vm_perform_err = |err: pir_8_emu::micro::MicroOpPerformError, vm: &mut pir_8_emu::binutils::pir_8_emu::Vm| {
         eprintln!("error: failed to perform micro-op: {}", err);
