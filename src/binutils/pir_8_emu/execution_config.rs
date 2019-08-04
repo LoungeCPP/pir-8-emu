@@ -1,5 +1,6 @@
 use serde::de::{Deserializer, Deserialize, MapAccess as DeserialiserMapAccess, Visitor as DeserialisationVisitor};
 use toml::de::{Error as TomlError, from_str as from_toml_str};
+use toml::to_string_pretty as toml_to_string;
 use std::io::Error as IoError;
 use std::path::PathBuf;
 use serde::Serialize;
@@ -80,6 +81,49 @@ impl ExecutionConfig {
 
         let data = fs::read_to_string(cfg).map_err(Ok)?;
         from_toml_str(&data).map(Some).map_err(Err)
+    }
+
+    /// Write this execution config to the file named `"exec_cfg.toml"` under the specified config directory
+    ///
+    /// The specified config directory and all its ascendants will be created
+    ///
+    /// # Examples
+    ///
+    /// Given `"$ROOT/exec_cfg.toml"` containing:
+    ///
+    /// ```toml
+    /// execute_full_instructions = true
+    /// hewwo = "uWu"
+    /// ```
+    ///
+    /// The following holds:
+    ///
+    /// ```
+    /// # use pir_8_emu::binutils::pir_8_emu::ExecutionConfig;
+    /// # use std::env::temp_dir;
+    /// # use std::path::Path;
+    /// # use std::fs;
+    /// # let root = temp_dir().join("pir_8_emu-doctest").join("binutils-pir_8_emu-ExecutionConfig-write_to_config_dir-0");
+    /// # /*
+    /// let root = Path::new("$ROOT");
+    /// # */
+    /// ExecutionConfig::new().write_to_config_dir(&root).unwrap();
+    ///
+    /// assert_eq!(fs::read_to_string(root.join("exec_cfg.toml")).unwrap(),
+    ///            "auto_load_next_instruction = false\n\
+    ///             execute_full_instructions = false\n");
+    /// ```
+    pub fn write_to_config_dir<P: Into<PathBuf>>(&self, cfg_dir: P) -> Result<(), IoError> {
+        self.write_to_config_dir_impl(cfg_dir.into())
+    }
+
+    fn write_to_config_dir_impl(&self, mut cfg: PathBuf) -> Result<(), IoError> {
+        fs::create_dir_all(&cfg)?;
+
+        cfg.push("exec_cfg.toml");
+
+        let data = toml_to_string(&self).expect("ExecutionConfig is TOML-serialisable");
+        fs::write(cfg, data.as_bytes())
     }
 }
 

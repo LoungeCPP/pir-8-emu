@@ -12,10 +12,10 @@
 //! ```
 
 
+use std::path::{PathBuf, is_separator as is_path_separator, MAIN_SEPARATOR as MAIN_PATH_SEPARATOR};
 use self::super::isa::GeneralPurposeRegister;
 use self::super::util::parse_with_prefix;
 use clap::{AppSettings, App, Arg};
-use std::path::PathBuf;
 use std::fs;
 use dirs;
 
@@ -275,7 +275,11 @@ fn config_dir_process(file_s: &str) -> (String, PathBuf) {
         file.push(".");
     }
 
-    (file_s.to_string(),
+    (if !file_s.ends_with(is_path_separator) {
+         format!("{}{}", file_s, MAIN_PATH_SEPARATOR)
+     } else {
+         file_s.to_string()
+     },
      file.canonicalize()
          .map(|mut p| {
              p.push(file_name);

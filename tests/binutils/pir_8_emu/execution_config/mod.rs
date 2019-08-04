@@ -1,6 +1,7 @@
 use pir_8_emu::binutils::pir_8_emu::ExecutionConfig;
 
 mod read_from_config_dir;
+mod write_to_config_dir;
 
 
 #[test]

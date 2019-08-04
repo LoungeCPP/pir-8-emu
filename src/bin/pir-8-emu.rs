@@ -55,13 +55,15 @@ fn actual_main() -> Result<(), i32> {
             pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new()
         }
         Err(err) => {
-            let err_s = match err {
-                Ok(ioe) => ioe.to_string(),
-                Err(te) => te.to_string(),
+            let (var, err_s) = match err {
+                Ok(ioe) => ("read", ioe.to_string()),
+                Err(te) => ("load", te.to_string()),
             };
 
-            terminal::print_xy(0, 0, "Failed to load configuration:");
-            terminal::print_xy(29 + 1, 0, &err_s);
+            terminal::print_xy(0, 0, "Failed to");
+            terminal::print_xy(9 + 1, 0, var);
+            terminal::print_xy(9 + 1 + 4 + 1, 0, "configuration:");
+            terminal::print_xy(9 + 1 + 4 + 1 + 14 + 1, 0, &err_s);
 
             pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new()
         }
