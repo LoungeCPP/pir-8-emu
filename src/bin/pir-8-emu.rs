@@ -68,6 +68,16 @@ fn actual_main() -> Result<(), i32> {
             pir_8_emu::binutils::pir_8_emu::ExecutionConfig::new()
         }
     };
+    let _config_destructor = pir_8_emu::binutils::pir_8_emu::QuickscopeWrapper(Some({
+        let config = &config as *const pir_8_emu::binutils::pir_8_emu::ExecutionConfig;
+        let opts = &opts;
+        move || {
+            let config = unsafe { *config };
+            if let Err(err) = config.write_to_config_dir(&opts.config_dir.1) {
+                eprintln!("warning: failed to save config {:?} to {}: {}", config, opts.config_dir.0, err);
+            }
+        }
+    }));
 
     let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new();
     let vm_perform_err = |err: pir_8_emu::micro::MicroOpPerformError, vm: &mut pir_8_emu::binutils::pir_8_emu::Vm| {
