@@ -1,6 +1,7 @@
 extern crate bear_lib_terminal;
 #[macro_use]
 extern crate downcast_rs;
+extern crate arraydeque;
 extern crate num_traits;
 extern crate serde;
 #[macro_use]

@@ -183,6 +183,8 @@ fn actual_main() -> Result<(), i32> {
                 pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
             }
 
+            println!("{:?}", vm.instruction_history);
+
             terminal::refresh();
         }
     }

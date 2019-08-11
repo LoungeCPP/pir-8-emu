@@ -1,5 +1,6 @@
 use self::super::super::super::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister, SpecialPurposeRegister};
 use self::super::super::super::micro::{MicroOpPerformError, MicroOpBlock, MicroOp, NEXT_INSTRUCTION};
+use arraydeque::{ArrayDeque, Wrapping as ArrayDequeBehaviourWrapping};
 use self::super::super::super::isa::instruction::Instruction;
 use self::super::super::super::vm::{Memory, Ports};
 use self::super::super::super::rw::ReadWritable;
@@ -23,6 +24,8 @@ pub struct Vm {
     pub execution_finished: bool,
 
     pub stack: Vec<u8>,
+
+    pub instruction_history: ArrayDeque<[(u16, Instruction, u16); 5], ArrayDequeBehaviourWrapping>,
 }
 
 impl Vm {
@@ -44,6 +47,8 @@ impl Vm {
             execution_finished: false,
 
             stack: vec![],
+
+            instruction_history: ArrayDeque::new(),
         }
     }
 
@@ -62,6 +67,7 @@ impl Vm {
         self.instruction_valid = false;
         self.execution_finished = false;
         self.stack.clear();
+        self.instruction_history.clear();
     }
 
     pub fn perform_next_op(&mut self) -> Result<bool, MicroOpPerformError> {
@@ -86,6 +92,16 @@ impl Vm {
                 self.instruction = Instruction::from(*self.ins);
                 self.ops = MicroOp::from_instruction(self.instruction);
                 self.instruction_valid = true;
+
+                let rw = self.adr.was_read() && self.adr.was_written();
+                let mut data = 0u16;
+                for i in 0..(self.instruction.data_length() as u16) {
+                    data = (data << 8) | (self.memory[..][self.adr.wrapping_add(i) as usize] as u16);
+                }
+                self.instruction_history.push_front((*self.adr, self.instruction, data));
+                if !rw {
+                    self.adr.reset_rw();
+                }
             } else {
                 self.ops = NEXT_INSTRUCTION;
                 self.instruction_valid = false;
