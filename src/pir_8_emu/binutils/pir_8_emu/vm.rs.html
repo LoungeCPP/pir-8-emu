@@ -98,9 +98,26 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
+<span class="kw">use</span> <span class="ident">arraydeque</span>::{<span class="ident">ArrayDeque</span>, <span class="ident">Wrapping</span> <span class="kw">as</span> <span class="ident">ArrayDequeBehaviourWrapping</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">Instruction</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::{<span class="ident">Memory</span>, <span class="ident">Ports</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">rw</span>::<span class="ident">ReadWritable</span>;
@@ -124,6 +141,8 @@
     <span class="kw">pub</span> <span class="ident">execution_finished</span>: <span class="ident">bool</span>,
 
     <span class="kw">pub</span> <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+
+    <span class="kw">pub</span> <span class="ident">instruction_history</span>: <span class="ident">ArrayDeque</span><span class="op">&lt;</span>[(<span class="ident">u16</span>, <span class="ident">Instruction</span>, <span class="ident">u16</span>); <span class="number">5</span>], <span class="ident">ArrayDequeBehaviourWrapping</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Vm</span> {
@@ -145,6 +164,8 @@
             <span class="ident">execution_finished</span>: <span class="bool-val">false</span>,
 
             <span class="ident">stack</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+
+            <span class="ident">instruction_history</span>: <span class="ident">ArrayDeque</span>::<span class="ident">new</span>(),
         }
     }
 
@@ -163,6 +184,7 @@
         <span class="self">self</span>.<span class="ident">instruction_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">execution_finished</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
+        <span class="self">self</span>.<span class="ident">instruction_history</span>.<span class="ident">clear</span>();
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform_next_op</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">MicroOpPerformError</span><span class="op">&gt;</span> {
@@ -187,6 +209,16 @@
                 <span class="self">self</span>.<span class="ident">instruction</span> <span class="op">=</span> <span class="ident">Instruction</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ins</span>);
                 <span class="self">self</span>.<span class="ident">ops</span> <span class="op">=</span> <span class="ident">MicroOp</span>::<span class="ident">from_instruction</span>(<span class="self">self</span>.<span class="ident">instruction</span>);
                 <span class="self">self</span>.<span class="ident">instruction_valid</span> <span class="op">=</span> <span class="bool-val">true</span>;
+
+                <span class="kw">let</span> <span class="ident">rw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">adr</span>.<span class="ident">was_read</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">adr</span>.<span class="ident">was_written</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="number">0u16</span>;
+                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="self">self</span>.<span class="ident">instruction</span>.<span class="ident">data_length</span>() <span class="kw">as</span> <span class="ident">u16</span>) {
+                    <span class="ident">data</span> <span class="op">=</span> (<span class="ident">data</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">memory</span>[..][<span class="self">self</span>.<span class="ident">adr</span>.<span class="ident">wrapping_add</span>(<span class="ident">i</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">u16</span>);
+                }
+                <span class="self">self</span>.<span class="ident">instruction_history</span>.<span class="ident">push_front</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">adr</span>, <span class="self">self</span>.<span class="ident">instruction</span>, <span class="ident">data</span>));
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">rw</span> {
+                    <span class="self">self</span>.<span class="ident">adr</span>.<span class="ident">reset_rw</span>();
+                }
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">ops</span> <span class="op">=</span> <span class="ident">NEXT_INSTRUCTION</span>;
                 <span class="self">self</span>.<span class="ident">instruction_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;

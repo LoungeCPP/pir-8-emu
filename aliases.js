@@ -1,5 +1,6 @@
 var ALIASES = {};
 ALIASES["ansi_term"] = {};
+ALIASES["arraydeque"] = {};
 ALIASES["atty"] = {};
 ALIASES["bear_lib_terminal"] = {};
 ALIASES["bear_lib_terminal_sys"] = {};

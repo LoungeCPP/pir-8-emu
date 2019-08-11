@@ -1,5 +1,6 @@
 var N = null;var sourcesIndex = {};
 sourcesIndex["ansi_term"] = {"name":"","files":["ansi.rs","debug.rs","difference.rs","display.rs","lib.rs","style.rs","windows.rs","write.rs"]};
+sourcesIndex["arraydeque"] = {"name":"","dirs":[{"name":"maybe_uninit","files":["maybe_uninit_nodrop.rs","mod.rs","nodrop.rs"]}],"files":["array.rs","behavior.rs","error.rs","lib.rs","range.rs"]};
 sourcesIndex["atty"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["bear_lib_terminal"] = {"name":"","dirs":[{"name":"terminal","dirs":[{"name":"config","files":["font.rs","input_filter.rs","mod.rs","section.rs"]},{"name":"state","files":["mod.rs","mouse.rs"]}],"files":["input.rs","mod.rs"]}],"files":["colors.rs","geometry.rs","lib.rs"]};
 sourcesIndex["bear_lib_terminal_sys"] = {"name":"","files":["lib.rs"]};
