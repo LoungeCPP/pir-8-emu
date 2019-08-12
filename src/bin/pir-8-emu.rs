@@ -16,7 +16,6 @@ fn main() {
 
 fn actual_main() -> Result<(), i32> {
     let opts = pir_8_emu::options::EmulatorOptions::parse();
-    println!("{:#?}", opts);
 
     terminal::open("pir-8-emu", 80, 24);
     let _bear_lib_terminal_destructor = pir_8_emu::binutils::pir_8_emu::QuickscopeWrapper(Some(|| terminal::close()));
@@ -103,6 +102,8 @@ fn actual_main() -> Result<(), i32> {
         pir_8_emu::binutils::pir_8_emu::display::micro::stack::write(0, 12);
         pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
         pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+
+        pir_8_emu::binutils::pir_8_emu::display::instruction_history_write(30, 1);
     };
 
     write_main_screen(&mut vm);
@@ -183,7 +184,11 @@ fn actual_main() -> Result<(), i32> {
                 pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
             }
 
-            println!("{:?}", vm.instruction_history);
+            pir_8_emu::binutils::pir_8_emu::display::instruction_history_update(30,
+                                                                                1,
+                                                                                &vm.instruction_history,
+                                                                                vm.instruction_history.capacity(),
+                                                                                &vm.registers);
 
             terminal::refresh();
         }

@@ -25,7 +25,7 @@ pub struct Vm {
 
     pub stack: Vec<u8>,
 
-    pub instruction_history: ArrayDeque<[(u16, Instruction, u16); 5], ArrayDequeBehaviourWrapping>,
+    pub instruction_history: ArrayDeque<[(u16, Instruction, u16); 10], ArrayDequeBehaviourWrapping>,
 }
 
 impl Vm {
