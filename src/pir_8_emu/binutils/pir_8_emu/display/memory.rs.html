@@ -80,7 +80,7 @@
 
 <span class="doccomment">/// ```plaintext</span>
 <span class="doccomment">/// Memory access</span>
-<span class="doccomment">/// 01234 = 0xAA</span>
+<span class="doccomment">/// 01234 ≡ 0xAA</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rw_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -99,7 +99,7 @@
         <span class="kw">let</span> (<span class="ident">fg</span>, <span class="ident">bg</span>) <span class="op">=</span> <span class="ident">colours_for_rw</span>(<span class="ident">r</span>, <span class="ident">w</span>);
         <span class="ident">with_colors</span>(<span class="ident">fg</span>, <span class="ident">bg</span>, <span class="op">||</span> <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">cur_line</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:04X}&quot;</span>, <span class="ident">addr</span>)));
 
-        <span class="ident">print_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">cur_line</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot; = {:#04X}&quot;</span>, <span class="ident">val</span>));
+        <span class="ident">print_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">cur_line</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot; ≡ {:#04X}&quot;</span>, <span class="ident">val</span>));
 
         <span class="ident">cur_line</span> <span class="op">+=</span> <span class="number">1</span>;
     }

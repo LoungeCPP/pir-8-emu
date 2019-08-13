@@ -111,6 +111,11 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">Instruction</span>;
@@ -175,11 +180,16 @@
                                                                                            <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">let</span> <span class="ident">max_instr_count</span> <span class="op">=</span> <span class="ident">max_instr_count</span> <span class="kw">as</span> <span class="ident">i32</span>;
 
-    <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">25</span>, <span class="ident">max_instr_count</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">2</span>)));
+    <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">25</span>, <span class="ident">max_instr_count</span>)));
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_line</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> (<span class="ident">addr</span>, <span class="ident">instr</span>, <span class="ident">data</span>) <span class="kw">in</span> <span class="ident">instrs</span> {
+        <span class="kw">if</span> <span class="ident">cur_line</span> <span class="op">&gt;=</span> <span class="ident">max_instr_count</span> {
+            <span class="kw">break</span>;
+        }
+
         <span class="kw">let</span> (<span class="ident">clr_start</span>, <span class="ident">clr_end</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">cur_line</span> <span class="op">==</span> <span class="number">0</span> {
             (<span class="string">&quot;[bkcolor=darker grey]&quot;</span>, <span class="string">&quot;[/bkcolor]&quot;</span>)
         } <span class="kw">else</span> {
@@ -196,7 +206,7 @@
                           <span class="ident">clr_end</span>));
         <span class="ident">cur_line</span> <span class="op">+=</span> <span class="number">1</span>;
 
-        <span class="kw">if</span> <span class="ident">instr</span>.<span class="ident">data_length</span>() <span class="op">!=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">instr</span>.<span class="ident">data_length</span>() <span class="op">!=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">cur_line</span> <span class="op">&lt;</span> <span class="ident">max_instr_count</span> {
             <span class="ident">print_xy</span>(<span class="ident">x_start</span>,
                      <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">cur_line</span>,
                      <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}{:04X} D {:#0w$X}{}&quot;</span>,

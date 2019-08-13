@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["rw_update",""],["rw_write","`plaintext Memory access 01234 = 0xAA `"],["view_update",""],["view_write",""]]});
+initSidebarItems({"fn":[["rw_update",""],["rw_write","`plaintext Memory access 01234 ≡ 0xAA `"],["view_update",""],["view_write",""]]});
