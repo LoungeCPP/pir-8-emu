@@ -106,6 +106,7 @@ fn actual_main() -> Result<(), i32> {
         pir_8_emu::binutils::pir_8_emu::display::instruction_history_write(30, 1);
 
         pir_8_emu::binutils::pir_8_emu::display::memory_view_write(30 + 25, 1);
+        pir_8_emu::binutils::pir_8_emu::display::memory_view_update(30 + 25, 1, vm.adr, &vm.memory);
     };
 
     write_main_screen(&mut vm);

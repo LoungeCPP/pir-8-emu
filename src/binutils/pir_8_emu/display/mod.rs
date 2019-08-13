@@ -66,17 +66,30 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
 
     let mut cur_line = 0;
     for (addr, instr, data) in instrs {
+        let (clr_start, clr_end) = if cur_line == 0 {
+            ("[bkcolor=darker grey]", "[/bkcolor]")
+        } else {
+            ("", "")
+        };
+
         print_xy(x_start,
                  y_start + 1 + cur_line,
-                 &format!("{:04X} {} {}", addr, if !instr.is_valid() { '!' } else { ' ' }, instr.display(registers)));
+                 &format!("{}{:04X} {} {}{}",
+                          clr_start,
+                          addr,
+                          if !instr.is_valid() { '!' } else { ' ' },
+                          instr.display(registers),
+                          clr_end));
         cur_line += 1;
 
         if instr.data_length() != 0 {
             print_xy(x_start,
                      y_start + 1 + cur_line,
-                     &format!("{:04X} D {:#0w$X}",
+                     &format!("{}{:04X} D {:#0w$X}{}",
+                              clr_start,
                               addr.wrapping_add(instr.data_length() as u16),
                               data,
+                              clr_end,
                               w = instr.data_length() * 2));
             cur_line += 1;
         }
@@ -103,19 +116,15 @@ pub fn memory_view_update(x_start: usize, y_start: usize, adr: SpecialPurposeReg
         let addr = adr.wrapping_add(cur_line as u16).wrapping_sub(4);
         let val = mem[..][addr as usize];
 
+        let (clr_start, clr_end) = if addr == adr {
+            ("[bkcolor=darker grey]", "[/bkcolor]")
+        } else {
+            ("", "")
+        };
+
         print_xy(x_start,
                  y_start + 1 + cur_line,
-                 &format!("{}{:04X} {:#04X} {:#06b}_{:04b}{}",
-                          if addr == adr {
-                              "[bkcolor=darker grey]"
-                          } else {
-                              ""
-                          },
-                          addr,
-                          val,
-                          val >> 4,
-                          val & 0b1111,
-                          if addr == adr { "[/bkcolor]" } else { "" }));
+                 &format!("{}{:04X} {:#04X} {:#06b}_{:04b}{}", clr_start, addr, val, val >> 4, val & 0b1111, clr_end));
     }
 }
 
