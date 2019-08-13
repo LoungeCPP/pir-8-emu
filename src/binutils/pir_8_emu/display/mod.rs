@@ -61,11 +61,16 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
                                                                                            registers: &GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
+    let max_instr_count = max_instr_count as i32;
 
-    clear(Some(Rect::from_values(x_start, y_start + 1, 25, max_instr_count as i32 * 2)));
+    clear(Some(Rect::from_values(x_start, y_start + 1, 25, max_instr_count)));
 
     let mut cur_line = 0;
     for (addr, instr, data) in instrs {
+        if cur_line >= max_instr_count {
+            break;
+        }
+
         let (clr_start, clr_end) = if cur_line == 0 {
             ("[bkcolor=darker grey]", "[/bkcolor]")
         } else {
@@ -82,7 +87,7 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
                           clr_end));
         cur_line += 1;
 
-        if instr.data_length() != 0 {
+        if instr.data_length() != 0 && cur_line < max_instr_count {
             print_xy(x_start,
                      y_start + 1 + cur_line,
                      &format!("{}{:04X} D {:#0w$X}{}",

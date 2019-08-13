@@ -7,7 +7,7 @@ use self::super::colours_for_rw;
 
 /// ```plaintext
 /// Memory access
-/// 01234 = 0xAA
+/// 01234 ≡ 0xAA
 /// ```
 pub fn rw_write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
@@ -26,7 +26,7 @@ pub fn rw_update(x_start: usize, y_start: usize, mem: &mut Memory) {
         let (fg, bg) = colours_for_rw(r, w);
         with_colors(fg, bg, || print_xy(x_start, y_start + 1 + cur_line, &format!("{:04X}", addr)));
 
-        print_xy(x_start + 4, y_start + 1 + cur_line, &format!(" = {:#04X}", val));
+        print_xy(x_start + 4, y_start + 1 + cur_line, &format!(" ≡ {:#04X}", val));
 
         cur_line += 1;
     }
