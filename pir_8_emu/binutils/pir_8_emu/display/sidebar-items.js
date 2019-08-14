@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["colours_for_rw",""],["config",""],["instruction_history_update",""],["instruction_history_write",""],["instruction_update",""],["instruction_write",""]],"mod":[["memory",""],["micro",""],["register",""]]});
+initSidebarItems({"fn":[["colours_for_rw",""],["config",""],["instruction_history_update",""],["instruction_history_write",""],["instruction_update",""],["instruction_write",""],["ports_rw_update",""],["ports_rw_write",""]],"mod":[["memory",""],["micro",""],["register",""]]});
