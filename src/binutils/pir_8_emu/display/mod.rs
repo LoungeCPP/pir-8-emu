@@ -1,8 +1,12 @@
+use self::super::super::super::vm::{MemoryPortsReadWrittenIterator, Ports};
+use bear_lib_terminal::terminal::{with_colors, print_xy, put_xy, clear};
 use self::super::super::super::isa::GeneralPurposeRegisterBank;
 use self::super::super::super::isa::instruction::Instruction;
-use bear_lib_terminal::terminal::{print_xy, put_xy, clear};
+use num_traits::{Unsigned, NumCast, PrimInt, Num};
 use bear_lib_terminal::geometry::Rect;
 use bear_lib_terminal::Color;
+use std::fmt::UpperHex;
+use std::mem::size_of;
 use std::borrow::Cow;
 
 pub mod register;
@@ -24,6 +28,7 @@ pub fn colours_for_rw(read: bool, written: bool) -> (Color, Color) {
 
     (fg, bg)
 }
+
 
 pub fn instruction_write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
@@ -115,4 +120,53 @@ pub fn config(x_start: usize, y_start: usize, name: &str, is_on: bool) {
     print_xy(x_start, y_start, name);
     put_xy(x_start + name_len, y_start, ':');
     print_xy(x_start + name_len + 1 + 1, y_start, if is_on { "ON" } else { "OFF" });
+}
+
+pub fn ports_rw_write(x_start: usize, y_start: usize) {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+
+    print_xy(x_start, y_start, "Port activity");
+    print_xy(x_start, y_start + 1, "{none}");
+}
+
+pub fn ports_rw_update(x_start: usize, y_start: usize, pts: &mut Ports) {
+    mem_ports_rw_update(x_start, y_start, pts.iter_rw());
+    pts.reset_rw();
+}
+
+
+fn mem_ports_rw_update<IdxT: Num + Unsigned + PrimInt + NumCast + UpperHex>(x_start: usize, y_start: usize, itr: MemoryPortsReadWrittenIterator<IdxT>) {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+
+    let mut cur_line = 0;
+    for (addr, val, r, w) in itr {
+        let (fg, bg) = colours_for_rw(r, w);
+        with_colors(fg,
+                    bg,
+                    || print_xy(x_start, y_start + 1 + cur_line, &format!("{:0w$X}", addr, w = size_of::<IdxT>() * 2)));
+
+        print_xy(x_start + 4,
+                 y_start + 1 + cur_line,
+                 &format!(" {} {:#04X}",
+                          match (r, w) {
+                              (false, false) => unreachable!(),
+                              (false, true) => '←',
+                              (true, false) => '→',
+                              (true, true) => '≡',
+                          },
+                          val));
+
+        cur_line += 1;
+    }
+
+    if cur_line == 0 {
+        print_xy(x_start, y_start + 1, "{none}      ");
+        cur_line += 1;
+    }
+
+    if cur_line < 5 {
+        clear(Some(Rect::from_values(x_start, y_start + 1 + cur_line, 4 + 3 + 4, 5 - cur_line)));
+    }
 }

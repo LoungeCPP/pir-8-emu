@@ -8,6 +8,8 @@ mod mem_ports_rw_iter;
 pub use self::memory::Memory;
 pub use self::ports::{PortHandlerInstallError, PortHandler, Ports};
 
+pub(crate) use self::mem_ports_rw_iter::MemoryPortsReadWrittenIterator;
+
 
 /// Iterator over read-from and written-to parts of `Ports`
 ///

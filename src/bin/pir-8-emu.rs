@@ -104,6 +104,7 @@ fn actual_main() -> Result<(), i32> {
         pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
 
         pir_8_emu::binutils::pir_8_emu::display::instruction_history_write(30, 1);
+        pir_8_emu::binutils::pir_8_emu::display::ports_rw_write(30, 13);
 
         pir_8_emu::binutils::pir_8_emu::display::memory::view_write(30 + 25, 1);
         pir_8_emu::binutils::pir_8_emu::display::memory::view_update(30 + 25, 1, vm.adr, &vm.memory);
@@ -194,6 +195,7 @@ fn actual_main() -> Result<(), i32> {
                                                                                 &vm.instruction_history,
                                                                                 vm.instruction_history.capacity(),
                                                                                 &vm.registers);
+            pir_8_emu::binutils::pir_8_emu::display::ports_rw_update(30, 13, &mut vm.ports);
 
             pir_8_emu::binutils::pir_8_emu::display::memory::view_update(30 + 25, 1, vm.adr, &vm.memory);
             pir_8_emu::binutils::pir_8_emu::display::memory::rw_update(30 + 25, 13, &mut vm.memory);

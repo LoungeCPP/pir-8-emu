@@ -1,8 +1,7 @@
 use self::super::super::super::super::isa::SpecialPurposeRegister;
-use bear_lib_terminal::terminal::{with_colors, print_xy, clear};
 use self::super::super::super::super::vm::Memory;
-use bear_lib_terminal::geometry::Rect;
-use self::super::colours_for_rw;
+use bear_lib_terminal::terminal::print_xy;
+use self::super::mem_ports_rw_update;
 
 
 /// ```plaintext
@@ -18,28 +17,7 @@ pub fn rw_write(x_start: usize, y_start: usize) {
 }
 
 pub fn rw_update(x_start: usize, y_start: usize, mem: &mut Memory) {
-    let x_start = x_start as i32;
-    let y_start = y_start as i32;
-
-    let mut cur_line = 0;
-    for (addr, val, r, w) in mem.iter_rw() {
-        let (fg, bg) = colours_for_rw(r, w);
-        with_colors(fg, bg, || print_xy(x_start, y_start + 1 + cur_line, &format!("{:04X}", addr)));
-
-        print_xy(x_start + 4, y_start + 1 + cur_line, &format!(" ≡ {:#04X}", val));
-
-        cur_line += 1;
-    }
-
-    if cur_line == 0 {
-        print_xy(x_start, y_start + 1, "{none}      ");
-        cur_line += 1;
-    }
-
-    if cur_line < 5 {
-        clear(Some(Rect::from_values(x_start, y_start + 1 + cur_line, 4 + 3 + 4, 5 - cur_line)));
-    }
-
+    mem_ports_rw_update(x_start, y_start, mem.iter_rw());
     mem.reset_rw();
 }
 
