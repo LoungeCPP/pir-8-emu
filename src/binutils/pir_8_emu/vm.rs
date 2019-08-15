@@ -70,6 +70,19 @@ impl Vm {
         self.instruction_history.clear();
     }
 
+    pub fn jump_to_addr(&mut self, to_addr: u16) -> Result<(), MicroOpPerformError> {
+        for _ in self.curr_op..self.ops.1 {
+           self.perform_next_op()?;
+        }
+
+        *self.pc = to_addr;
+        self.ops = NEXT_INSTRUCTION;
+        self.instruction_valid = false;
+        self.curr_op = 0;
+
+        Ok(())
+    }
+
     pub fn perform_next_op(&mut self) -> Result<bool, MicroOpPerformError> {
         if self.execution_finished {
             return Ok(false);

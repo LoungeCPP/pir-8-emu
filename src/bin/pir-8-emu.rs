@@ -163,7 +163,11 @@ fn actual_main() -> Result<(), i32> {
                 }
             }
             Event::KeyPressed { key: KeyCode::J, ctrl: true, .. } if !showing_help => {
-                println!("{:?}", pir_8_emu::binutils::pir_8_emu::display::read_address(0, 0, "Jump to address"));
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::read_address(0, 0, "Jump to address") {
+                    vm.jump_to_addr(addr).map_err(|err| vm_perform_err(err, &mut vm))?;
+                    flush_instruction_load(&mut vm, &config)?;
+                    new_ops = true;
+                }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
                 if config.execute_full_instructions && vm.instruction_valid {

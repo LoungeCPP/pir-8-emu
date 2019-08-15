@@ -3,13 +3,13 @@ pir-8-emu – the emulator for the pir-8 ISA
 General key mappings:
   Ctrl[color=lightest grey]+[/color]C – Close the emulator
   Ctrl[color=lightest grey]+[/color]O – Open a memory image and reset the emulation therewith
+  Ctrl[color=lightest grey]+[/color]J – Read in a memory address, finish current μOps, and jump thereto
   Space  – If [color=amber]execute full instructions[/color] is [color=red]OFF[/color], perform the highlighted μOp,
            otherwise execute the current instruction
 
 Config key mappings:
   Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]A – Toggle [color=amber]auto load next instruction[/color]
   Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]F – Toggle [color=amber]execute full instructions[/color]
-
 
 
 
