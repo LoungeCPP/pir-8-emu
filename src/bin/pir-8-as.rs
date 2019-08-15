@@ -38,7 +38,7 @@ fn actual_main() -> Result<(), i32> {
     let mut labels = BTreeMap::new();
 
     for input in opts.input {
-        let (input, input_name): (Box<BufRead>, Cow<'static, str>) = match input {
+        let (input, input_name): (Box<dyn BufRead>, Cow<'static, str>) = match input {
             Some((name, path)) => {
                 (Box::new(BufReader::new(File::open(path).map_err(|err| {
                          eprintln!("Error: couldn't open input file \"{}\": {}", name, err);

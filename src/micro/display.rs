@@ -26,7 +26,7 @@ impl<'a> fmt::Display for DisplayMicroOp<'a> {
             MicroOp::ReadRegister(aaa) => write!(f, "ReadRegister {}", self.registers[*aaa as usize].letter()),
             MicroOp::WriteRegister(aaa) => write!(f, "WriteRegister {}", self.registers[*aaa as usize].letter()),
 
-            op => (op as &fmt::Debug).fmt(f),
+            op => (op as &dyn fmt::Debug).fmt(f),
         }
     }
 }

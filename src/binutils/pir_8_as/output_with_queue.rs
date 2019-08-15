@@ -43,7 +43,7 @@ use std::io::{self, Write};
 /// assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
 /// ```
 pub struct OutputWithQueue {
-    phys_out: Box<Write>,
+    phys_out: Box<dyn Write>,
     buffer: VecDeque<BufferedData>,
 }
 
@@ -53,7 +53,7 @@ impl OutputWithQueue {
         OutputWithQueue::new_impl(Box::new(output))
     }
 
-    fn new_impl(output: Box<Write>) -> OutputWithQueue {
+    fn new_impl(output: Box<dyn Write>) -> OutputWithQueue {
         OutputWithQueue {
             phys_out: output,
             buffer: VecDeque::new(),
@@ -130,7 +130,7 @@ impl BufferedData {
         }
     }
 
-    pub fn write_if_ready(&self, to: &mut Box<Write>, labels: &BTreeMap<String, u16>) -> io::Result<bool> {
+    pub fn write_if_ready(&self, to: &mut Box<dyn Write>, labels: &BTreeMap<String, u16>) -> io::Result<bool> {
         match labels.get(&self.label) {
             Some(addr) => {
                 let addr = if self.offset < 0 {

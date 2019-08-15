@@ -16,7 +16,7 @@ pub struct Ports {
     read: Box<[u64; PORTS_LEN / 64]>,
     written: Box<[u64; PORTS_LEN / 64]>,
 
-    handlers: Vec<Option<Box<PortHandler + 'static>>>,
+    handlers: Vec<Option<Box<dyn PortHandler + 'static>>>,
     handler_mappings: Box<[Option<NonZeroU16>; PORTS_LEN]>,
 }
 
@@ -97,7 +97,7 @@ impl Ports {
         }
     }
 
-    fn install_handler_impl(&mut self, handler: Box<PortHandler + 'static>, ports: &[u8]) -> usize {
+    fn install_handler_impl(&mut self, handler: Box<dyn PortHandler + 'static>, ports: &[u8]) -> usize {
         self.handlers.push(Some(handler));
 
         let handler_idx = self.handlers.len() - 1;
@@ -111,12 +111,12 @@ impl Ports {
     }
 
     /// Get reference to the handler with the specified ID, if exists
-    pub fn get_handler(&self, idx: usize) -> Option<&(PortHandler + 'static)> {
+    pub fn get_handler(&self, idx: usize) -> Option<&(dyn PortHandler + 'static)> {
         self.handlers.get(idx).and_then(|h| h.as_ref()).map(|h| h.as_ref())
     }
 
     /// Get mutable reference to the handler with the specified ID, if exists
-    pub fn get_handler_mut(&mut self, idx: usize) -> Option<&mut (PortHandler + 'static)> {
+    pub fn get_handler_mut(&mut self, idx: usize) -> Option<&mut (dyn PortHandler + 'static)> {
         self.handlers.get_mut(idx).and_then(|h| h.as_mut()).map(|h| h.as_mut())
     }
 
@@ -146,7 +146,7 @@ impl Ports {
     ///
     /// assert!(ports.get_handler(handler_id).is_none());
     /// ```
-    pub fn uninstall_handler(&mut self, idx: usize) -> Option<Box<PortHandler + 'static>> {
+    pub fn uninstall_handler(&mut self, idx: usize) -> Option<Box<dyn PortHandler + 'static>> {
         if idx >= self.handlers.len() {
             return None;
         }

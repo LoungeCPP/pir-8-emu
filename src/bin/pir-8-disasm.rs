@@ -21,7 +21,7 @@ fn actual_main() -> Result<(), i32> {
 
     let mut output = stdout();
 
-    let (mut input, input_name): (Box<Read>, Cow<'static, str>) = match opts.input.take() {
+    let (mut input, input_name): (Box<dyn Read>, Cow<'static, str>) = match opts.input.take() {
         Some((name, path)) => {
             (Box::new(File::open(path).map_err(|err| {
                      eprintln!("Couldn't open input file \"{}\": {}", name, err);
