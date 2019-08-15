@@ -117,6 +117,7 @@ impl Vm {
         self.ops = NEXT_INSTRUCTION;
         self.instruction_valid = false;
         self.curr_op = 0;
+        self.execution_finished = false;
 
         Ok(())
     }
