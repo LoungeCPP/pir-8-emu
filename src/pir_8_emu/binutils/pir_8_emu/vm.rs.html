@@ -114,6 +114,19 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
@@ -185,6 +198,19 @@
         <span class="self">self</span>.<span class="ident">execution_finished</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">instruction_history</span>.<span class="ident">clear</span>();
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jump_to_addr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to_addr</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MicroOpPerformError</span><span class="op">&gt;</span> {
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">curr_op</span>..<span class="self">self</span>.<span class="ident">ops</span>.<span class="number">1</span> {
+           <span class="self">self</span>.<span class="ident">perform_next_op</span>()<span class="question-mark">?</span>;
+        }
+
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">pc</span> <span class="op">=</span> <span class="ident">to_addr</span>;
+        <span class="self">self</span>.<span class="ident">ops</span> <span class="op">=</span> <span class="ident">NEXT_INSTRUCTION</span>;
+        <span class="self">self</span>.<span class="ident">instruction_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="self">self</span>.<span class="ident">curr_op</span> <span class="op">=</span> <span class="number">0</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform_next_op</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">MicroOpPerformError</span><span class="op">&gt;</span> {

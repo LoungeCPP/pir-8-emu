@@ -170,13 +170,46 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">read_str</span>, <span class="ident">put_xy</span>, <span class="ident">clear</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::{<span class="ident">MemoryPortsReadWrittenIterator</span>, <span class="ident">Ports</span>};
-<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">put_xy</span>, <span class="ident">clear</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">Instruction</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>;
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Unsigned</span>, <span class="ident">NumCast</span>, <span class="ident">PrimInt</span>, <span class="ident">Num</span>};
-<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">geometry</span>::<span class="ident">Rect</span>;
+<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">geometry</span>::{<span class="ident">Point</span>, <span class="ident">Rect</span>};
 <span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">Color</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">UpperHex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>;
@@ -293,6 +326,37 @@
     <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">name</span>);
     <span class="ident">put_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">name_len</span>, <span class="ident">y_start</span>, <span class="string">&#39;:&#39;</span>);
     <span class="ident">print_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">name_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y_start</span>, <span class="kw">if</span> <span class="ident">is_on</span> { <span class="string">&quot;ON&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;OFF&quot;</span> });
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_address</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">let</span> <span class="ident">x_past_header_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="op">+</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>;
+
+    <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="number">80</span>, <span class="number">1</span>)));
+
+    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">label</span>);
+    <span class="ident">put_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">label_len</span>, <span class="ident">y_start</span>, <span class="string">&#39;:&#39;</span>);
+
+    <span class="kw">match</span> <span class="ident">read_str</span>(<span class="ident">Point</span>::<span class="ident">new</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>), <span class="number">80</span> <span class="op">-</span> <span class="ident">x_past_header_start</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">raw_addr</span>) <span class="op">=&gt;</span> {
+            <span class="kw">match</span> <span class="ident">parse_with_prefix</span>(<span class="kw-2">&amp;</span><span class="ident">raw_addr</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#06X}&quot;</span>, <span class="ident">addr</span>));
+                    <span class="prelude-val">Some</span>(<span class="ident">addr</span>)
+                }
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                    <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;{parse failed}&quot;</span>);
+                    <span class="prelude-val">None</span>
+                }
+            }
+        }
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+            <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;{cancelled}&quot;</span>);
+            <span class="prelude-val">None</span>
+        }
+    }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ports_rw_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
