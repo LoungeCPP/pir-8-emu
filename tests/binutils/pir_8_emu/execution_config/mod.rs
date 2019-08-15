@@ -10,5 +10,6 @@ fn new() {
                ExecutionConfig {
                    auto_load_next_instruction: false,
                    execute_full_instructions: false,
+                   general_purpose_register_letters: ['F', 'S', 'X', 'Y', 'A', 'B', 'C', 'D'],
                });
 }

@@ -1,10 +1,15 @@
 use serde::de::{Deserializer, Deserialize, MapAccess as DeserialiserMapAccess, Visitor as DeserialisationVisitor};
+use self::super::super::super::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister};
 use toml::de::{Error as TomlError, from_str as from_toml_str};
 use toml::to_string_pretty as toml_to_string;
 use std::io::Error as IoError;
 use std::path::PathBuf;
+use std::mem::size_of;
 use serde::Serialize;
 use std::{fmt, fs};
+
+
+const GP_REGISTER_COUNT: usize = size_of::<GeneralPurposeRegisterBank>() / size_of::<GeneralPurposeRegister>();
 
 
 /// A configuration set, specifying various execution tunings
@@ -13,8 +18,12 @@ pub struct ExecutionConfig {
     /// Automatically load the next instruction, silently performing the
     /// [`NEXT_INSTRUCTION`](../../micro/static.NEXT_INSTRUCTION.html) microops
     pub auto_load_next_instruction: bool,
-    /// Whetherto perform all of instructions' μOps at once
+    /// Whether to perform all of instructions' μOps at once
     pub execute_full_instructions: bool,
+    /// The register letters
+    ///
+    /// Validated and optionally truncated/reset at load
+    pub general_purpose_register_letters: [char; GP_REGISTER_COUNT],
 }
 
 impl ExecutionConfig {
@@ -23,6 +32,7 @@ impl ExecutionConfig {
         ExecutionConfig {
             auto_load_next_instruction: false,
             execute_full_instructions: false,
+            general_purpose_register_letters: default_letters(),
         }
     }
 
@@ -42,6 +52,7 @@ impl ExecutionConfig {
     /// ```toml
     /// execute_full_instructions = true
     /// hewwo = "uWu"
+    /// general_purpose_register_letters = ['H', 'e', 'w', 'w', 'o', 'U', 'w', 'U']
     /// ```
     ///
     /// The following holds:
@@ -59,13 +70,15 @@ impl ExecutionConfig {
     /// # let _ = fs::create_dir(&root);
     /// # fs::write(root.join("exec_cfg.toml"), r#"
     /// # execute_full_instructions = true
-    /// # hewwo = "uWu""#.as_bytes()).unwrap();
+    /// # hewwo = "uWu"
+    /// # general_purpose_register_letters = ['H', 'e', 'w', 'w', 'o', 'U', 'w', 'U']"#.as_bytes()).unwrap();
     /// # /*
     /// let root = Path::new("$ROOT");
     /// # */
     /// assert_eq!(ExecutionConfig::read_from_config_dir(root).unwrap(),
     ///            Some(ExecutionConfig {
     ///                execute_full_instructions: true,
+    ///                general_purpose_register_letters: ['H', 'e', 'w', 'w', 'o', 'U', 'w', 'U'],
     ///                ..ExecutionConfig::new()
     ///            }));
     /// ```
@@ -89,15 +102,6 @@ impl ExecutionConfig {
     ///
     /// # Examples
     ///
-    /// Given `"$ROOT/exec_cfg.toml"` containing:
-    ///
-    /// ```toml
-    /// execute_full_instructions = true
-    /// hewwo = "uWu"
-    /// ```
-    ///
-    /// The following holds:
-    ///
     /// ```
     /// # use pir_8_emu::binutils::pir_8_emu::ExecutionConfig;
     /// # use std::env::temp_dir;
@@ -111,7 +115,17 @@ impl ExecutionConfig {
     ///
     /// assert_eq!(fs::read_to_string(root.join("exec_cfg.toml")).unwrap(),
     ///            "auto_load_next_instruction = false\n\
-    ///             execute_full_instructions = false\n");
+    ///             execute_full_instructions = false\n\
+    ///             general_purpose_register_letters = [\n\
+    ///             \x20   'F',\n\
+    ///             \x20   'S',\n\
+    ///             \x20   'X',\n\
+    ///             \x20   'Y',\n\
+    ///             \x20   'A',\n\
+    ///             \x20   'B',\n\
+    ///             \x20   'C',\n\
+    ///             \x20   'D',\n\
+    ///             ]\n");
     /// ```
     pub fn write_to_config_dir<P: Into<PathBuf>>(&self, cfg_dir: P) -> Result<(), IoError> {
         self.write_to_config_dir_impl(cfg_dir.into())
@@ -130,7 +144,7 @@ impl ExecutionConfig {
 impl<'de> Deserialize<'de> for ExecutionConfig {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         deserializer.deserialize_struct("ExecutionConfig",
-                                        &["auto_load_next_instruction", "execute_full_instructions"],
+                                        &["auto_load_next_instruction", "execute_full_instructions", "general_purpose_register_letters"],
                                         ExecutionConfigVisitor)
     }
 }
@@ -159,10 +173,28 @@ impl<'de> DeserialisationVisitor<'de> for ExecutionConfigVisitor {
             match key {
                 "auto_load_next_instruction" => ret.auto_load_next_instruction = map.next_value()?,
                 "execute_full_instructions" => ret.execute_full_instructions = map.next_value()?,
+                "general_purpose_register_letters" => {
+                    let gprl: [char; GP_REGISTER_COUNT] = map.next_value()?;
+
+                    if gprl.iter().all(char::is_ascii) {
+                        ret.general_purpose_register_letters = gprl;
+                    }
+                }
                 _ => drop(map.next_value::<()>()),
             }
         }
 
         Ok(ret)
     }
+}
+
+
+fn default_letters() -> [char; GP_REGISTER_COUNT] {
+    let mut ret = ['\0'; GP_REGISTER_COUNT];
+
+    for (i, reg) in GeneralPurposeRegister::defaults().into_iter().enumerate() {
+        ret[i] = reg.letter();
+    }
+
+    ret
 }

@@ -12,5 +12,15 @@ fn ok() {
 
     assert_eq!(fs::read_to_string(root.join("exec_cfg.toml")).unwrap(),
                "auto_load_next_instruction = false\n\
-               	execute_full_instructions = false\n");
+                execute_full_instructions = false\n\
+                general_purpose_register_letters = [\n\
+                \x20   'F',\n\
+                \x20   'S',\n\
+                \x20   'X',\n\
+                \x20   'Y',\n\
+                \x20   'A',\n\
+                \x20   'B',\n\
+                \x20   'C',\n\
+                \x20   'D',\n\
+                ]\n");
 }
