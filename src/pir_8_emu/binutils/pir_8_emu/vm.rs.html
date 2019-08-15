@@ -176,6 +176,7 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
@@ -296,6 +297,7 @@
         <span class="self">self</span>.<span class="ident">ops</span> <span class="op">=</span> <span class="ident">NEXT_INSTRUCTION</span>;
         <span class="self">self</span>.<span class="ident">instruction_valid</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">curr_op</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">execution_finished</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
