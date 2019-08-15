@@ -1,3 +1,6 @@
+//! `pir-8-emu`'s output, config, and execution handling
+
+
 mod vm;
 mod execution_config;
 

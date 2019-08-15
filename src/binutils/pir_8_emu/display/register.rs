@@ -1,3 +1,6 @@
+//! Register windows handling
+
+
 use self::super::super::super::super::isa::{GeneralPurposeRegisterBank, SpecialPurposeRegister};
 use bear_lib_terminal::terminal::{with_colors, print_xy, put_xy};
 use self::super::super::super::super::rw::ReadWritable;
@@ -7,9 +10,14 @@ use std::fmt::UpperHex;
 use std::mem::size_of;
 
 
+/// Prepare the "General-purpose registers" window at the specified coords
+///
+/// The window is `27x3`, laid out as follows:
+///
 /// ```plaintext
 ///  General-purpose registers
 /// F 0x00 S 0x00 X 0x00 Y 0x00
+/// A 0x00 B 0x00 C 0x00 D 0x00
 /// ```
 pub fn gp_write(x_start: usize, y_start: usize, registers: &mut GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
@@ -28,6 +36,9 @@ pub fn gp_write(x_start: usize, y_start: usize, registers: &mut GeneralPurposeRe
     }
 }
 
+/// Update the "General-purpose registers" window
+///
+/// See [`gp_write()`](fn.gp_write.html) for more info
 pub fn gp_update(x_start: usize, y_start: usize, registers: &mut GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -51,6 +62,10 @@ pub fn gp_update(x_start: usize, y_start: usize, registers: &mut GeneralPurposeR
 }
 
 
+/// Prepare the "Special-purpose registers" window at the specified coords
+///
+/// The window is `27x3`, laid out as follows:
+///
 /// ```plaintext
 ///  Special-purpose registers
 /// PC  0x0000       SP  0x0000
@@ -81,6 +96,9 @@ fn write_sp_register<T: Num + Unsigned + PrimInt + UpperHex>(x: i32, y: i32, reg
     reg.reset_rw();
 }
 
+/// Update the "Special-purpose registers" window
+///
+/// See [`sp_write()`](fn.sp_write.html) for more info
 pub fn sp_update(x_start: usize, y_start: usize, pc: &mut SpecialPurposeRegister<u16>, sp: &mut SpecialPurposeRegister<u16>,
                  adr: &mut SpecialPurposeRegister<u16>, ins: &mut SpecialPurposeRegister<u8>) {
     let x_start = x_start as i32;

@@ -1,3 +1,6 @@
+//! μOp window handling
+
+
 use self::super::super::super::super::super::isa::GeneralPurposeRegisterBank;
 use self::super::super::super::super::super::micro::{MicroOpBlock, MicroOp};
 use bear_lib_terminal::terminal::{print_xy, put_xy, clear};
@@ -9,6 +12,17 @@ use std::mem::size_of;
 const MAX_HEIGHT: usize = size_of::<MicroOpBlock>() / size_of::<MicroOp>();
 
 
+/// Prepare the "Current μOps" window at the specified coords
+///
+/// The window is `27x(1+H)`, laid out as follows:
+///
+/// ```plaintext
+/// Current μOps
+/// <ops>
+/// ```
+///
+/// Where `<ops>` is `{execution finished}` or between 1 and `H` μOps,
+/// and `H` is the length of [`MicroOpBlock`](../../../../../micro/type.MicroOpBlock.html)
 pub fn write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -16,6 +30,9 @@ pub fn write(x_start: usize, y_start: usize) {
     print_xy(x_start, y_start, "Current μOps");
 }
 
+/// Update the "Current μOps" window for new ops
+///
+/// See [`write()`](fn.write.html) for more info
 pub fn new(x_start: usize, y_start: usize, ops: &(MicroOpBlock, usize), registers: &GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -29,6 +46,9 @@ pub fn new(x_start: usize, y_start: usize, ops: &(MicroOpBlock, usize), register
     }
 }
 
+/// Update the "Current μOps" window when going from op to op
+///
+/// See [`write()`](fn.write.html) for more info
 pub fn update(x_start: usize, y_start: usize, current_op: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -38,6 +58,9 @@ pub fn update(x_start: usize, y_start: usize, current_op: usize) {
     put_xy(x_start, y_start + 1 + current_op, '>');
 }
 
+/// Update the "Current μOps" window when execution was finished
+///
+/// See [`write()`](fn.write.html) for more info
 pub fn finished(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;

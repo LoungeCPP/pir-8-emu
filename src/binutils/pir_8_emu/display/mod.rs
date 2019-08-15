@@ -1,3 +1,6 @@
+//! BearLibTerminal display management and handling
+
+
 use bear_lib_terminal::terminal::{with_colors, print_xy, read_str, put_xy, clear};
 use self::super::super::super::vm::{MemoryPortsReadWrittenIterator, Ports};
 use self::super::super::super::isa::GeneralPurposeRegisterBank;
@@ -18,6 +21,11 @@ pub mod micro;
 const COLUMN_WIDTH: i32 = 27;
 
 
+/// Get the colours for the specified R/W state
+///
+/// Background contains, if `read`, green, if `written`, red.
+///
+/// Foreground is white by default and black if `read`.
 pub fn colours_for_rw(read: bool, written: bool) -> (Color, Color) {
     let fg = if read {
         Color::from_rgb(0x00, 0x00, 0x00)
@@ -30,7 +38,16 @@ pub fn colours_for_rw(read: bool, written: bool) -> (Color, Color) {
     (fg, bg)
 }
 
-
+/// Prepare the "Current instruction" window at the specified coords
+///
+/// The window is `20x2`, laid out as follows:
+///
+/// ```plaintext
+/// Current instruction
+/// <instr>
+/// ```
+///
+/// Where `<instr>` is either `{undecoded}`, `{execution finished}`, or the assembly name of the instruction.
 pub fn instruction_write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -39,6 +56,9 @@ pub fn instruction_write(x_start: usize, y_start: usize) {
     print_xy(x_start, y_start + 1, "{undecoded}");
 }
 
+/// Update the "Current instruction" window
+///
+/// See [`instruction_write()`](fn.instruction_write.html) for more info
 pub fn instruction_update(x_start: usize, y_start: usize, valid: bool, execution_finished: bool, instr: &Instruction, registers: &GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -55,6 +75,17 @@ pub fn instruction_update(x_start: usize, y_start: usize, valid: bool, execution
     clear(Some(Rect::from_values(x_start + disp.len() as i32, y_start + 1, COLUMN_WIDTH - disp.len() as i32, 1)));
 }
 
+/// Prepare the "Instruction history" window at the specified coords
+///
+/// The window is `25x(1+N)`, laid out as follows:
+///
+/// ```plaintext
+/// Instruction history
+/// <instrs>
+/// ```
+///
+/// Where `<instrs>` is either `{empty}`, or up to `N` lines of `pir-8-disasm`-formatted instructions and data therefor,
+/// and `N` is `max_instr_count`, as passed to [`instruction_history_update()`](fn.instruction_history_update.html)
 pub fn instruction_history_write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -63,6 +94,9 @@ pub fn instruction_history_write(x_start: usize, y_start: usize) {
     print_xy(x_start, y_start + 1, "{empty}");
 }
 
+/// Update the "Instruction history" window
+///
+/// See [`instruction_history_write()`](fn.instruction_history_write.html) for more info
 pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instruction, u16)>>(x_start: usize, y_start: usize, instrs: I, max_instr_count: usize,
                                                                                            registers: &GeneralPurposeRegisterBank) {
     let x_start = x_start as i32;
@@ -111,10 +145,56 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
     }
 }
 
+/// Prepare the "Port activity" window at the specified coords
+///
+/// The window is `13x6`, laid out as follows:
+///
+/// ```plaintext
+/// Port activity
+/// <port_acts>
+/// ```
+///
+/// Where `<port_acts>` is either `{none}`, or up to 5 lines in the following format:
+///
+/// ```plaintext
+/// 00 ← 0x10
+/// 01 → 0x11
+/// 02 ≡ 0x12
+/// ```
+///
+/// Where port `0x00` was written to and has value `0x10`,
+///       port `0x01` was read from and has value `0x11`, and
+///       port `0x02` was read from and written to and has value `0x12`,
+pub fn ports_rw_write(x_start: usize, y_start: usize) {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+
+    print_xy(x_start, y_start, "Port activity");
+    print_xy(x_start, y_start + 1, "{none}");
+}
+
+/// Update the "Port activity" window
+///
+/// See [`ports_rw_write()`](fn.ports_rw_write.html) for more info
+pub fn ports_rw_update(x_start: usize, y_start: usize, pts: &mut Ports) {
+    mem_ports_rw_update(x_start, y_start, pts.iter_rw());
+    pts.reset_rw();
+}
+
+/// Write binary config value to the status line
+///
+/// Equivalent to [`status_line(..., "ON"/"OFF")`](fn.status_line.html)
 pub fn config(x_start: usize, y_start: usize, name: &str, is_on: bool) {
     status_line(x_start, y_start, name, if is_on { "ON" } else { "OFF" })
 }
 
+/// Clear the status line and write a K/V pair thereto
+///
+/// The status line is `80x1`, laid out as follows:
+///
+/// ```plaintext
+/// <name>: <value>
+/// ```
 pub fn status_line(x_start: usize, y_start: usize, name: &str, value: &str) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -125,6 +205,10 @@ pub fn status_line(x_start: usize, y_start: usize, name: &str, value: &str) {
     print_xy(x_start + name_len + 1 + 1, y_start, value);
 }
 
+/// Read the specified number type at the status line
+///
+/// The prompt will appear in the value space, and the value will be set to the hex-formatter in-put value,
+/// if the input was cancelled, it'll be `{cancelled}`, and if the number wasn't valid, `{parse failed}`
 pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, label: &str) -> Option<T> {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -151,19 +235,6 @@ pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, 
             None
         }
     }
-}
-
-pub fn ports_rw_write(x_start: usize, y_start: usize) {
-    let x_start = x_start as i32;
-    let y_start = y_start as i32;
-
-    print_xy(x_start, y_start, "Port activity");
-    print_xy(x_start, y_start + 1, "{none}");
-}
-
-pub fn ports_rw_update(x_start: usize, y_start: usize, pts: &mut Ports) {
-    mem_ports_rw_update(x_start, y_start, pts.iter_rw());
-    pts.reset_rw();
 }
 
 

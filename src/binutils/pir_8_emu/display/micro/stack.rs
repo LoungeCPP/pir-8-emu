@@ -1,8 +1,21 @@
+//! μStack window handling
+
+
 use bear_lib_terminal::terminal::{print_xy, put_xy, clear};
 use bear_lib_terminal::geometry::Rect;
 use self::super::super::COLUMN_WIDTH;
 
 
+/// Prepare the "μstack" window at the specified coords
+///
+/// The window is `27x2`, laid out as follows:
+///
+/// ```plaintext
+/// μstack
+/// 0x00, 0xA1
+/// ```
+///
+/// Where the amount of μstack elements is variable
 pub fn write(x_start: usize, y_start: usize) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
@@ -11,6 +24,9 @@ pub fn write(x_start: usize, y_start: usize) {
     print_xy(x_start, y_start + 1, "{empty}");
 }
 
+/// Update the "μstack" window
+///
+/// See [`write()`](fn.write.html) for more info
 pub fn update(x_start: usize, y_start: usize, stack: &[u8]) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
