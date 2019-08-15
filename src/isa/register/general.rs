@@ -99,6 +99,18 @@ impl GeneralPurposeRegister {
     pub fn letter(self) -> char {
         self.letter
     }
+
+    /// Change this register's letter to the specified one
+    ///
+    /// Will return `Err(())` if the letter isn't ASCII
+    pub fn relabel(&mut self, to_letter: char) -> Result<(), ()> {
+        if to_letter.is_ascii() {
+            self.letter = to_letter;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
 }
 
 impl GeneralPurposeRegister {

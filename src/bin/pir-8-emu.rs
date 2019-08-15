@@ -78,7 +78,8 @@ fn actual_main() -> Result<(), i32> {
         }
     }));
 
-    let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new();
+    let mut vm = pir_8_emu::binutils::pir_8_emu::Vm::new(&config.general_purpose_register_letters.iter().collect::<String>())
+        .expect("ExecutionConfig::general_purpose_register_letters is validated");
     let vm_perform_err = |err: pir_8_emu::micro::MicroOpPerformError, vm: &mut pir_8_emu::binutils::pir_8_emu::Vm| {
         eprintln!("error: failed to perform micro-op: {}", err);
         eprintln!("VM state follows");
@@ -147,6 +148,17 @@ fn actual_main() -> Result<(), i32> {
 
                 pir_8_emu::binutils::pir_8_emu::display::status::config_bool(0, 0, "Execute full instructions", config.execute_full_instructions);
             }
+            Event::KeyPressed { key: KeyCode::R, ctrl: true, shift: true } if !showing_help => {
+                if let Some(letters) = pir_8_emu::binutils::pir_8_emu::display::status::read_gp_register_letters(0, 0) {
+                    config.general_purpose_register_letters = letters;
+
+                    for (reg, &ltr) in vm.registers.iter_mut().zip(config.general_purpose_register_letters.iter()) {
+                        reg.relabel(ltr).expect("ExecutionConfig::general_purpose_register_letters is validated");
+                    }
+
+                    pir_8_emu::binutils::pir_8_emu::display::register::gp_write(0, 1, &mut vm.registers);
+                }
+            }
             Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } if !showing_help => {
                 if let Some(fname) = open_file_dialog("Open memory image", "", Some((&["*.p8b", "*.bin"], "Memory image files (*.p8b, *.bin)"))) {
                     match fs::read(&fname) {
@@ -155,7 +167,8 @@ fn actual_main() -> Result<(), i32> {
                                 eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
                             }
 
-                            vm.reset(&mem);
+                            vm.reset(&config.general_purpose_register_letters.iter().collect::<String>(), &mem)
+                                .expect("ExecutionConfig::general_purpose_register_letters is validated");
                             new_ops |= flush_instruction_load(&mut vm, &config)?;
                         }
                         Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),

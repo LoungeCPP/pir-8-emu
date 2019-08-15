@@ -59,12 +59,12 @@ pub struct Vm {
 }
 
 impl Vm {
-    /// Create a new, default-initialised VM
-    pub fn new() -> Vm {
-        Vm {
+    /// Create a new, zero-initialised VM with the specified general-purpose register letters
+    pub fn new(gp_reg_ltrs: &str) -> Result<Vm, i8> {
+        Ok(Vm {
             memory: Memory::new(),
             ports: Ports::new(),
-            registers: GeneralPurposeRegister::defaults(),
+            registers: GeneralPurposeRegister::from_letters(gp_reg_ltrs)?,
             pc: SpecialPurposeRegister::new("Program Counter", "PC"),
             sp: SpecialPurposeRegister::new("Stack Pointer", "SP"),
             adr: SpecialPurposeRegister::new("Memory Address", "ADR"),
@@ -80,15 +80,15 @@ impl Vm {
             stack: vec![],
 
             instruction_history: ArrayDeque::new(),
-        }
+        })
     }
 
     /// Reset this VM to a default state but with the specified memory buffer
-    pub fn reset(&mut self, memory: &[u8]) {
+    pub fn reset(&mut self, gp_reg_ltrs: &str, memory: &[u8]) -> Result<(), i8> {
         self.memory = Memory::from(memory);
 
         self.ports = Ports::new();
-        self.registers = GeneralPurposeRegister::defaults();
+        self.registers = GeneralPurposeRegister::from_letters(gp_reg_ltrs)?;
         self.pc = SpecialPurposeRegister::new("Program Counter", "PC");
         self.sp = SpecialPurposeRegister::new("Stack Pointer", "SP");
         self.adr = SpecialPurposeRegister::new("Memory Address", "ADR");
@@ -100,6 +100,8 @@ impl Vm {
         self.execution_finished = false;
         self.stack.clear();
         self.instruction_history.clear();
+
+        Ok(())
     }
 
     /// Safely jump to the specified address

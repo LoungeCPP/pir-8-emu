@@ -1,12 +1,17 @@
 //! Status bar handling
 
 
+use self::super::super::super::super::isa::{GeneralPurposeRegisterBank, GeneralPurposeRegister};
+use self::super::super::super::super::options::register_bank_validator;
 use bear_lib_terminal::terminal::{print_xy, read_str, put_xy, clear};
 use self::super::super::super::super::util::parse_with_prefix;
 use bear_lib_terminal::geometry::{Point, Rect};
 use num_traits::{PrimInt, Num};
 use std::fmt::UpperHex;
 use std::mem::size_of;
+
+
+const GP_REGISTER_COUNT: usize = size_of::<GeneralPurposeRegisterBank>() / size_of::<GeneralPurposeRegister>();
 
 
 /// Write binary config value to the status line
@@ -35,7 +40,7 @@ pub fn line(x_start: usize, y_start: usize, name: &str, value: &str) {
 
 /// Read the specified number type at the status line
 ///
-/// The prompt will appear in the value space, and the value will be set to the hex-formatter in-put value,
+/// The prompt will appear in the value space, and the value will be set to the hex-formatted in-put value,
 /// if the input was cancelled, it'll be `{cancelled}`, and if the number wasn't valid, `{parse failed}`
 pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, label: &str) -> Option<T> {
     let x_start = x_start as i32;
@@ -54,6 +59,49 @@ pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, 
                 }
                 None => {
                     print_xy(x_past_header_start, y_start, "{parse failed}");
+                    None
+                }
+            }
+        }
+        None => {
+            print_xy(x_past_header_start, y_start, "{cancelled}");
+            None
+        }
+    }
+}
+
+/// Read General-purpose register letters at the status line
+///
+/// The prompt will appear in the value space, and the value will be set to new register letters,
+/// if the input was cancelled, it'll be `{cancelled}`, and if the labels weren't valid, `{<error message>}`
+pub fn read_gp_register_letters(x_start: usize, y_start: usize) -> Option<[char; GP_REGISTER_COUNT]> {
+    static LABEL: &str = "General-purpose register letters";
+
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+    let label_len = LABEL.len() as i32;
+    let x_past_header_start = x_start + label_len + 1 + 1;
+
+    status_line_header(x_start, y_start, LABEL);
+
+    match read_str(Point::new(x_past_header_start, y_start), GP_REGISTER_COUNT as i32) {
+        Some(letters) => {
+            match register_bank_validator(&letters) {
+                Ok(()) => {
+                    print_xy(x_past_header_start, y_start, &letters);
+
+                    let mut ret = ['\0'; GP_REGISTER_COUNT];
+                    for (i, c) in letters.chars().into_iter().enumerate() {
+                        ret[i] = c;
+                    }
+                    Some(ret)
+                }
+                Err(err) => {
+                    let err_msg = &err["Register bank ".len()..];
+
+                    put_xy(x_past_header_start, y_start, '{');
+                    print_xy(x_past_header_start + 1, y_start, err_msg);
+                    put_xy(x_past_header_start + 1 + err_msg.len() as i32, y_start, '}');
                     None
                 }
             }

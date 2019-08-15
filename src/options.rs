@@ -88,7 +88,7 @@ impl AssemblerOptions {
             .setting(AppSettings::ColoredHelp)
             .args(&[Arg::from_usage("-o [BINFILE] 'Name of the the binary-file output'").default_value("a.p8b").validator(output_file_validator),
                     Arg::from_usage("-r [REGISTERS] 'Use the specified general-purpose register bank letters instead of the defaults'")
-                        .validator(register_bank_validator),
+                        .validator(|s| register_bank_validator(&s)),
                     Arg::from_usage("[ASMFILE]... 'Files to assemble'")
                         .empty_values(false)
                         .validator(|s| if s == "-" {
@@ -134,7 +134,7 @@ impl DisassemblerOptions {
                         .number_of_values(1)
                         .validator(|s| parse_keep(&s).map(|_| ())),
                     Arg::from_usage("-r [REGISTERS] 'Use the specified general-purpose register bank letters instead of the defaults'")
-                        .validator(register_bank_validator),
+                        .validator(|s| register_bank_validator(&s)),
                     Arg::from_usage("<FILE> 'Binary to disassemble'").empty_values(false).validator(|s| if s == "-" {
                         Ok(())
                     } else {
@@ -227,7 +227,7 @@ fn config_dir_validator(s: String) -> Result<(), String> {
     }
 }
 
-fn register_bank_validator(s: String) -> Result<(), String> {
+pub(crate) fn register_bank_validator(s: &str) -> Result<(), String> {
     GeneralPurposeRegister::from_letters(&s).map(|_| ()).map_err(|i| match i {
         -1 | 8 => format!("Register bank letterset \"{}\" too {}", s, if i == -1 { "short" } else { "long" }),
         i => format!("Register bank register {:#05b} letter '{}' non-ASCII", i, s.chars().nth(i as usize).unwrap()),

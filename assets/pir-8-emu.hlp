@@ -7,13 +7,13 @@ General key mappings:
 Config key mappings:
   Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]A – Toggle [color=amber]auto load next instruction[/color]
   Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]F – Toggle [color=amber]execute full instructions[/color]
+  Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]R – Rename general-purpose registers
 
 Execution key mappings:
   Ctrl[color=lightest grey]+[/color]J   – Read in a memory address, finish current μOps, and jump thereto
   Ctrl[color=lightest grey]+[/color]R/W – Read/Write from/to a port
   Space    – If [color=amber]execute full instructions[/color] is [color=red]OFF[/color], perform the highlighted μOp,
              otherwise execute the current instruction
-
 
 
 
