@@ -59,7 +59,7 @@
             <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ReadRegister {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
             <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;WriteRegister {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
 
-            <span class="ident">op</span> <span class="op">=&gt;</span> (<span class="ident">op</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">fmt</span>::<span class="ident">Debug</span>).<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">op</span> <span class="op">=&gt;</span> (<span class="ident">op</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">fmt</span>::<span class="ident">Debug</span>).<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
