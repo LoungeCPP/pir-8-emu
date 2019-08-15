@@ -1,9 +1,10 @@
+use bear_lib_terminal::terminal::{with_colors, print_xy, read_str, put_xy, clear};
 use self::super::super::super::vm::{MemoryPortsReadWrittenIterator, Ports};
-use bear_lib_terminal::terminal::{with_colors, print_xy, put_xy, clear};
 use self::super::super::super::isa::GeneralPurposeRegisterBank;
 use self::super::super::super::isa::instruction::Instruction;
+use self::super::super::super::util::parse_with_prefix;
 use num_traits::{Unsigned, NumCast, PrimInt, Num};
-use bear_lib_terminal::geometry::Rect;
+use bear_lib_terminal::geometry::{Point, Rect};
 use bear_lib_terminal::Color;
 use std::fmt::UpperHex;
 use std::mem::size_of;
@@ -120,6 +121,37 @@ pub fn config(x_start: usize, y_start: usize, name: &str, is_on: bool) {
     print_xy(x_start, y_start, name);
     put_xy(x_start + name_len, y_start, ':');
     print_xy(x_start + name_len + 1 + 1, y_start, if is_on { "ON" } else { "OFF" });
+}
+
+pub fn read_address(x_start: usize, y_start: usize, label: &str) -> Option<u16> {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+    let label_len = label.len() as i32;
+    let x_past_header_start = x_start + label_len + 1 + 1;
+
+    clear(Some(Rect::from_values(x_start, y_start, 80, 1)));
+
+    print_xy(x_start, y_start, label);
+    put_xy(x_start + label_len, y_start, ':');
+
+    match read_str(Point::new(x_past_header_start, y_start), 80 - x_past_header_start) {
+        Some(raw_addr) => {
+            match parse_with_prefix(&raw_addr) {
+                Some(addr) => {
+                    print_xy(x_past_header_start, y_start, &format!("{:#06X}", addr));
+                    Some(addr)
+                }
+                None => {
+                    print_xy(x_past_header_start, y_start, "{parse failed}");
+                    None
+                }
+            }
+        }
+        None => {
+            print_xy(x_past_header_start, y_start, "{cancelled}");
+            None
+        }
+    }
 }
 
 pub fn ports_rw_write(x_start: usize, y_start: usize) {
