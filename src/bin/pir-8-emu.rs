@@ -113,8 +113,45 @@ fn actual_main() -> Result<(), i32> {
         pir_8_emu::binutils::pir_8_emu::display::memory::rw_write(30 + 25, 13);
     };
 
+    let update_main_screen = |vm: &mut pir_8_emu::binutils::pir_8_emu::Vm, new_ops| {
+        pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut vm.registers);
+        pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
+        if new_ops {
+            pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
+        }
+        pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &vm.stack);
+        if vm.execution_finished {
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
+        } else if new_ops || vm.curr_op == 0 {
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+        } else {
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
+        }
+
+        pir_8_emu::binutils::pir_8_emu::display::instruction_history_update(30, 1, &vm.instruction_history, vm.instruction_history.capacity(), &vm.registers);
+        pir_8_emu::binutils::pir_8_emu::display::ports_rw_update(30, 13, &mut vm.ports);
+
+        pir_8_emu::binutils::pir_8_emu::display::memory::view_update(30 + 25, 1, vm.adr, &vm.memory);
+        pir_8_emu::binutils::pir_8_emu::display::memory::rw_update(30 + 25, 13, &mut vm.memory);
+    };
+
     write_main_screen(&mut vm);
     terminal::refresh();
+
+    let step = |vm: &mut pir_8_emu::binutils::pir_8_emu::Vm, config: &pir_8_emu::binutils::pir_8_emu::ExecutionConfig| -> Result<bool, i32> {
+        let mut new_ops = false;
+
+        if config.execute_full_instructions && vm.instruction_valid {
+            for _ in vm.curr_op..vm.ops.1 {
+                new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
+            }
+        } else {
+            new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
+        }
+        new_ops |= flush_instruction_load(vm, &config)?;
+
+        Ok(new_ops)
+    };
 
     let mut showing_help = false;
 
@@ -197,43 +234,13 @@ fn actual_main() -> Result<(), i32> {
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
-                if config.execute_full_instructions && vm.instruction_valid {
-                    for _ in vm.curr_op..vm.ops.1 {
-                        new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
-                    }
-                } else {
-                    new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, &mut vm))?;
-                }
-                new_ops |= flush_instruction_load(&mut vm, &config)?;
+                new_ops |= step(&mut vm, &config)?;
             }
             _ => {}
         }
 
         if !showing_help {
-            pir_8_emu::binutils::pir_8_emu::display::register::gp_update(0, 1, &mut vm.registers);
-            pir_8_emu::binutils::pir_8_emu::display::register::sp_update(0, 5, &mut vm.pc, &mut vm.sp, &mut vm.adr, &mut vm.ins);
-            if new_ops {
-                pir_8_emu::binutils::pir_8_emu::display::instruction_update(0, 9, vm.instruction_valid, vm.execution_finished, &vm.instruction, &vm.registers);
-            }
-            pir_8_emu::binutils::pir_8_emu::display::micro::stack::update(0, 12, &vm.stack);
-            if vm.execution_finished {
-                pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
-            } else if new_ops || vm.curr_op == 0 {
-                pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
-            } else {
-                pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
-            }
-
-            pir_8_emu::binutils::pir_8_emu::display::instruction_history_update(30,
-                                                                                1,
-                                                                                &vm.instruction_history,
-                                                                                vm.instruction_history.capacity(),
-                                                                                &vm.registers);
-            pir_8_emu::binutils::pir_8_emu::display::ports_rw_update(30, 13, &mut vm.ports);
-
-            pir_8_emu::binutils::pir_8_emu::display::memory::view_update(30 + 25, 1, vm.adr, &vm.memory);
-            pir_8_emu::binutils::pir_8_emu::display::memory::rw_update(30 + 25, 13, &mut vm.memory);
-
+            update_main_screen(&mut vm, new_ops);
             terminal::refresh();
         }
     }
