@@ -166,14 +166,51 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{<span class="ident">Deserializer</span>, <span class="ident">Deserialize</span>, <span class="ident">MapAccess</span> <span class="kw">as</span> <span class="ident">DeserialiserMapAccess</span>, <span class="ident">Visitor</span> <span class="kw">as</span> <span class="ident">DeserialisationVisitor</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>};
 <span class="kw">use</span> <span class="ident">toml</span>::<span class="ident">de</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">TomlError</span>, <span class="ident">from_str</span> <span class="kw">as</span> <span class="ident">from_toml_str</span>};
 <span class="kw">use</span> <span class="ident">toml</span>::<span class="ident">to_string_pretty</span> <span class="kw">as</span> <span class="ident">toml_to_string</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">fs</span>};
+
+
+<span class="kw">const</span> <span class="ident">GP_REGISTER_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">GeneralPurposeRegisterBank</span><span class="op">&gt;</span>() <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">GeneralPurposeRegister</span><span class="op">&gt;</span>();
 
 
 <span class="doccomment">/// A configuration set, specifying various execution tunings</span>
@@ -182,8 +219,12 @@
     <span class="doccomment">/// Automatically load the next instruction, silently performing the</span>
     <span class="doccomment">/// [`NEXT_INSTRUCTION`](../../micro/static.NEXT_INSTRUCTION.html) microops</span>
     <span class="kw">pub</span> <span class="ident">auto_load_next_instruction</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whetherto perform all of instructions&#39; μOps at once</span>
+    <span class="doccomment">/// Whether to perform all of instructions&#39; μOps at once</span>
     <span class="kw">pub</span> <span class="ident">execute_full_instructions</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The register letters</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Validated and optionally truncated/reset at load</span>
+    <span class="kw">pub</span> <span class="ident">general_purpose_register_letters</span>: [<span class="ident">char</span>; <span class="ident">GP_REGISTER_COUNT</span>],
 }
 
 <span class="kw">impl</span> <span class="ident">ExecutionConfig</span> {
@@ -192,6 +233,7 @@
         <span class="ident">ExecutionConfig</span> {
             <span class="ident">auto_load_next_instruction</span>: <span class="bool-val">false</span>,
             <span class="ident">execute_full_instructions</span>: <span class="bool-val">false</span>,
+            <span class="ident">general_purpose_register_letters</span>: <span class="ident">default_letters</span>(),
         }
     }
 
@@ -211,6 +253,7 @@
     <span class="doccomment">/// ```toml</span>
     <span class="doccomment">/// execute_full_instructions = true</span>
     <span class="doccomment">/// hewwo = &quot;uWu&quot;</span>
+    <span class="doccomment">/// general_purpose_register_letters = [&#39;H&#39;, &#39;e&#39;, &#39;w&#39;, &#39;w&#39;, &#39;o&#39;, &#39;U&#39;, &#39;w&#39;, &#39;U&#39;]</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The following holds:</span>
@@ -228,13 +271,15 @@
     <span class="doccomment">/// # let _ = fs::create_dir(&amp;root);</span>
     <span class="doccomment">/// # fs::write(root.join(&quot;exec_cfg.toml&quot;), r#&quot;</span>
     <span class="doccomment">/// # execute_full_instructions = true</span>
-    <span class="doccomment">/// # hewwo = &quot;uWu&quot;&quot;#.as_bytes()).unwrap();</span>
+    <span class="doccomment">/// # hewwo = &quot;uWu&quot;</span>
+    <span class="doccomment">/// # general_purpose_register_letters = [&#39;H&#39;, &#39;e&#39;, &#39;w&#39;, &#39;w&#39;, &#39;o&#39;, &#39;U&#39;, &#39;w&#39;, &#39;U&#39;]&quot;#.as_bytes()).unwrap();</span>
     <span class="doccomment">/// # /*</span>
     <span class="doccomment">/// let root = Path::new(&quot;$ROOT&quot;);</span>
     <span class="doccomment">/// # */</span>
     <span class="doccomment">/// assert_eq!(ExecutionConfig::read_from_config_dir(root).unwrap(),</span>
     <span class="doccomment">///            Some(ExecutionConfig {</span>
     <span class="doccomment">///                execute_full_instructions: true,</span>
+    <span class="doccomment">///                general_purpose_register_letters: [&#39;H&#39;, &#39;e&#39;, &#39;w&#39;, &#39;w&#39;, &#39;o&#39;, &#39;U&#39;, &#39;w&#39;, &#39;U&#39;],</span>
     <span class="doccomment">///                ..ExecutionConfig::new()</span>
     <span class="doccomment">///            }));</span>
     <span class="doccomment">/// ```</span>
@@ -258,15 +303,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Given `&quot;$ROOT/exec_cfg.toml&quot;` containing:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```toml</span>
-    <span class="doccomment">/// execute_full_instructions = true</span>
-    <span class="doccomment">/// hewwo = &quot;uWu&quot;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The following holds:</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use pir_8_emu::binutils::pir_8_emu::ExecutionConfig;</span>
     <span class="doccomment">/// # use std::env::temp_dir;</span>
@@ -280,7 +316,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(fs::read_to_string(root.join(&quot;exec_cfg.toml&quot;)).unwrap(),</span>
     <span class="doccomment">///            &quot;auto_load_next_instruction = false\n\</span>
-    <span class="doccomment">///             execute_full_instructions = false\n&quot;);</span>
+    <span class="doccomment">///             execute_full_instructions = false\n\</span>
+    <span class="doccomment">///             general_purpose_register_letters = [\n\</span>
+    <span class="doccomment">///             \x20   &#39;F&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;S&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;X&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;Y&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;A&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;B&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;C&#39;,\n\</span>
+    <span class="doccomment">///             \x20   &#39;D&#39;,\n\</span>
+    <span class="doccomment">///             ]\n&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_to_config_dir</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cfg_dir</span>: <span class="ident">P</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">write_to_config_dir_impl</span>(<span class="ident">cfg_dir</span>.<span class="ident">into</span>())
@@ -299,7 +345,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExecutionConfig</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">deserializer</span>.<span class="ident">deserialize_struct</span>(<span class="string">&quot;ExecutionConfig&quot;</span>,
-                                        <span class="kw-2">&amp;</span>[<span class="string">&quot;auto_load_next_instruction&quot;</span>, <span class="string">&quot;execute_full_instructions&quot;</span>],
+                                        <span class="kw-2">&amp;</span>[<span class="string">&quot;auto_load_next_instruction&quot;</span>, <span class="string">&quot;execute_full_instructions&quot;</span>, <span class="string">&quot;general_purpose_register_letters&quot;</span>],
                                         <span class="ident">ExecutionConfigVisitor</span>)
     }
 }
@@ -328,12 +374,30 @@
             <span class="kw">match</span> <span class="ident">key</span> {
                 <span class="string">&quot;auto_load_next_instruction&quot;</span> <span class="op">=&gt;</span> <span class="ident">ret</span>.<span class="ident">auto_load_next_instruction</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>,
                 <span class="string">&quot;execute_full_instructions&quot;</span> <span class="op">=&gt;</span> <span class="ident">ret</span>.<span class="ident">execute_full_instructions</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>,
+                <span class="string">&quot;general_purpose_register_letters&quot;</span> <span class="op">=&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">gprl</span>: [<span class="ident">char</span>; <span class="ident">GP_REGISTER_COUNT</span>] <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
+
+                    <span class="kw">if</span> <span class="ident">gprl</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="ident">char</span>::<span class="ident">is_ascii</span>) {
+                        <span class="ident">ret</span>.<span class="ident">general_purpose_register_letters</span> <span class="op">=</span> <span class="ident">gprl</span>;
+                    }
+                }
                 <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">drop</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>()),
             }
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
+}
+
+
+<span class="kw">fn</span> <span class="ident">default_letters</span>() <span class="op">-&gt;</span> [<span class="ident">char</span>; <span class="ident">GP_REGISTER_COUNT</span>] {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="string">&#39;\0&#39;</span>; <span class="ident">GP_REGISTER_COUNT</span>];
+
+    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">reg</span>) <span class="kw">in</span> <span class="ident">GeneralPurposeRegister</span>::<span class="ident">defaults</span>().<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
+        <span class="ident">ret</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">reg</span>.<span class="ident">letter</span>();
+    }
+
+    <span class="ident">ret</span>
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

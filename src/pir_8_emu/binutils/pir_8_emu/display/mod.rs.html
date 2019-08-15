@@ -215,88 +215,23 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! BearLibTerminal display management and handling</span>
 
 
-<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">read_str</span>, <span class="ident">put_xy</span>, <span class="ident">clear</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::{<span class="ident">MemoryPortsReadWrittenIterator</span>, <span class="ident">Ports</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
+<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">clear</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">Instruction</span>;
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>;
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Unsigned</span>, <span class="ident">NumCast</span>, <span class="ident">PrimInt</span>, <span class="ident">Num</span>};
-<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">geometry</span>::{<span class="ident">Point</span>, <span class="ident">Rect</span>};
+<span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">geometry</span>::<span class="ident">Rect</span>;
 <span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">Color</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">UpperHex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">register</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">status</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">memory</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">micro</span>;
 
@@ -464,62 +399,6 @@
     <span class="ident">pts</span>.<span class="ident">reset_rw</span>();
 }
 
-<span class="doccomment">/// Write binary config value to the status line</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Equivalent to [`status_line(..., &quot;ON&quot;/&quot;OFF&quot;)`](fn.status_line.html)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_on</span>: <span class="ident">bool</span>) {
-    <span class="ident">status_line</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">name</span>, <span class="kw">if</span> <span class="ident">is_on</span> { <span class="string">&quot;ON&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;OFF&quot;</span> })
-}
-
-<span class="doccomment">/// Clear the status line and write a K/V pair thereto</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The status line is `80x1`, laid out as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```plaintext</span>
-<span class="doccomment">/// &lt;name&gt;: &lt;value&gt;</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_line</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">name_len</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-
-    <span class="ident">status_line_header</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">name</span>);
-
-    <span class="ident">print_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">name_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y_start</span>, <span class="ident">value</span>);
-}
-
-<span class="doccomment">/// Read the specified number type at the status line</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The prompt will appear in the value space, and the value will be set to the hex-formatter in-put value,</span>
-<span class="doccomment">/// if the input was cancelled, it&#39;ll be `{cancelled}`, and if the number wasn&#39;t valid, `{parse failed}`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_number</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">PrimInt</span> <span class="op">+</span> <span class="ident">UpperHex</span><span class="op">&gt;</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">x_past_header_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="op">+</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>;
-
-    <span class="ident">status_line_header</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">label</span>);
-
-    <span class="kw">match</span> <span class="ident">read_str</span>(<span class="ident">Point</span>::<span class="ident">new</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>), <span class="number">80</span> <span class="op">-</span> <span class="ident">x_past_header_start</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">raw_addr</span>) <span class="op">=&gt;</span> {
-            <span class="kw">match</span> <span class="ident">parse_with_prefix</span>(<span class="kw-2">&amp;</span><span class="ident">raw_addr</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=&gt;</span> {
-                    <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#0w$X}&quot;</span>, <span class="ident">addr</span>, <span class="ident">w</span> <span class="op">=</span> <span class="number">2</span> <span class="op">+</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">2</span>));
-                    <span class="prelude-val">Some</span>(<span class="ident">addr</span>)
-                }
-                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
-                    <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;{parse failed}&quot;</span>);
-                    <span class="prelude-val">None</span>
-                }
-            }
-        }
-        <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
-            <span class="ident">print_xy</span>(<span class="ident">x_past_header_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;{cancelled}&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
 
 <span class="kw">fn</span> <span class="ident">mem_ports_rw_update</span><span class="op">&lt;</span><span class="ident">IdxT</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">Unsigned</span> <span class="op">+</span> <span class="ident">PrimInt</span> <span class="op">+</span> <span class="ident">NumCast</span> <span class="op">+</span> <span class="ident">UpperHex</span><span class="op">&gt;</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">itr</span>: <span class="ident">MemoryPortsReadWrittenIterator</span><span class="op">&lt;</span><span class="ident">IdxT</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -553,15 +432,6 @@
     <span class="kw">if</span> <span class="ident">cur_line</span> <span class="op">&lt;</span> <span class="number">5</span> {
         <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">cur_line</span>, <span class="number">4</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">4</span>, <span class="number">5</span> <span class="op">-</span> <span class="ident">cur_line</span>)));
     }
-}
-
-<span class="kw">fn</span> <span class="ident">status_line_header</span>(<span class="ident">x_start</span>: <span class="ident">i32</span>, <span class="ident">y_start</span>: <span class="ident">i32</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="ident">label</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-
-    <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="number">80</span>, <span class="number">1</span>)));
-
-    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">label</span>);
-    <span class="ident">put_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">label_len</span>, <span class="ident">y_start</span>, <span class="string">&#39;:&#39;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../../../aliases.js"></script><script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
