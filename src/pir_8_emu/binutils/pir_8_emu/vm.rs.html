@@ -174,6 +174,8 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
@@ -236,12 +238,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Vm</span> {
-    <span class="doccomment">/// Create a new, default-initialised VM</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Vm</span> {
-        <span class="ident">Vm</span> {
+    <span class="doccomment">/// Create a new, zero-initialised VM with the specified general-purpose register letters</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">gp_reg_ltrs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vm</span>, <span class="ident">i8</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">Vm</span> {
             <span class="ident">memory</span>: <span class="ident">Memory</span>::<span class="ident">new</span>(),
             <span class="ident">ports</span>: <span class="ident">Ports</span>::<span class="ident">new</span>(),
-            <span class="ident">registers</span>: <span class="ident">GeneralPurposeRegister</span>::<span class="ident">defaults</span>(),
+            <span class="ident">registers</span>: <span class="ident">GeneralPurposeRegister</span>::<span class="ident">from_letters</span>(<span class="ident">gp_reg_ltrs</span>)<span class="question-mark">?</span>,
             <span class="ident">pc</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Program Counter&quot;</span>, <span class="string">&quot;PC&quot;</span>),
             <span class="ident">sp</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Stack Pointer&quot;</span>, <span class="string">&quot;SP&quot;</span>),
             <span class="ident">adr</span>: <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Memory Address&quot;</span>, <span class="string">&quot;ADR&quot;</span>),
@@ -257,15 +259,15 @@
             <span class="ident">stack</span>: <span class="macro">vec</span><span class="macro">!</span>[],
 
             <span class="ident">instruction_history</span>: <span class="ident">ArrayDeque</span>::<span class="ident">new</span>(),
-        }
+        })
     }
 
     <span class="doccomment">/// Reset this VM to a default state but with the specified memory buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">memory</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">gp_reg_ltrs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">memory</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">i8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">memory</span> <span class="op">=</span> <span class="ident">Memory</span>::<span class="ident">from</span>(<span class="ident">memory</span>);
 
         <span class="self">self</span>.<span class="ident">ports</span> <span class="op">=</span> <span class="ident">Ports</span>::<span class="ident">new</span>();
-        <span class="self">self</span>.<span class="ident">registers</span> <span class="op">=</span> <span class="ident">GeneralPurposeRegister</span>::<span class="ident">defaults</span>();
+        <span class="self">self</span>.<span class="ident">registers</span> <span class="op">=</span> <span class="ident">GeneralPurposeRegister</span>::<span class="ident">from_letters</span>(<span class="ident">gp_reg_ltrs</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">pc</span> <span class="op">=</span> <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Program Counter&quot;</span>, <span class="string">&quot;PC&quot;</span>);
         <span class="self">self</span>.<span class="ident">sp</span> <span class="op">=</span> <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Stack Pointer&quot;</span>, <span class="string">&quot;SP&quot;</span>);
         <span class="self">self</span>.<span class="ident">adr</span> <span class="op">=</span> <span class="ident">SpecialPurposeRegister</span>::<span class="ident">new</span>(<span class="string">&quot;Memory Address&quot;</span>, <span class="string">&quot;ADR&quot;</span>);
@@ -277,6 +279,8 @@
         <span class="self">self</span>.<span class="ident">execution_finished</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">instruction_history</span>.<span class="ident">clear</span>();
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Safely jump to the specified address</span>

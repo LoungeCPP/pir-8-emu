@@ -184,6 +184,18 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">ReadWriteMarker</span>, <span class="ident">ReadWritable</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -285,6 +297,18 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">char</span> {
         <span class="self">self</span>.<span class="ident">letter</span>
+    }
+
+    <span class="doccomment">/// Change this register&#39;s letter to the specified one</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will return `Err(())` if the letter isn&#39;t ASCII</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relabel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to_letter</span>: <span class="ident">char</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">to_letter</span>.<span class="ident">is_ascii</span>() {
+            <span class="self">self</span>.<span class="ident">letter</span> <span class="op">=</span> <span class="ident">to_letter</span>;
+            <span class="prelude-val">Ok</span>(())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(())
+        }
     }
 }
 
