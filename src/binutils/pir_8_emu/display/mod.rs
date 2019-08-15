@@ -112,33 +112,32 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
 }
 
 pub fn config(x_start: usize, y_start: usize, name: &str, is_on: bool) {
+    status_line(x_start, y_start, name, if is_on { "ON" } else { "OFF" })
+}
+
+pub fn status_line(x_start: usize, y_start: usize, name: &str, value: &str) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
     let name_len = name.len() as i32;
 
-    clear(Some(Rect::from_values(x_start, y_start, 80, 1)));
+    status_line_header(x_start, y_start, name);
 
-    print_xy(x_start, y_start, name);
-    put_xy(x_start + name_len, y_start, ':');
-    print_xy(x_start + name_len + 1 + 1, y_start, if is_on { "ON" } else { "OFF" });
+    print_xy(x_start + name_len + 1 + 1, y_start, value);
 }
 
-pub fn read_address(x_start: usize, y_start: usize, label: &str) -> Option<u16> {
+pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, label: &str) -> Option<T> {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
     let label_len = label.len() as i32;
     let x_past_header_start = x_start + label_len + 1 + 1;
 
-    clear(Some(Rect::from_values(x_start, y_start, 80, 1)));
-
-    print_xy(x_start, y_start, label);
-    put_xy(x_start + label_len, y_start, ':');
+    status_line_header(x_start, y_start, label);
 
     match read_str(Point::new(x_past_header_start, y_start), 80 - x_past_header_start) {
         Some(raw_addr) => {
             match parse_with_prefix(&raw_addr) {
                 Some(addr) => {
-                    print_xy(x_past_header_start, y_start, &format!("{:#06X}", addr));
+                    print_xy(x_past_header_start, y_start, &format!("{:#0w$X}", addr, w = 2 + size_of::<T>() * 2));
                     Some(addr)
                 }
                 None => {
@@ -171,15 +170,14 @@ pub fn ports_rw_update(x_start: usize, y_start: usize, pts: &mut Ports) {
 fn mem_ports_rw_update<IdxT: Num + Unsigned + PrimInt + NumCast + UpperHex>(x_start: usize, y_start: usize, itr: MemoryPortsReadWrittenIterator<IdxT>) {
     let x_start = x_start as i32;
     let y_start = y_start as i32;
+    let addr_width = size_of::<IdxT>() * 2;
 
     let mut cur_line = 0;
     for (addr, val, r, w) in itr {
         let (fg, bg) = colours_for_rw(r, w);
-        with_colors(fg,
-                    bg,
-                    || print_xy(x_start, y_start + 1 + cur_line, &format!("{:0w$X}", addr, w = size_of::<IdxT>() * 2)));
+        with_colors(fg, bg, || print_xy(x_start, y_start + 1 + cur_line, &format!("{:0w$X}", addr, w = addr_width)));
 
-        print_xy(x_start + 4,
+        print_xy(x_start + addr_width as i32,
                  y_start + 1 + cur_line,
                  &format!(" {} {:#04X}",
                           match (r, w) {
@@ -201,4 +199,13 @@ fn mem_ports_rw_update<IdxT: Num + Unsigned + PrimInt + NumCast + UpperHex>(x_st
     if cur_line < 5 {
         clear(Some(Rect::from_values(x_start, y_start + 1 + cur_line, 4 + 3 + 4, 5 - cur_line)));
     }
+}
+
+fn status_line_header(x_start: i32, y_start: i32, label: &str) {
+    let label_len = label.len() as i32;
+
+    clear(Some(Rect::from_values(x_start, y_start, 80, 1)));
+
+    print_xy(x_start, y_start, label);
+    put_xy(x_start + label_len, y_start, ':');
 }
