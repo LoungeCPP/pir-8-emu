@@ -138,14 +138,14 @@ fn actual_main() -> Result<(), i32> {
             Event::KeyPressed { key: KeyCode::A, ctrl: true, shift: true } if !showing_help => {
                 config.auto_load_next_instruction = !config.auto_load_next_instruction;
 
-                pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Auto load next instruction", config.auto_load_next_instruction);
+                pir_8_emu::binutils::pir_8_emu::display::status::config_bool(0, 0, "Auto load next instruction", config.auto_load_next_instruction);
 
                 new_ops |= flush_instruction_load(&mut vm, &config)?;
             }
             Event::KeyPressed { key: KeyCode::F, ctrl: true, shift: true } if !showing_help => {
                 config.execute_full_instructions = !config.execute_full_instructions;
 
-                pir_8_emu::binutils::pir_8_emu::display::config(0, 0, "Execute full instructions", config.execute_full_instructions);
+                pir_8_emu::binutils::pir_8_emu::display::status::config_bool(0, 0, "Execute full instructions", config.execute_full_instructions);
             }
             Event::KeyPressed { key: KeyCode::O, ctrl: true, .. } if !showing_help => {
                 if let Some(fname) = open_file_dialog("Open memory image", "", Some((&["*.p8b", "*.bin"], "Memory image files (*.p8b, *.bin)"))) {
@@ -163,24 +163,24 @@ fn actual_main() -> Result<(), i32> {
                 }
             }
             Event::KeyPressed { key: KeyCode::J, ctrl: true, .. } if !showing_help => {
-                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::read_number(0, 0, "Jump to address") {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Jump to address") {
                     vm.jump_to_addr(addr).map_err(|err| vm_perform_err(err, &mut vm))?;
                     flush_instruction_load(&mut vm, &config)?;
                     new_ops = true;
                 }
             }
             Event::KeyPressed { key: KeyCode::W, ctrl: true, .. } if !showing_help => {
-                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::read_number(0, 0, "Write to port") {
-                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::read_number(0, 0, &format!("Byte to write to port {:#04X}", port)) {
+                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Write to port") {
+                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, &format!("Byte to write to port {:#04X}", port)) {
                         vm.ports.write(port, byte);
                     }
                 }
             }
             Event::KeyPressed { key: KeyCode::R, ctrl: true, .. } if !showing_help => {
-                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::read_number(0, 0, "Read from port") {
+                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Read from port") {
                     let byte = vm.ports.read(port);
 
-                    pir_8_emu::binutils::pir_8_emu::display::status_line(0, 0, &format!("Byte read from port {:#04X}", port), &format!("{:#04X}", byte));
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:#04X}", port), &format!("{:#04X}", byte));
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
