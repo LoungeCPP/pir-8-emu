@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["finished",""],["new",""],["update",""],["write",""]]});
+initSidebarItems({"fn":[["finished","Update the \"Current μOps\" window when execution was finished"],["new","Update the \"Current μOps\" window for new ops"],["update","Update the \"Current μOps\" window when going from op to op"],["write","Prepare the \"Current μOps\" window at the specified coords"]]});

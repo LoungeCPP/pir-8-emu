@@ -105,7 +105,28 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Register windows handling</span>
+
+
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">put_xy</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">rw</span>::<span class="ident">ReadWritable</span>;
@@ -115,9 +136,14 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>;
 
 
+<span class="doccomment">/// Prepare the &quot;General-purpose registers&quot; window at the specified coords</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The window is `27x3`, laid out as follows:</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```plaintext</span>
 <span class="doccomment">///  General-purpose registers</span>
 <span class="doccomment">/// F 0x00 S 0x00 X 0x00 Y 0x00</span>
+<span class="doccomment">/// A 0x00 B 0x00 C 0x00 D 0x00</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gp_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GeneralPurposeRegisterBank</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -136,6 +162,9 @@
     }
 }
 
+<span class="doccomment">/// Update the &quot;General-purpose registers&quot; window</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`gp_write()`](fn.gp_write.html) for more info</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gp_update</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GeneralPurposeRegisterBank</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -159,6 +188,10 @@
 }
 
 
+<span class="doccomment">/// Prepare the &quot;Special-purpose registers&quot; window at the specified coords</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The window is `27x3`, laid out as follows:</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```plaintext</span>
 <span class="doccomment">///  Special-purpose registers</span>
 <span class="doccomment">/// PC  0x0000       SP  0x0000</span>
@@ -189,6 +222,9 @@
     <span class="ident">reg</span>.<span class="ident">reset_rw</span>();
 }
 
+<span class="doccomment">/// Update the &quot;Special-purpose registers&quot; window</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`sp_write()`](fn.sp_write.html) for more info</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sp_update</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">pc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">sp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
                  <span class="ident">adr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">ins</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;

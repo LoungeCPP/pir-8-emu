@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["rw_update",""],["rw_write","`plaintext Memory access 01234 ≡ 0xAA `"],["view_update",""],["view_write",""]]});
+initSidebarItems({"fn":[["rw_update","Update the \"Memory access\" window"],["rw_write","Prepare the \"Memory access\" window at the specified coords"],["view_update","Update the \"Memory view\" window"],["view_write","Prepare the \"Memory view\" window at the specified coords"]]});

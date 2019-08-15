@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["update",""],["write",""]]});
+initSidebarItems({"fn":[["update","Update the \"μstack\" window"],["write","Prepare the \"μstack\" window at the specified coords"]]});

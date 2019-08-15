@@ -209,7 +209,81 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! BearLibTerminal display management and handling</span>
+
+
 <span class="kw">use</span> <span class="ident">bear_lib_terminal</span>::<span class="ident">terminal</span>::{<span class="ident">with_colors</span>, <span class="ident">print_xy</span>, <span class="ident">read_str</span>, <span class="ident">put_xy</span>, <span class="ident">clear</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::{<span class="ident">MemoryPortsReadWrittenIterator</span>, <span class="ident">Ports</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
@@ -230,6 +304,11 @@
 <span class="kw">const</span> <span class="ident">COLUMN_WIDTH</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">27</span>;
 
 
+<span class="doccomment">/// Get the colours for the specified R/W state</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Background contains, if `read`, green, if `written`, red.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Foreground is white by default and black if `read`.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colours_for_rw</span>(<span class="ident">read</span>: <span class="ident">bool</span>, <span class="ident">written</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> (<span class="ident">Color</span>, <span class="ident">Color</span>) {
     <span class="kw">let</span> <span class="ident">fg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">read</span> {
         <span class="ident">Color</span>::<span class="ident">from_rgb</span>(<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>)
@@ -242,7 +321,16 @@
     (<span class="ident">fg</span>, <span class="ident">bg</span>)
 }
 
-
+<span class="doccomment">/// Prepare the &quot;Current instruction&quot; window at the specified coords</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The window is `20x2`, laid out as follows:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// Current instruction</span>
+<span class="doccomment">/// &lt;instr&gt;</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Where `&lt;instr&gt;` is either `{undecoded}`, `{execution finished}`, or the assembly name of the instruction.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instruction_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -251,6 +339,9 @@
     <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;{undecoded}&quot;</span>);
 }
 
+<span class="doccomment">/// Update the &quot;Current instruction&quot; window</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`instruction_write()`](fn.instruction_write.html) for more info</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instruction_update</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">valid</span>: <span class="ident">bool</span>, <span class="ident">execution_finished</span>: <span class="ident">bool</span>, <span class="ident">instr</span>: <span class="kw-2">&amp;</span><span class="ident">Instruction</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -267,6 +358,17 @@
     <span class="ident">clear</span>(<span class="prelude-val">Some</span>(<span class="ident">Rect</span>::<span class="ident">from_values</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">disp</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">COLUMN_WIDTH</span> <span class="op">-</span> <span class="ident">disp</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>)));
 }
 
+<span class="doccomment">/// Prepare the &quot;Instruction history&quot; window at the specified coords</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The window is `25x(1+N)`, laid out as follows:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// Instruction history</span>
+<span class="doccomment">/// &lt;instrs&gt;</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Where `&lt;instrs&gt;` is either `{empty}`, or up to `N` lines of `pir-8-disasm`-formatted instructions and data therefor,</span>
+<span class="doccomment">/// and `N` is `max_instr_count`, as passed to [`instruction_history_update()`](fn.instruction_history_update.html)</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instruction_history_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -275,6 +377,9 @@
     <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;{empty}&quot;</span>);
 }
 
+<span class="doccomment">/// Update the &quot;Instruction history&quot; window</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`instruction_history_write()`](fn.instruction_history_write.html) for more info</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instruction_history_update</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> (<span class="ident">u16</span>, <span class="ident">Instruction</span>, <span class="ident">u16</span>)<span class="op">&gt;&gt;</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">instrs</span>: <span class="ident">I</span>, <span class="ident">max_instr_count</span>: <span class="ident">usize</span>,
                                                                                            <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -323,10 +428,56 @@
     }
 }
 
+<span class="doccomment">/// Prepare the &quot;Port activity&quot; window at the specified coords</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The window is `13x6`, laid out as follows:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// Port activity</span>
+<span class="doccomment">/// &lt;port_acts&gt;</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Where `&lt;port_acts&gt;` is either `{none}`, or up to 5 lines in the following format:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// 00 ← 0x10</span>
+<span class="doccomment">/// 01 → 0x11</span>
+<span class="doccomment">/// 02 ≡ 0x12</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Where port `0x00` was written to and has value `0x10`,</span>
+<span class="doccomment">///       port `0x01` was read from and has value `0x11`, and</span>
+<span class="doccomment">///       port `0x02` was read from and written to and has value `0x12`,</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ports_rw_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
+    <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
+
+    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;Port activity&quot;</span>);
+    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;{none}&quot;</span>);
+}
+
+<span class="doccomment">/// Update the &quot;Port activity&quot; window</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`ports_rw_write()`](fn.ports_rw_write.html) for more info</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ports_rw_update</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ports</span>) {
+    <span class="ident">mem_ports_rw_update</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">pts</span>.<span class="ident">iter_rw</span>());
+    <span class="ident">pts</span>.<span class="ident">reset_rw</span>();
+}
+
+<span class="doccomment">/// Write binary config value to the status line</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Equivalent to [`status_line(..., &quot;ON&quot;/&quot;OFF&quot;)`](fn.status_line.html)</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_on</span>: <span class="ident">bool</span>) {
     <span class="ident">status_line</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">name</span>, <span class="kw">if</span> <span class="ident">is_on</span> { <span class="string">&quot;ON&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;OFF&quot;</span> })
 }
 
+<span class="doccomment">/// Clear the status line and write a K/V pair thereto</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The status line is `80x1`, laid out as follows:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```plaintext</span>
+<span class="doccomment">/// &lt;name&gt;: &lt;value&gt;</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_line</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -337,6 +488,10 @@
     <span class="ident">print_xy</span>(<span class="ident">x_start</span> <span class="op">+</span> <span class="ident">name_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y_start</span>, <span class="ident">value</span>);
 }
 
+<span class="doccomment">/// Read the specified number type at the status line</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The prompt will appear in the value space, and the value will be set to the hex-formatter in-put value,</span>
+<span class="doccomment">/// if the input was cancelled, it&#39;ll be `{cancelled}`, and if the number wasn&#39;t valid, `{parse failed}`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_number</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">PrimInt</span> <span class="op">+</span> <span class="ident">UpperHex</span><span class="op">&gt;</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
     <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
@@ -363,19 +518,6 @@
             <span class="prelude-val">None</span>
         }
     }
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ports_rw_write</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="ident">x_start</span> <span class="op">=</span> <span class="ident">x_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">let</span> <span class="ident">y_start</span> <span class="op">=</span> <span class="ident">y_start</span> <span class="kw">as</span> <span class="ident">i32</span>;
-
-    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="string">&quot;Port activity&quot;</span>);
-    <span class="ident">print_xy</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span> <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;{none}&quot;</span>);
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ports_rw_update</span>(<span class="ident">x_start</span>: <span class="ident">usize</span>, <span class="ident">y_start</span>: <span class="ident">usize</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Ports</span>) {
-    <span class="ident">mem_ports_rw_update</span>(<span class="ident">x_start</span>, <span class="ident">y_start</span>, <span class="ident">pts</span>.<span class="ident">iter_rw</span>());
-    <span class="ident">pts</span>.<span class="ident">reset_rw</span>();
 }
 
 

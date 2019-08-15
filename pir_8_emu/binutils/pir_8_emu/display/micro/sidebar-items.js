@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["ops",""],["stack",""]]});
+initSidebarItems({"mod":[["ops","μOp window handling"],["stack","μStack window handling"]]});
