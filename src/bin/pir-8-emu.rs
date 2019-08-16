@@ -227,11 +227,17 @@ fn actual_main() -> Result<(), i32> {
                     }
                 }
             }
-            Event::KeyPressed { key: KeyCode::J, ctrl: true, .. } if !showing_help => {
-                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Jump to address") {
-                    vm.jump_to_addr(addr).map_err(|err| vm_perform_err(err, &mut vm))?;
-                    flush_instruction_load(&mut vm, &config)?;
-                    new_ops = true;
+            Event::KeyPressed { key: KeyCode::U, ctrl: true, .. } if !showing_help => {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Update address") {
+                    *vm.adr = addr;
+
+                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0,
+                                                                                                     0,
+                                                                                                     &format!("Change {:04X} from {:#04X}",
+                                                                                                              addr,
+                                                                                                              vm.memory[addr])) {
+                        vm.memory[addr] = byte;
+                    }
                 }
             }
             Event::KeyPressed { key: KeyCode::W, ctrl: true, .. } if !showing_help => {
@@ -285,6 +291,13 @@ fn actual_main() -> Result<(), i32> {
                             eprintln!("warning: failed to load port handler DLL from {}: {}", fname, err);
                         }
                     }
+                }
+            }
+            Event::KeyPressed { key: KeyCode::J, ctrl: true, .. } if !showing_help => {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Jump to address") {
+                    vm.jump_to_addr(addr).map_err(|err| vm_perform_err(err, &mut vm))?;
+                    flush_instruction_load(&mut vm, &config)?;
+                    new_ops = true;
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {

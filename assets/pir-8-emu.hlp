@@ -10,13 +10,13 @@ Config key mappings:
   Ctrl[color=lightest grey]+[/color]Shift[color=lightest grey]+[/color]R – Rename general-purpose registers
 
 Execution key mappings:
-  Ctrl[color=lightest grey]+[/color]J      – Read in a memory address, finish current μOps, and jump thereto
+  Ctrl[color=lightest grey]+[/color]U      – Update a memory address
   Ctrl[color=lightest grey]+[/color]R/W    – Read/Write from/to a port
   Ctrl[color=lightest grey]+[/color]I      – Install a native port handler
+  Ctrl[color=lightest grey]+[/color]J      – Read in a memory address, finish current μOps, and jump thereto
   Space       – Perform the highlighted μOp if [color=amber]execute full instructions[/color] is [color=red]OFF[/color],
                 otherwise execute the current instruction
   Shift[color=lightest grey]+[/color]Space – Read in a frequency and press [bkcolor=darker grey]Space[/bkcolor] thereat
-
 
 Questions? Problems? Don't hesitate to open an issue over at
 [color=sky]https://github.com/LoungeCPP/pir-8-emu[/color]
