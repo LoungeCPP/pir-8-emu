@@ -5,9 +5,11 @@ use std::time::Duration;
 
 mod vm;
 mod execution_config;
+mod native_port_handler;
 
 pub use self::vm::Vm;
 pub use self::execution_config::ExecutionConfig;
+pub use self::native_port_handler::{RawNativePortHandler, NativePortHandler};
 
 pub mod display;
 
