@@ -135,7 +135,7 @@ pub fn instruction_history_update<'i, I: IntoIterator<Item = &'i (u16, Instructi
                               addr.wrapping_add(instr.data_length() as u16),
                               data,
                               clr_end,
-                              w = instr.data_length() * 2));
+                              w = 2 + instr.data_length() * 2));
             cur_line += 1;
         }
     }

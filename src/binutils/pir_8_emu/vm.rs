@@ -158,7 +158,7 @@ impl Vm {
 
                 let rw = self.adr.was_read() && self.adr.was_written();
                 let mut data = 0u16;
-                for i in 0..(self.instruction.data_length() as u16) {
+                for i in 1..=(self.instruction.data_length() as u16) {
                     data = (data << 8) | (self.memory[..][self.adr.wrapping_add(i) as usize] as u16);
                 }
                 self.instruction_history.push_front((*self.adr, self.instruction, data));
