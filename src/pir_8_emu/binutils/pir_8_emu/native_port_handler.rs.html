@@ -138,12 +138,18 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::<span class="ident">PortHandler</span>;
 <span class="kw">use</span> <span class="ident">dlopen</span>::<span class="ident">raw</span>::<span class="ident">Library</span> <span class="kw">as</span> <span class="ident">NativeLibrary</span>;
 <span class="kw">use</span> <span class="ident">dlopen</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DlOpenError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">NonZeroU8</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsStr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsString</span>;
 <span class="kw">use</span> <span class="ident">libc</span>::<span class="ident">c_void</span>;
 
 
@@ -155,6 +161,7 @@
 <span class="doccomment">/// `uninit()`ed</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NativePortHandler</span> {
+    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">OsString</span>,
     <span class="ident">lib</span>: <span class="ident">NativeLibrary</span>,
     <span class="ident">raw</span>: <span class="ident">RawNativePortHandler</span>,
     <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span><span class="op">&gt;</span>,
@@ -164,11 +171,12 @@
     <span class="doccomment">/// Load the handler from the DLL at the specified path</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If successful, the returned handler is ready to be used in [`Ports`](../../vm/struct.Ports.html)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_from_dll</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;&gt;</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativePortHandler</span>, <span class="ident">DlOpenError</span><span class="op">&gt;</span> {
-        <span class="ident">NativePortHandler</span>::<span class="ident">load_from_dll_impl</span>(<span class="ident">NativeLibrary</span>::<span class="ident">open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_from_dll</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativePortHandler</span>, <span class="ident">DlOpenError</span><span class="op">&gt;</span> {
+        <span class="ident">NativePortHandler</span>::<span class="ident">load_from_dll_impl</span>(<span class="ident">path</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">load_from_dll_impl</span>(<span class="ident">lib</span>: <span class="ident">NativeLibrary</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativePortHandler</span>, <span class="ident">DlOpenError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">load_from_dll_impl</span>(<span class="ident">path</span>: <span class="ident">OsString</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativePortHandler</span>, <span class="ident">DlOpenError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">lib</span> <span class="op">=</span> <span class="ident">NativeLibrary</span>::<span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawNativePortHandler</span> {
             <span class="ident">port_count</span>: <span class="kw">unsafe</span> { <span class="ident">lib</span>.<span class="ident">symbol_cstr</span>(<span class="ident">RawNativePortHandler</span>::<span class="ident">PORT_COUNT_NAME</span>.<span class="ident">as_cstr</span>()) }<span class="question-mark">?</span>,
             <span class="ident">init</span>: <span class="kw">unsafe</span> { <span class="ident">lib</span>.<span class="ident">symbol_cstr</span>(<span class="ident">RawNativePortHandler</span>::<span class="ident">INIT_NAME</span>.<span class="ident">as_cstr</span>()) }<span class="question-mark">?</span>,
@@ -178,6 +186,7 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativePortHandler</span> {
+            <span class="ident">path</span>: <span class="ident">path</span>,
             <span class="ident">lib</span>: <span class="ident">lib</span>,
             <span class="ident">raw</span>: <span class="ident">raw</span>,
             <span class="ident">state</span>: <span class="prelude-val">None</span>,
@@ -187,7 +196,10 @@
 
 <span class="kw">impl</span> <span class="ident">PortHandler</span> <span class="kw">for</span> <span class="ident">NativePortHandler</span> {
     <span class="kw">fn</span> <span class="ident">port_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">NonZeroU8</span> {
-        <span class="ident">NonZeroU8</span>::<span class="ident">new</span>((<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">port_count</span>)()).<span class="ident">expect</span>(<span class="string">&quot;RawNativePortHandler::port_count() returned 0&quot;</span>)
+        <span class="kw">match</span> <span class="ident">NonZeroU8</span>::<span class="ident">new</span>((<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">port_count</span>)()) {
+            <span class="prelude-val">Some</span>(<span class="ident">pc</span>) <span class="op">=&gt;</span> <span class="ident">pc</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;{:?}&#39;s port_count() @ {:?} returned 0&quot;</span>, <span class="self">self</span>.<span class="ident">path</span>, <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">port_count</span>),
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ports</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
