@@ -158,6 +158,7 @@ fn actual_main() -> Result<(), i32> {
     };
 
     let mut showing_help = false;
+    let mut current_memory_image = None;
 
     for ev in terminal::events() {
         let mut new_ops = false;
@@ -207,6 +208,7 @@ fn actual_main() -> Result<(), i32> {
                             if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu – {}", fname))) {
                                 eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
                             }
+                            current_memory_image = Some(fname);
 
                             vm.reset(&config.general_purpose_register_letters.iter().collect::<String>(), &mem)
                                 .expect("ExecutionConfig::general_purpose_register_letters is validated");
@@ -238,7 +240,7 @@ fn actual_main() -> Result<(), i32> {
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {
-                if let Some(freq) = pir_8_emu::binutils::pir_8_emu::display::status::read_pos_float(0, 0, "Step frequency") {
+                if let Some(freq) = pir_8_emu::binutils::pir_8_emu::display::status::read_pos_float(0, 0, "Target step frequency") {
                     let mut max_count = 0;
                     let mut sub_max_nanos = 1_000_000_000f64 / freq;
 
@@ -254,13 +256,15 @@ fn actual_main() -> Result<(), i32> {
                     let mut refresh_ns = 0u64;
 
                     'steppy: loop {
+                        let before = precise_time_ns();
+
                         let mut max_count = max_count;
                         let mut sub_max_nanos = sub_max_nanos;
 
                         while refresh_ns > sub_max_nanos && max_count > 0 {
                             max_count -= 1;
                             refresh_ns -= sub_max_nanos;
-                            sub_max_nanos = pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as u64;
+                            sub_max_nanos = pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as u64 - sub_max_nanos;
                         }
                         if refresh_ns > sub_max_nanos {
                             sub_max_nanos = 0;
@@ -280,17 +284,28 @@ fn actual_main() -> Result<(), i32> {
                             break 'steppy;
                         }
 
-                        let before = precise_time_ns();
                         let mut new_ops = false;
+                        println!("hewwo {} {}", max_count, sub_max_nanos);
                         new_ops |= step(&mut vm, &config)?;
                         update_main_screen(&mut vm, new_ops);
-                        terminal::refresh();
-                        refresh_ns = precise_time_ns() - before;
 
-                        if !terminal::set(terminal::config::Window::empty()
-                            .title(format!("pir-8-emu – {:.2}", 1_000_000_000f64 / ((before - frame_start) as f64)))) {
+                        if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu{}{} – {:.2} steps/s",
+                                                                                          if current_memory_image.is_some() {
+                                                                                              " –"
+                                                                                          } else {
+                                                                                              ""
+                                                                                          },
+                                                                                          if let Some(cmi) = current_memory_image.as_ref() {
+                                                                                              &cmi
+                                                                                          } else {
+                                                                                              ""
+                                                                                          },
+                                                                                          1_000_000_000f64 / ((before - frame_start) as f64)))) {
                             eprintln!("warning: failed to set window title for framerate");
                         }
+                        terminal::refresh();
+
+                        refresh_ns = precise_time_ns() - before;
                         frame_start = before;
 
                         if vm.execution_finished {
@@ -298,6 +313,19 @@ fn actual_main() -> Result<(), i32> {
                         }
                     }
 
+                    if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu{}{}",
+                                                                                      if current_memory_image.is_some() {
+                                                                                          " –"
+                                                                                      } else {
+                                                                                          ""
+                                                                                      },
+                                                                                      if let Some(cmi) = current_memory_image.as_ref() {
+                                                                                          &cmi
+                                                                                      } else {
+                                                                                          ""
+                                                                                      }))) {
+                        eprintln!("warning: failed to set window title after end of auto step");
+                    }
                     pir_8_emu::binutils::pir_8_emu::display::status::line(0,
                                                                           0,
                                                                           "Stepping",
