@@ -1,10 +1,12 @@
 extern crate bear_lib_terminal;
 extern crate tinyfiledialogs;
 extern crate pir_8_emu;
+extern crate time;
 
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
 use tinyfiledialogs::open_file_dialog;
 use bear_lib_terminal::Color;
+use time::precise_time_ns;
 use std::time::Duration;
 use std::process::exit;
 use std::thread::sleep;
@@ -247,9 +249,25 @@ fn actual_main() -> Result<(), i32> {
                         sub_max_nanos = cnt.fract() * pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64;
                     }
 
-                    let sub_max = Duration::from_nanos(sub_max_nanos as u64);
+                    let sub_max_nanos = sub_max_nanos as u64;
+                    let mut frame_start = precise_time_ns();
+                    let mut refresh_ns = 0u64;
 
                     'steppy: loop {
+                        let mut max_count = max_count;
+                        let mut sub_max_nanos = sub_max_nanos;
+
+                        while refresh_ns > sub_max_nanos && max_count > 0 {
+                            max_count -= 1;
+                            refresh_ns -= sub_max_nanos;
+                            sub_max_nanos = pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as u64;
+                        }
+                        if refresh_ns > sub_max_nanos {
+                            sub_max_nanos = 0;
+                        } else {
+                            sub_max_nanos -= refresh_ns;
+                        }
+
                         for _ in 0..max_count {
                             sleep(pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY);
                             if terminal::has_input() {
@@ -257,15 +275,23 @@ fn actual_main() -> Result<(), i32> {
                             }
                         }
 
-                        sleep(sub_max);
+                        sleep(Duration::from_nanos(sub_max_nanos));
                         if terminal::has_input() {
                             break 'steppy;
                         }
 
+                        let before = precise_time_ns();
                         let mut new_ops = false;
                         new_ops |= step(&mut vm, &config)?;
                         update_main_screen(&mut vm, new_ops);
                         terminal::refresh();
+                        refresh_ns = precise_time_ns() - before;
+
+                        if !terminal::set(terminal::config::Window::empty()
+                            .title(format!("pir-8-emu – {:.2}", 1_000_000_000f64 / ((before - frame_start) as f64)))) {
+                            eprintln!("warning: failed to set window title for framerate");
+                        }
+                        frame_start = before;
 
                         if vm.execution_finished {
                             break 'steppy;
