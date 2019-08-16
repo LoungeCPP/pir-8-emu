@@ -353,7 +353,7 @@
                               <span class="ident">addr</span>.<span class="ident">wrapping_add</span>(<span class="ident">instr</span>.<span class="ident">data_length</span>() <span class="kw">as</span> <span class="ident">u16</span>),
                               <span class="ident">data</span>,
                               <span class="ident">clr_end</span>,
-                              <span class="ident">w</span> <span class="op">=</span> <span class="ident">instr</span>.<span class="ident">data_length</span>() <span class="op">*</span> <span class="number">2</span>));
+                              <span class="ident">w</span> <span class="op">=</span> <span class="number">2</span> <span class="op">+</span> <span class="ident">instr</span>.<span class="ident">data_length</span>() <span class="op">*</span> <span class="number">2</span>));
             <span class="ident">cur_line</span> <span class="op">+=</span> <span class="number">1</span>;
         }
     }
