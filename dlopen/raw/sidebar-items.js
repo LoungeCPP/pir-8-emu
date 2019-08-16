@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Library","Main interface for opening and working with a dynamic link library."]]});
