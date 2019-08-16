@@ -52,6 +52,8 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! `pir-8-emu`&#39;s output, config, and execution handling</span>
 
@@ -60,9 +62,11 @@
 
 <span class="kw">mod</span> <span class="ident">vm</span>;
 <span class="kw">mod</span> <span class="ident">execution_config</span>;
+<span class="kw">mod</span> <span class="ident">native_port_handler</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">vm</span>::<span class="ident">Vm</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">execution_config</span>::<span class="ident">ExecutionConfig</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">native_port_handler</span>::{<span class="ident">RawNativePortHandler</span>, <span class="ident">NativePortHandler</span>};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">display</span>;
 
