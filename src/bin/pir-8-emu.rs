@@ -244,6 +244,8 @@ fn actual_main() -> Result<(), i32> {
                     let mut max_count = 0;
                     let mut sub_max_nanos = 1_000_000_000f64 / freq;
 
+                    let target_nanos = sub_max_nanos as u64;
+
                     if sub_max_nanos > pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64 {
                         let cnt = sub_max_nanos / pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64;
 
@@ -252,7 +254,7 @@ fn actual_main() -> Result<(), i32> {
                     }
 
                     let sub_max_nanos = sub_max_nanos as u64;
-                    let mut frame_start = precise_time_ns();
+                    let mut frame_start = precise_time_ns() - target_nanos;
                     let mut refresh_ns = 0u64;
 
                     'steppy: loop {
@@ -266,11 +268,7 @@ fn actual_main() -> Result<(), i32> {
                             refresh_ns -= sub_max_nanos;
                             sub_max_nanos = pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as u64 - sub_max_nanos;
                         }
-                        if refresh_ns > sub_max_nanos {
-                            sub_max_nanos = 0;
-                        } else {
-                            sub_max_nanos -= refresh_ns;
-                        }
+                        sub_max_nanos = sub_max_nanos.checked_sub(refresh_ns).unwrap_or(0);
 
                         for _ in 0..max_count {
                             sleep(pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY);
@@ -305,8 +303,8 @@ fn actual_main() -> Result<(), i32> {
                         }
                         terminal::refresh();
 
-                        refresh_ns = precise_time_ns() - before;
                         frame_start = before;
+                        refresh_ns = (precise_time_ns() - before).checked_sub(target_nanos).unwrap_or(0);
 
                         if vm.execution_finished {
                             break 'steppy;
