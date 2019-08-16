@@ -22,6 +22,7 @@ ALIASES["serde_derive"] = {};
 ALIASES["strsim"] = {};
 ALIASES["syn"] = {};
 ALIASES["textwrap"] = {};
+ALIASES["time"] = {};
 ALIASES["tinyfiledialogs"] = {};
 ALIASES["toml"] = {};
 ALIASES["unicode_width"] = {};
