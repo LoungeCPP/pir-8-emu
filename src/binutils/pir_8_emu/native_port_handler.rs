@@ -1,5 +1,7 @@
+use self::super::super::super::vm::PortHandler;
 use dlopen::raw::Library as NativeLibrary;
 use dlopen::Error as DlOpenError;
+use std::num::NonZeroU8;
 use std::ffi::OsStr;
 use libc::c_void;
 
@@ -7,6 +9,9 @@ use libc::c_void;
 
 /// A [`PortHandler`](../../vm/trait.PortHandler.html) using the native API defined in
 /// [`RawNativePortHandler`](struct.RawNativePortHandler.html)
+///
+/// Funxions taking `state` are no-ops/return `0` if `init()` wasn't called, and `init()` is a no-op if already called and not
+/// `uninit()`ed
 #[derive(Debug)]
 pub struct NativePortHandler {
     lib: NativeLibrary,
@@ -36,6 +41,37 @@ impl NativePortHandler {
             raw: raw,
             state: None,
         })
+    }
+}
+
+impl PortHandler for NativePortHandler {
+    fn port_count(&self) -> NonZeroU8 {
+        NonZeroU8::new((self.raw.port_count)()).expect("RawNativePortHandler::port_count() returned 0")
+    }
+
+    fn init(&mut self, ports: &[u8]) {
+        if self.state.is_none() {
+            self.state = Some((self.raw.init)(ports.as_ptr(), ports.len() as u8));
+        }
+    }
+
+    fn uninit(&mut self) {
+        if let Some(state) = self.state.take() {
+            (self.raw.uninit)(state);
+        }
+    }
+
+    fn handle_read(&mut self, port: u8) -> u8 {
+        match self.state.as_ref() {
+            Some(&state) => (self.raw.handle_read)(state, port),
+            None => 0,
+        }
+    }
+
+    fn handle_write(&mut self, port: u8, byte: u8) {
+        if let Some(&state) = self.state.as_ref() {
+            (self.raw.handle_write)(state, port, byte);
+        }
     }
 }
 
