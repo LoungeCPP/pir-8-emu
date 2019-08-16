@@ -1,8 +1,10 @@
 extern crate bear_lib_terminal;
 extern crate tinyfiledialogs;
+extern crate arraydeque;
 extern crate pir_8_emu;
 extern crate time;
 
+use arraydeque::{ArrayDeque, Wrapping as ArrayDequeBehaviourWrapping};
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
 use tinyfiledialogs::open_file_dialog;
 use bear_lib_terminal::Color;
@@ -11,6 +13,7 @@ use std::time::Duration;
 use std::process::exit;
 use std::thread::sleep;
 use std::{env, fs};
+use std::ops::Add;
 
 
 fn main() {
@@ -253,6 +256,8 @@ fn actual_main() -> Result<(), i32> {
                         sub_max_nanos = cnt.fract() * pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64;
                     }
 
+                    let mut framerate_samples: ArrayDeque<[f64; 10], ArrayDequeBehaviourWrapping> = ArrayDeque::new();
+
                     let sub_max_nanos = sub_max_nanos as u64;
                     let mut frame_start = precise_time_ns() - target_nanos;
                     let mut refresh_ns = 0u64;
@@ -283,10 +288,10 @@ fn actual_main() -> Result<(), i32> {
                         }
 
                         let mut new_ops = false;
-                        println!("hewwo {} {}", max_count, sub_max_nanos);
                         new_ops |= step(&mut vm, &config)?;
                         update_main_screen(&mut vm, new_ops);
 
+                        framerate_samples.push_back(1_000_000_000f64 / ((before - frame_start) as f64));
                         if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu{}{} – {:.2} steps/s",
                                                                                           if current_memory_image.is_some() {
                                                                                               " –"
@@ -298,7 +303,8 @@ fn actual_main() -> Result<(), i32> {
                                                                                           } else {
                                                                                               ""
                                                                                           },
-                                                                                          1_000_000_000f64 / ((before - frame_start) as f64)))) {
+                                                                                          framerate_samples.iter().fold(0f64, f64::add) /
+                                                                                          framerate_samples.len() as f64))) {
                             eprintln!("warning: failed to set window title for framerate");
                         }
                         terminal::refresh();
