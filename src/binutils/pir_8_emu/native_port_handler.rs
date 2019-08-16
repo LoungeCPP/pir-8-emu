@@ -1,4 +1,43 @@
+use dlopen::raw::Library as NativeLibrary;
+use dlopen::Error as DlOpenError;
+use std::ffi::OsStr;
 use libc::c_void;
+
+
+
+/// A [`PortHandler`](../../vm/trait.PortHandler.html) using the native API defined in
+/// [`RawNativePortHandler`](struct.RawNativePortHandler.html)
+#[derive(Debug)]
+pub struct NativePortHandler {
+    lib: NativeLibrary,
+    raw: RawNativePortHandler,
+    state: Option<*mut c_void>,
+}
+
+impl NativePortHandler {
+    /// Load the handler from the DLL at the specified path
+    ///
+    /// If successful, the returned handler is ready to be used in [`Ports`](../../vm/struct.Ports.html)
+    pub fn load_from_dll<P: AsRef<OsStr>>(path: &P) -> Result<NativePortHandler, DlOpenError> {
+        NativePortHandler::load_from_dll_impl(NativeLibrary::open(path)?)
+    }
+
+    fn load_from_dll_impl(lib: NativeLibrary) -> Result<NativePortHandler, DlOpenError> {
+        let raw = RawNativePortHandler {
+            port_count: unsafe { lib.symbol_cstr(RawNativePortHandler::PORT_COUNT_NAME.as_cstr()) }?,
+            init: unsafe { lib.symbol_cstr(RawNativePortHandler::INIT_NAME.as_cstr()) }?,
+            uninit: unsafe { lib.symbol_cstr(RawNativePortHandler::UNINIT_NAME.as_cstr()) }?,
+            handle_read: unsafe { lib.symbol_cstr(RawNativePortHandler::HANDLE_READ_NAME.as_cstr()) }?,
+            handle_write: unsafe { lib.symbol_cstr(RawNativePortHandler::HANDLE_WRITE_NAME.as_cstr()) }?,
+        };
+
+        Ok(NativePortHandler {
+            lib: lib,
+            raw: raw,
+            state: None,
+        })
+    }
+}
 
 
 /// Raw C funxion pointers into a loaded DLL
@@ -20,6 +59,7 @@ use libc::c_void;
 ///
 /// void pir_8_emu_handle_write(void * state, unsigned char port, unsigned char byte);
 /// ```
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RawNativePortHandler {
     /// Get the amount of ports this handler handles
     ///
@@ -27,6 +67,8 @@ pub struct RawNativePortHandler {
     pub port_count: extern "C" fn() -> u8,
 
     /// Get the handler-allocated state corresponding to the specified ports set
+    ///
+    /// It *is* valid to return `nullptr` from this funxion
     ///
     /// The `ports_len` argument will always be equal to the last return value of `port_count()`
     pub init: extern "C" fn(ports: *const u8, ports_len: u8) -> *mut c_void,
@@ -60,7 +102,3 @@ impl RawNativePortHandler {
         pub HANDLE_WRITE_NAME = "pir_8_emu_handle_write";
     }
 }
-
-
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct NativePortHandler {}
