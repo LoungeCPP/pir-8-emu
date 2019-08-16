@@ -2,11 +2,14 @@ extern crate bear_lib_terminal;
 extern crate tinyfiledialogs;
 extern crate arraydeque;
 extern crate pir_8_emu;
+extern crate dlopen;
 extern crate time;
 
 use arraydeque::{ArrayDeque, Wrapping as ArrayDequeBehaviourWrapping};
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
+use dlopen::utils::PLATFORM_FILE_EXTENSION;
 use tinyfiledialogs::open_file_dialog;
+use pir_8_emu::vm::PortHandler;
 use bear_lib_terminal::Color;
 use time::precise_time_ns;
 use std::time::Duration;
@@ -217,7 +220,10 @@ fn actual_main() -> Result<(), i32> {
                                 .expect("ExecutionConfig::general_purpose_register_letters is validated");
                             new_ops |= flush_instruction_load(&mut vm, &config)?;
                         }
-                        Err(err) => eprintln!("warning: failed to read memory image from {}: {}", fname, err),
+                        Err(err) => {
+                            pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Memory image load", &err.to_string());
+                            eprintln!("warning: failed to read memory image from {}: {}", fname, err);
+                        }
                     }
                 }
             }
@@ -240,6 +246,45 @@ fn actual_main() -> Result<(), i32> {
                     let byte = vm.ports.read(port);
 
                     pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:#04X}", port), &format!("{:#04X}", byte));
+                }
+            }
+            Event::KeyPressed { key: KeyCode::I, ctrl: true, .. } if !showing_help => {
+                if let Some(fname) = open_file_dialog("Install port handler",
+                                                      "",
+                                                      Some((&[&format!("*.{}", PLATFORM_FILE_EXTENSION)],
+                                                            &format!("Dynamically loaded libraries (*.{})", PLATFORM_FILE_EXTENSION)))) {
+                    match pir_8_emu::binutils::pir_8_emu::NativePortHandler::load_from_dll(&fname) {
+                        Ok(handler) => {
+                            let port_count = handler.port_count().get() as usize;
+
+                            let mut ports = Vec::with_capacity(port_count);
+                            for port in 0..port_count {
+                                match pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, &format!("Port #{}", port)) {
+                                    Some(port) => ports.push(port),
+                                    None => break,
+                                }
+                            }
+
+                            if ports.len() == port_count {
+                                match vm.ports.install_handler(handler, &ports) {
+                                    Ok(handler_idx) => {
+                                        pir_8_emu::binutils::pir_8_emu::display::status::line(0,
+                                                                                              0,
+                                                                                              "Install port handler",
+                                                                                              &format!("ID = {:#06X}", handler_idx))
+                                    }
+                                    Err((hndl, err)) => {
+                                        pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Install port handler", &err.to_string());
+                                        eprintln!("warning: failed to install port handler {:?}: {}", hndl.path, err);
+                                    }
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Loading port handler DLL", &err.to_string());
+                            eprintln!("warning: failed to load port handler DLL from {}: {}", fname, err);
+                        }
+                    }
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {
