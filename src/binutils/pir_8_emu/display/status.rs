@@ -9,6 +9,7 @@ use bear_lib_terminal::geometry::{Point, Rect};
 use num_traits::{PrimInt, Num};
 use std::fmt::UpperHex;
 use std::mem::size_of;
+use std::str::FromStr;
 
 
 const GP_REGISTER_COUNT: usize = size_of::<GeneralPurposeRegisterBank>() / size_of::<GeneralPurposeRegister>();
@@ -58,6 +59,38 @@ pub fn read_number<T: Num + PrimInt + UpperHex>(x_start: usize, y_start: usize, 
                     Some(addr)
                 }
                 None => {
+                    print_xy(x_past_header_start, y_start, "{parse failed}");
+                    None
+                }
+            }
+        }
+        None => {
+            print_xy(x_past_header_start, y_start, "{cancelled}");
+            None
+        }
+    }
+}
+
+/// Read a positive floating-point number at the status line
+///
+/// The prompt will appear in the value space, and the value will be set to in-put value,
+/// if the input was cancelled, it'll be `{cancelled}`, and if the number wasn't valid, `{parse failed}`
+pub fn read_pos_float(x_start: usize, y_start: usize, label: &str) -> Option<f64> {
+    let x_start = x_start as i32;
+    let y_start = y_start as i32;
+    let label_len = label.len() as i32;
+    let x_past_header_start = x_start + label_len + 1 + 1;
+
+    status_line_header(x_start, y_start, label);
+
+    match read_str(Point::new(x_past_header_start, y_start), 80 - x_past_header_start) {
+        Some(raw_flt) => {
+            match f64::from_str(&raw_flt) {
+                Ok(flt) if flt > 0f64 => {
+                    print_xy(x_past_header_start, y_start, &flt.to_string());
+                    Some(flt)
+                }
+                _ => {
                     print_xy(x_past_header_start, y_start, "{parse failed}");
                     None
                 }

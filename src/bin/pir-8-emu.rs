@@ -5,7 +5,9 @@ extern crate pir_8_emu;
 use bear_lib_terminal::terminal::{self, KeyCode, Event};
 use tinyfiledialogs::open_file_dialog;
 use bear_lib_terminal::Color;
+use std::time::Duration;
 use std::process::exit;
+use std::thread::sleep;
 use std::{env, fs};
 
 
@@ -231,6 +233,56 @@ fn actual_main() -> Result<(), i32> {
                     let byte = vm.ports.read(port);
 
                     pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:#04X}", port), &format!("{:#04X}", byte));
+                }
+            }
+            Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {
+                if let Some(freq) = pir_8_emu::binutils::pir_8_emu::display::status::read_pos_float(0, 0, "Step frequency") {
+                    let mut max_count = 0;
+                    let mut sub_max_nanos = 1_000_000_000f64 / freq;
+
+                    if sub_max_nanos > pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64 {
+                        let cnt = sub_max_nanos / pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64;
+
+                        max_count = cnt.floor() as u64;
+                        sub_max_nanos = cnt.fract() * pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY.as_nanos() as f64;
+                    }
+
+                    let sub_max = Duration::from_nanos(sub_max_nanos as u64);
+
+                    'steppy: loop {
+                        for _ in 0..max_count {
+                            sleep(pir_8_emu::binutils::pir_8_emu::MAX_UI_DELAY);
+                            if terminal::has_input() {
+                                break 'steppy;
+                            }
+                        }
+
+                        sleep(sub_max);
+                        if terminal::has_input() {
+                            break 'steppy;
+                        }
+
+                        let mut new_ops = false;
+                        new_ops |= step(&mut vm, &config)?;
+                        update_main_screen(&mut vm, new_ops);
+                        terminal::refresh();
+
+                        if vm.execution_finished {
+                            break 'steppy;
+                        }
+                    }
+
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0,
+                                                                          0,
+                                                                          "Stepping",
+                                                                          if vm.execution_finished {
+                                                                              "finished"
+                                                                          } else {
+                                                                              "cancelled"
+                                                                          });
+                    terminal::refresh();
+
+                    continue;
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
