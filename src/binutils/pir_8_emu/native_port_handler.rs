@@ -1,7 +1,7 @@
 use libc::c_void;
 
 
-/// Raw C function pointers into a loaded DLL
+/// Raw C funxion pointers into a loaded DLL
 ///
 /// The raw in-/exported names are prefixed with `pir_8_emu_`
 ///
@@ -23,7 +23,7 @@ use libc::c_void;
 pub struct RawNativePortHandler {
     /// Get the amount of ports this handler handles
     ///
-    /// Returning `0` from this function will panic
+    /// Returning `0` from this funxion will panic
     pub port_count: extern "C" fn() -> u8,
 
     /// Get the handler-allocated state corresponding to the specified ports set
@@ -49,6 +49,16 @@ pub struct RawNativePortHandler {
     ///
     /// The `state` argument will always be equal to the one returned from `init()`
     pub handle_write: extern "C" fn(state: *mut c_void, port: u8, byte: u8),
+}
+
+impl RawNativePortHandler {
+    const_cstr! {
+        pub PORT_COUNT_NAME   = "pir_8_emu_port_count";
+        pub INIT_NAME         = "pir_8_emu_init";
+        pub UNINIT_NAME       = "pir_8_emu_uninit";
+        pub HANDLE_READ_NAME  = "pir_8_emu_handle_read";
+        pub HANDLE_WRITE_NAME = "pir_8_emu_handle_write";
+    }
 }
 
 
