@@ -2,7 +2,7 @@ use self::super::super::super::vm::PortHandler;
 use dlopen::raw::Library as NativeLibrary;
 use dlopen::Error as DlOpenError;
 use std::num::NonZeroU8;
-use std::ffi::OsStr;
+use std::ffi::OsString;
 use libc::c_void;
 
 
@@ -14,6 +14,7 @@ use libc::c_void;
 /// `uninit()`ed
 #[derive(Debug)]
 pub struct NativePortHandler {
+    pub path: OsString,
     lib: NativeLibrary,
     raw: RawNativePortHandler,
     state: Option<*mut c_void>,
@@ -23,11 +24,12 @@ impl NativePortHandler {
     /// Load the handler from the DLL at the specified path
     ///
     /// If successful, the returned handler is ready to be used in [`Ports`](../../vm/struct.Ports.html)
-    pub fn load_from_dll<P: AsRef<OsStr>>(path: &P) -> Result<NativePortHandler, DlOpenError> {
-        NativePortHandler::load_from_dll_impl(NativeLibrary::open(path)?)
+    pub fn load_from_dll<P: Into<OsString>>(path: P) -> Result<NativePortHandler, DlOpenError> {
+        NativePortHandler::load_from_dll_impl(path.into())
     }
 
-    fn load_from_dll_impl(lib: NativeLibrary) -> Result<NativePortHandler, DlOpenError> {
+    fn load_from_dll_impl(path: OsString) -> Result<NativePortHandler, DlOpenError> {
+        let lib = NativeLibrary::open(&path)?;
         let raw = RawNativePortHandler {
             port_count: unsafe { lib.symbol_cstr(RawNativePortHandler::PORT_COUNT_NAME.as_cstr()) }?,
             init: unsafe { lib.symbol_cstr(RawNativePortHandler::INIT_NAME.as_cstr()) }?,
@@ -37,6 +39,7 @@ impl NativePortHandler {
         };
 
         Ok(NativePortHandler {
+            path: path,
             lib: lib,
             raw: raw,
             state: None,
@@ -46,7 +49,10 @@ impl NativePortHandler {
 
 impl PortHandler for NativePortHandler {
     fn port_count(&self) -> NonZeroU8 {
-        NonZeroU8::new((self.raw.port_count)()).expect("RawNativePortHandler::port_count() returned 0")
+        match NonZeroU8::new((self.raw.port_count)()) {
+            Some(pc) => pc,
+            None => panic!("{:?}'s port_count() @ {:?} returned 0", self.path, self.raw.port_count),
+        }
     }
 
     fn init(&mut self, ports: &[u8]) {
