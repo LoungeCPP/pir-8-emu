@@ -469,20 +469,25 @@ fn actual_main() -> Result<(), i32> {
                 pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Stepping", "until interrupted");
                 terminal::refresh();
 
+                let mut step_count = 0usize;
                 while !terminal::has_input() && !vm.execution_finished && !vm.active_breakpoint.is_some() {
                     vm.ins.reset_rw();
                     new_ops |= step(&mut vm, &config)?;
+                    step_count += 1;
                 }
 
                 if !vm.active_breakpoint.is_some() {
                     pir_8_emu::binutils::pir_8_emu::display::status::line(0,
                                                                           0,
                                                                           "Stepping",
-                                                                          if vm.execution_finished {
-                                                                              "finished"
-                                                                          } else {
-                                                                              "cancelled"
-                                                                          });
+                                                                          &format!("{} after {} step{}",
+                                                                                   if vm.execution_finished {
+                                                                                       "finished"
+                                                                                   } else {
+                                                                                       "cancelled"
+                                                                                   },
+                                                                                   step_count,
+                                                                                   if step_count == 1 { "" } else { "s" }));
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {

@@ -31,7 +31,7 @@ extern "C" {
 //! For more information about native port handlers visit the
 //! [`RawNativePortHandler`](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/binutils/pir_8_emu/struct.RawNativePortHandler.html) doc page.
 //!
-//! For more information about port handlers lifetimes et al. in general visit the
+//! For more information about port handlers' lifetimes et al. in general visit the
 //! [`Ports`](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/vm/struct.Ports.html) doc page
 //!
 //! For an example implementation see the
