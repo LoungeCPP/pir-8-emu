@@ -98,11 +98,17 @@ fn actual_main() -> Result<(), i32> {
     };
     let flush_instruction_load = |vm: &mut pir_8_emu::binutils::pir_8_emu::Vm, config: &pir_8_emu::binutils::pir_8_emu::ExecutionConfig| -> Result<bool, i32> {
         let mut new_ops = false;
+
         if config.auto_load_next_instruction {
-            while !vm.instruction_valid && !vm.execution_finished && !vm.breakpoint_active {
+            while !vm.instruction_valid && !vm.execution_finished && !vm.active_breakpoint.is_some() {
                 new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
             }
         }
+
+        if let Some(breakpoint_addr) = vm.active_breakpoint {
+            pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Hit breakpoint", &format!("{:#06X}", breakpoint_addr));
+        }
+
         Ok(new_ops)
     };
 
@@ -112,7 +118,7 @@ fn actual_main() -> Result<(), i32> {
         pir_8_emu::binutils::pir_8_emu::display::instruction_write(0, 9);
         pir_8_emu::binutils::pir_8_emu::display::micro::stack::write(0, 12);
         pir_8_emu::binutils::pir_8_emu::display::micro::ops::write(0, 15);
-        pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+        pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers, vm.active_breakpoint.is_some());
 
         pir_8_emu::binutils::pir_8_emu::display::instruction_history_write(30, 1);
         pir_8_emu::binutils::pir_8_emu::display::ports_rw_write(30, 13);
@@ -133,9 +139,9 @@ fn actual_main() -> Result<(), i32> {
         if vm.execution_finished {
             pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
         } else if new_ops || vm.curr_op == 0 {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers, vm.breakpoint_active);
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers, vm.active_breakpoint.is_some());
         } else {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op, vm.breakpoint_active);
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op, vm.active_breakpoint.is_some());
         }
 
         pir_8_emu::binutils::pir_8_emu::display::instruction_history_update(30, 1, &vm.instruction_history, vm.instruction_history.capacity(), &vm.registers);
@@ -154,6 +160,9 @@ fn actual_main() -> Result<(), i32> {
         if config.execute_full_instructions && vm.instruction_valid {
             for _ in vm.curr_op..vm.ops.1 {
                 new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
+                if vm.active_breakpoint.is_some() {
+                    break;
+                }
             }
         } else {
             new_ops |= vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
@@ -177,6 +186,13 @@ fn actual_main() -> Result<(), i32> {
 
                 terminal::clear(None);
                 write_main_screen(&mut vm);
+            }
+            Event::KeyPressed { key: KeyCode::Escape, .. } if !showing_help => {
+                if let Some(breakpoint_addr) = vm.active_breakpoint.take() {
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Cleared breakpoint", &format!("{:#06X}", breakpoint_addr));
+                }
+
+                new_ops |= flush_instruction_load(&mut vm, &config)?;
             }
             Event::KeyPressed { key: KeyCode::F1, .. } => {
                 help_page = Some(0);
@@ -310,6 +326,18 @@ fn actual_main() -> Result<(), i32> {
                     }
                 }
             }
+            Event::KeyPressed { key: KeyCode::B, ctrl: true, .. } if !showing_help => {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "New breakpoint address") {
+                    vm.breakpoints.insert(addr);
+                    println!("status: added breakpoint for {:#06X}", addr);
+                }
+            }
+            Event::KeyPressed { key: KeyCode::G, ctrl: true, .. } if !showing_help => {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Remove breakpoint for address") {
+                    vm.breakpoints.remove(&addr);
+                    println!("status: removed breakpoint for {:#06X}", addr);
+                }
+            }
             Event::KeyPressed { key: KeyCode::U, ctrl: true, .. } if !showing_help => {
                 if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Update address") {
                     *vm.adr = addr;
@@ -402,7 +430,7 @@ fn actual_main() -> Result<(), i32> {
                         frame_start = before;
                         refresh_ns = (precise_time_ns() - before).checked_sub(target_nanos).unwrap_or(0);
 
-                        if vm.execution_finished || vm.breakpoint_active {
+                        if vm.execution_finished || vm.active_breakpoint.is_some() {
                             break 'steppy;
                         }
                     }
@@ -420,16 +448,16 @@ fn actual_main() -> Result<(), i32> {
                                                                                       }))) {
                         eprintln!("warning: failed to set window title after end of auto step");
                     }
-                    pir_8_emu::binutils::pir_8_emu::display::status::line(0,
-                                                                          0,
-                                                                          "Stepping",
-                                                                          if vm.execution_finished {
-                                                                              "finished"
-                                                                          } else if vm.breakpoint_active {
-                                                                              "broken"
-                                                                          } else {
-                                                                              "cancelled"
-                                                                          });
+                    if !vm.active_breakpoint.is_some() {
+                        pir_8_emu::binutils::pir_8_emu::display::status::line(0,
+                                                                              0,
+                                                                              "Stepping",
+                                                                              if vm.execution_finished {
+                                                                                  "finished"
+                                                                              } else {
+                                                                                  "cancelled"
+                                                                              });
+                    }
                     terminal::refresh();
 
                     continue;

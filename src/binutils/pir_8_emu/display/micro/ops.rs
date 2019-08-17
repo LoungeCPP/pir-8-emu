@@ -40,7 +40,7 @@ pub fn new(x_start: usize, y_start: usize, ops: &(MicroOpBlock, usize), register
 
     clear(Some(Rect::from_values(x_start, y_start + 1, COLUMN_WIDTH, MAX_HEIGHT as i32)));
 
-    red_if_breakpoint(breakpoint_active,||put_xy(x_start, y_start + 1, '>'));
+    red_if_breakpoint(breakpoint_active, || put_xy(x_start, y_start + 1, '>'));
 
     for i in 0..ops.1 {
         print_xy(x_start + 1, y_start + 1 + i as i32, &ops.0[i].display(registers).to_string());
@@ -55,8 +55,8 @@ pub fn update(x_start: usize, y_start: usize, current_op: usize, breakpoint_acti
     let y_start = y_start as i32;
     let current_op = current_op as i32;
 
-    clear(Some(Rect::from_values(x_start, y_start + 1 + current_op - 1, 1, 1)));
-    red_if_breakpoint(breakpoint_active,||put_xy(x_start, y_start + 1 + current_op, '>'));
+    clear(Some(Rect::from_values(x_start, y_start + 1, 1, MAX_HEIGHT as i32)));
+    red_if_breakpoint(breakpoint_active, || put_xy(x_start, y_start + 1 + current_op, '>'));
 }
 
 /// Update the "Current μOps" window when execution was finished
@@ -70,6 +70,7 @@ pub fn finished(x_start: usize, y_start: usize) {
 
     print_xy(x_start, y_start + 1, "{execution finished}");
 }
+
 
 fn red_if_breakpoint<F: FnOnce()>(breakpoint_active: bool, write: F) {
     if breakpoint_active {

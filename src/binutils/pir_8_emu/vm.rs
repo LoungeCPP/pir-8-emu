@@ -60,7 +60,7 @@ pub struct Vm {
 
     /// Pause execution when ADR is contained herein until the flag is cleared
     pub breakpoints: BTreeSet<u16>,
-    pub breakpoint_active: bool,
+    pub active_breakpoint: Option<u16>,
 }
 
 impl Vm {
@@ -87,7 +87,7 @@ impl Vm {
             instruction_history: ArrayDeque::new(),
 
             breakpoints: BTreeSet::new(),
-            breakpoint_active: false,
+            active_breakpoint: None,
         })
     }
 
@@ -109,7 +109,7 @@ impl Vm {
         self.stack.clear();
         self.instruction_history.clear();
         self.breakpoints.clear();
-        self.breakpoint_active = false;
+        self.active_breakpoint = None;
 
         Ok(())
     }
@@ -128,7 +128,7 @@ impl Vm {
         self.instruction_valid = false;
         self.curr_op = 0;
         self.execution_finished = false;
-        self.breakpoint_active = false;
+        self.active_breakpoint = None;
 
         Ok(())
     }
@@ -145,7 +145,7 @@ impl Vm {
     ///
     /// The returned value represents whether new μOps are present
     pub fn perform_next_op(&mut self) -> Result<bool, MicroOpPerformError> {
-        if self.execution_finished || self.breakpoint_active {
+        if self.execution_finished || self.active_breakpoint.is_some() {
             return Ok(false);
         }
 
@@ -185,7 +185,7 @@ impl Vm {
             new_ops = true;
         }
 
-        self.breakpoint_active = self.breakpoints.contains(&adr);
+        self.active_breakpoint = self.breakpoints.get(&adr).copied();
 
         if !adr_r {
             self.adr.reset_rw();
