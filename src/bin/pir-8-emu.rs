@@ -226,17 +226,11 @@ fn actual_main() -> Result<(), i32> {
                     }
                 }
             }
-            Event::KeyPressed { key: KeyCode::U, ctrl: true, .. } if !showing_help => {
-                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Update address") {
-                    *vm.adr = addr;
+            Event::KeyPressed { key: KeyCode::R, ctrl: true, .. } if !showing_help => {
+                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Read from port") {
+                    let byte = vm.ports.read(port);
 
-                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0,
-                                                                                                     0,
-                                                                                                     &format!("Change {:04X} from {:#04X}",
-                                                                                                              addr,
-                                                                                                              vm.memory[addr])) {
-                        vm.memory[addr] = byte;
-                    }
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:02X}", port), &format!("{:#04X}", byte));
                 }
             }
             Event::KeyPressed { key: KeyCode::W, ctrl: true, .. } if !showing_help => {
@@ -244,13 +238,6 @@ fn actual_main() -> Result<(), i32> {
                     if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, &format!("Byte to write to port {:02X}", port)) {
                         vm.ports.write(port, byte);
                     }
-                }
-            }
-            Event::KeyPressed { key: KeyCode::R, ctrl: true, .. } if !showing_help => {
-                if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Read from port") {
-                    let byte = vm.ports.read(port);
-
-                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:02X}", port), &format!("{:#04X}", byte));
                 }
             }
             Event::KeyPressed { key: KeyCode::I, ctrl: true, .. } if !showing_help => {
@@ -320,6 +307,19 @@ fn actual_main() -> Result<(), i32> {
                         None => {
                             pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Uninstall port handler", &format!("{:#06X} not found", handler_idx))
                         }
+                    }
+                }
+            }
+            Event::KeyPressed { key: KeyCode::U, ctrl: true, .. } if !showing_help => {
+                if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Update address") {
+                    *vm.adr = addr;
+
+                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0,
+                                                                                                     0,
+                                                                                                     &format!("Change {:04X} from {:#04X}",
+                                                                                                              addr,
+                                                                                                              vm.memory[addr])) {
+                        vm.memory[addr] = byte;
                     }
                 }
             }
