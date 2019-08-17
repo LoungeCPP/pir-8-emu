@@ -20,6 +20,7 @@ matrix:
       addons:
         apt:
           packages:
+            - libx11-dev
             - libxmu-dev
             - libgl1-mesa-dev
           sources: &sources
@@ -30,6 +31,7 @@ matrix:
       addons:
         apt:
           packages:
+            - libx11-dev
             - libxmu-dev
             - libgl1-mesa-dev
           sources: *sources
@@ -39,6 +41,7 @@ matrix:
       addons:
         apt:
           packages:
+            - libx11-dev
             - libxmu-dev
             - libgl1-mesa-dev
           sources: *sources
@@ -92,6 +95,7 @@ install:
     fi
 
 script:
+  - if [ "$LANGUAGE" == "Rust" ]; then make; fi
   - if [ "$LANGUAGE" == "Rust" ]; then cargo build --verbose; fi
   - if [ "$LANGUAGE" == "Rust" ]; then cargo test  --verbose; fi
   - if [ "$LANGUAGE" == "Rust" ] && [ "$CLIPPY_INSTALLED" == 1 ]; then cargo clippy; fi

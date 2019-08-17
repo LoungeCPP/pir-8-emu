@@ -34,7 +34,9 @@ extern "C" {
 //! For more information about port handlers lifetimes et al. in general visit the
 //! [`Ports`](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/vm/struct.Ports.html) doc page
 //!
-//! For an example implementation see [TBD]
+//! For an example implementation see the
+//! [`handler-examples/message.cpp`](https://github.com/LoungeCPP/pir-8-emu/blob/master/handler-examples/message.cpp)
+//! file in the git repo
 
 
 /// Get the amount of ports this handler handles

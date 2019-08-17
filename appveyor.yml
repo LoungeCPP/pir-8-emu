@@ -27,6 +27,7 @@ install:
 
 build: off
 build_script:
+  - make
   - cargo build --verbose --release
 
 test: off
