@@ -7,7 +7,7 @@ pir-8-emu(1) -- Emulator of the pir-8
 
 ## DESCRIPTION
 
-Implementation of the pir-8 ISA.
+Implementation of the [`pir-8` ISA](https://github.com/thecoshman/pir-8/blob/master/ISA.md).
 
 First, compile your source code with pir-8-as(1).
 
