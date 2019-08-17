@@ -99,7 +99,7 @@ fn actual_main() -> Result<(), i32> {
     let flush_instruction_load = |vm: &mut pir_8_emu::binutils::pir_8_emu::Vm, config: &pir_8_emu::binutils::pir_8_emu::ExecutionConfig| -> Result<bool, i32> {
         let mut new_ops = false;
         if config.auto_load_next_instruction {
-            while !vm.instruction_valid && !vm.execution_finished {
+            while !vm.instruction_valid && !vm.execution_finished && !vm.breakpoint_active {
                 new_ops = vm.perform_next_op().map_err(|err| vm_perform_err(err, vm))?;
             }
         }
@@ -133,9 +133,9 @@ fn actual_main() -> Result<(), i32> {
         if vm.execution_finished {
             pir_8_emu::binutils::pir_8_emu::display::micro::ops::finished(0, 15);
         } else if new_ops || vm.curr_op == 0 {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers);
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::new(0, 15, &vm.ops, &vm.registers, vm.breakpoint_active);
         } else {
-            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op);
+            pir_8_emu::binutils::pir_8_emu::display::micro::ops::update(0, 15, vm.curr_op, vm.breakpoint_active);
         }
 
         pir_8_emu::binutils::pir_8_emu::display::instruction_history_update(30, 1, &vm.instruction_history, vm.instruction_history.capacity(), &vm.registers);
@@ -402,7 +402,7 @@ fn actual_main() -> Result<(), i32> {
                         frame_start = before;
                         refresh_ns = (precise_time_ns() - before).checked_sub(target_nanos).unwrap_or(0);
 
-                        if vm.execution_finished {
+                        if vm.execution_finished || vm.breakpoint_active {
                             break 'steppy;
                         }
                     }
@@ -425,6 +425,8 @@ fn actual_main() -> Result<(), i32> {
                                                                           "Stepping",
                                                                           if vm.execution_finished {
                                                                               "finished"
+                                                                          } else if vm.breakpoint_active {
+                                                                              "broken"
                                                                           } else {
                                                                               "cancelled"
                                                                           });

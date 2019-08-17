@@ -42,7 +42,7 @@ libs : $(foreach l,$(SOURCES),$(patsubst $(SRCDIR)%.cpp,$(OUTDIR)$(PREDLL)%$(DLL
 
 $(OUTDIR)$(PREDLL)%$(DLL) : $(OBJDIR)%$(OBJ)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXAR) -o$@ $^ $(PIC) $(LDAR) -shared
+	$(CXX) $(CXXAR) -o$@ $^ $(LDAR) -shared
 
 $(OBJDIR)%$(OBJ) : $(SRCDIR)%.cpp
 	@mkdir -p $(dir $@)

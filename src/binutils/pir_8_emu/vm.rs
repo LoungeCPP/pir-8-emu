@@ -4,6 +4,7 @@ use arraydeque::{ArrayDeque, Wrapping as ArrayDequeBehaviourWrapping};
 use self::super::super::super::isa::instruction::Instruction;
 use self::super::super::super::vm::{Memory, Ports};
 use self::super::super::super::rw::ReadWritable;
+use std::collections::BTreeSet;
 
 
 /// Container for all data needed and/or useful for running a `pir-8-emu` virtual machine
@@ -56,6 +57,10 @@ pub struct Vm {
 
     /// Any instruction successfully loaded will be added to the front of this queue
     pub instruction_history: ArrayDeque<[(u16, Instruction, u16); 10], ArrayDequeBehaviourWrapping>,
+
+    /// Pause execution when ADR is contained herein until the flag is cleared
+    pub breakpoints: BTreeSet<u16>,
+    pub breakpoint_active: bool,
 }
 
 impl Vm {
@@ -80,6 +85,9 @@ impl Vm {
             stack: vec![],
 
             instruction_history: ArrayDeque::new(),
+
+            breakpoints: BTreeSet::new(),
+            breakpoint_active: false,
         })
     }
 
@@ -100,6 +108,8 @@ impl Vm {
         self.execution_finished = false;
         self.stack.clear();
         self.instruction_history.clear();
+        self.breakpoints.clear();
+        self.breakpoint_active = false;
 
         Ok(())
     }
@@ -118,6 +128,7 @@ impl Vm {
         self.instruction_valid = false;
         self.curr_op = 0;
         self.execution_finished = false;
+        self.breakpoint_active = false;
 
         Ok(())
     }
@@ -134,7 +145,7 @@ impl Vm {
     ///
     /// The returned value represents whether new μOps are present
     pub fn perform_next_op(&mut self) -> Result<bool, MicroOpPerformError> {
-        if self.execution_finished {
+        if self.execution_finished || self.breakpoint_active {
             return Ok(false);
         }
 
@@ -150,21 +161,21 @@ impl Vm {
                      &mut self.ins)?;
         self.curr_op += 1;
 
+
+        let (adr_r, adr_w) = (self.adr.was_read(), self.adr.was_written());
+        let adr = *self.adr;
+
         if self.curr_op >= self.ops.1 {
             if self.ins.was_written() {
                 self.instruction = Instruction::from(*self.ins);
                 self.ops = MicroOp::from_instruction(self.instruction);
                 self.instruction_valid = true;
 
-                let rw = self.adr.was_read() && self.adr.was_written();
                 let mut data = 0u16;
                 for i in 1..=(self.instruction.data_length() as u16) {
-                    data = (data << 8) | (self.memory[..][self.adr.wrapping_add(i) as usize] as u16);
+                    data = (data << 8) | (self.memory[..][adr.wrapping_add(i) as usize] as u16);
                 }
-                self.instruction_history.push_front((*self.adr, self.instruction, data));
-                if !rw {
-                    self.adr.reset_rw();
-                }
+                self.instruction_history.push_front((adr, self.instruction, data));
             } else {
                 self.ops = NEXT_INSTRUCTION;
                 self.instruction_valid = false;
@@ -172,6 +183,15 @@ impl Vm {
 
             self.curr_op = 0;
             new_ops = true;
+        }
+
+        self.breakpoint_active = self.breakpoints.contains(&adr);
+
+        if !adr_r {
+            self.adr.reset_rw();
+            if adr_w {
+                *self.adr = adr;
+            }
         }
 
         Ok(new_ops)
