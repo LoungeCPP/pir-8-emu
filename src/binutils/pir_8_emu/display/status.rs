@@ -124,7 +124,7 @@ pub fn read_gp_register_letters(x_start: usize, y_start: usize) -> Option<[char;
                     print_xy(x_past_header_start, y_start, &letters);
 
                     let mut ret = ['\0'; GP_REGISTER_COUNT];
-                    for (i, c) in letters.chars().into_iter().enumerate() {
+                    for (i, c) in letters.chars().enumerate() {
                         ret[i] = c;
                     }
                     Some(ret)
