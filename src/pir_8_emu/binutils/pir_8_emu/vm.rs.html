@@ -194,8 +194,8 @@
 <span class="doccomment">/// # use pir_8_emu::ReadWritable;</span>
 <span class="doccomment">/// # use pir_8_emu::binutils::pir_8_emu::Vm;</span>
 <span class="doccomment">/// # use pir_8_emu::isa::instruction::Instruction;</span>
-<span class="doccomment">/// let mut vm = Vm::new();</span>
-<span class="doccomment">/// vm.reset(&amp;[</span>
+<span class="doccomment">/// let mut vm = Vm::new(&quot;FSXYABCD&quot;).unwrap();</span>
+<span class="doccomment">/// vm.reset(&quot;FSXYABCD&quot;, &amp;[</span>
 <span class="doccomment">///     Instruction::Halt.into(),</span>
 <span class="doccomment">///     Instruction::LoadImmediate { aaa: 0b000 }.into(),</span>
 <span class="doccomment">///     0x69,</span>
