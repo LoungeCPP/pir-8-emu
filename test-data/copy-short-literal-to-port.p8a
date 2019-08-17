@@ -1,0 +1,42 @@
+JUMP
+:label load text
+
+:literal "*pounces on u* OwO what's whis?"
+0x00
+
+:label save text
+LOAD IMM Y
+1
+
+LOAD IMM A
+0x00
+
+LOAD IMM X
+0x03
+
+:label save loop-head
+SAVE X
+:label load-offset load-byte 2
+
+JUMP
+:label load load-byte
+
+:label save post-load
+COMP S
+JMPZ
+:label load end
+
+PORT OUT S
+ALU ADD
+MOVE S X
+JUMP
+:label load loop-head
+
+:label save end
+HALT
+
+:label save load-byte
+LOAD IND S
+0x0000
+JUMP
+:label load post-load

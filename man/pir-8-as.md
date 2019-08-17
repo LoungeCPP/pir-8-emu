@@ -63,6 +63,12 @@ Start with a colon, not limited to ASCII:
 
     The resulting address will wrap around both sides
 
+  :literal "<STRING>"
+
+    Insert STRING into the output
+
+    Using this when the current instruction is expecting data will yield an error
+
 ## OPTIONS
 
   -o BINFILE
