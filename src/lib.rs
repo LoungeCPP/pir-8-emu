@@ -1,6 +1,8 @@
 extern crate bear_lib_terminal;
 #[macro_use]
 extern crate downcast_rs;
+#[macro_use]
+extern crate lazy_static;
 extern crate arraydeque;
 #[macro_use]
 extern crate const_cstr;

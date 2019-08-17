@@ -19,6 +19,7 @@ exclude = ["*.enc"]
 bear-lib-terminal = "2.0"
 tinyfiledialogs = "3.3"
 downcast-rs = "1.0"
+lazy_static = "1.3"
 arraydeque = "0.4"
 const-cstr = "0.3"
 num-traits = "0.2"

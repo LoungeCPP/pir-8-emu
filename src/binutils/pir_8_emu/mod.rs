@@ -19,8 +19,13 @@ pub mod display;
 /// Cropped and scaled down version of [this](https://twitter.com/nabijaczleweli/status/1154176483730100224)
 pub static ICON: &[u8] = include_bytes!("../../../assets/pir-8-emu.ico");
 
-/// Contents of the help text to display after for the `pir-8-emu` window
+/// Contents of the help text to display after pressing F1 in the `pir-8-emu` window, paginated by Form Feeds
 pub static HELP_TEXT: &str = include_str!("../../../assets/pir-8-emu.hlp");
+
+lazy_static! {
+	/// Individual pages of the help text to display after pressing F1 in the `pir-8-emu` window, paginated by Form Feeds
+	pub static ref HELP_TEXT_PAGES: Vec<&'static str> = HELP_TEXT.split('\x0C').map(str::trim).collect();
+}
 
 /// When waiting, check at least this often for new input
 pub static MAX_UI_DELAY: Duration = Duration::from_millis(25);

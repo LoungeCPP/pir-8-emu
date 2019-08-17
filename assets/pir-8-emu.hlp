@@ -1,4 +1,4 @@
-pir-8-emu – an emulator for the pir-8 ISA
+pir-8-emu – an emulator of the pir-8 ISA
 
 General key mappings:
   Ctrl[color=lightest grey]+[/color]C – Close the emulator
@@ -11,14 +11,39 @@ Config key mappings:
 
 Execution key mappings:
   Ctrl[color=lightest grey]+[/color]U      – Update a memory address
-  Ctrl[color=lightest grey]+[/color]R/W    – Read/Write from/to a port
-  Ctrl[color=lightest grey]+[/color]I      – Install a native port handler
-  Ctrl[color=lightest grey]+[/color]K      – Uninstall a port handler
   Ctrl[color=lightest grey]+[/color]J      – Read in a memory address, finish current μOps, and jump thereto
   Space       – Perform the highlighted μOp if [color=amber]execute full instructions[/color] is [color=red]OFF[/color],
                 otherwise execute the current instruction
   Shift[color=lightest grey]+[/color]Space – Read in a frequency and press [bkcolor=darker grey]Space[/bkcolor] thereat
 
+
+
 Questions? Problems? Don't hesitate to open an issue over at
 [color=sky]https://github.com/LoungeCPP/pir-8-emu[/color]
+
+Press [bkcolor=darker grey]Space[/bkcolor] to go to the next page
+
+pir-8-emu – an emulator of the pir-8 ISA – page 2
+
+Port-related key mappings:
+  Ctrl[color=lightest grey]+[/color]R – Read a byte from a port
+  Ctrl[color=lightest grey]+[/color]W – Write a byte to a port
+  Ctrl[color=lightest grey]+[/color]I – Install a native port handler
+  Ctrl[color=lightest grey]+[/color]K – Uninstall a port handler
+
+
+
+
+
+
+
+
+
+
+
+
+
+Questions? Problems? Don't hesitate to open an issue over at
+[color=sky]https://github.com/LoungeCPP/pir-8-emu[/color]
+
 Press [bkcolor=darker grey]Escape[/bkcolor] to return to the emulation
