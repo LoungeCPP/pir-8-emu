@@ -87,7 +87,7 @@ Start with a colon, not limited to ASCII:
 
     Must be 8-ASCII-characters-long
 
-## Exit values
+## EXIT VALUES
 
     1 - option parsing error
     2 - output file creation failure

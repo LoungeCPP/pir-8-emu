@@ -101,7 +101,10 @@ script:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$CLIPPY_INSTALLED" == 1 ]; then cargo clippy; fi
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then cargo build --verbose --release; fi
   -
-  - if [ "$LANGUAGE" == "Ruby" ]; then ronn --organization="Lounge<C++>" man/*.md; fi
+  - if [ "$LANGUAGE" == "Ruby" ]; then
+      ronn --organization="Lounge<C++>" man/*.md;
+      sed -i 's;<head>;&\n  <meta charset="utf-8" />;' man/*.html;
+    fi
 
 after_success:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
