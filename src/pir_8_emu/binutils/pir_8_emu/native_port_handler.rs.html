@@ -144,6 +144,7 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::<span class="ident">PortHandler</span>;
 <span class="kw">use</span> <span class="ident">dlopen</span>::<span class="ident">raw</span>::<span class="ident">Library</span> <span class="kw">as</span> <span class="ident">NativeLibrary</span>;
@@ -161,6 +162,7 @@
 <span class="doccomment">/// `uninit()`ed</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NativePortHandler</span> {
+    <span class="doccomment">/// The path passed to [`load_from_dll()`](#fn.load_from_dll) on creation</span>
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">OsString</span>,
     <span class="ident">lib</span>: <span class="ident">NativeLibrary</span>,
     <span class="ident">raw</span>: <span class="ident">RawNativePortHandler</span>,
