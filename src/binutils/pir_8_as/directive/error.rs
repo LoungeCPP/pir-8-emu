@@ -2,8 +2,8 @@ use std::error::Error;
 use std::fmt;
 
 
-/// An error that could've occurred when [obeying](enum.AssemblyDirective.html#method.obey) an [pasembly
-/// directive](enum.AssemblyDirective.html).
+/// An error that could've occurred when [obeying](enum.AssemblyDirective.html#method.obey) an
+/// [asembly directive](enum.AssemblyDirective.html).
 ///
 /// # Examples
 ///
