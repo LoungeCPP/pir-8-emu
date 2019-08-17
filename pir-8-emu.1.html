@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
   <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
-  <title>pir-8-emu(1) - Implementation of the pir-8 ISA</title>
+  <title>pir-8-emu(1) - Emulator of the pir-8</title>
   <style type='text/css' media='all'>
   /* style: man */
   body#manpage {margin:0}
@@ -56,6 +56,8 @@
     <a href="#NAME">NAME</a>
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#CONTROLS">CONTROLS</a>
+    <a href="#PORT-HANDLERS">PORT HANDLERS</a>
     <a href="#OPTIONS">OPTIONS</a>
     <a href="#AUTHOR">AUTHOR</a>
     <a href="#SPECIAL-THANKS">SPECIAL THANKS</a>
@@ -71,12 +73,12 @@
 
   <h2 id="NAME">NAME</h2>
 <p class="man-name">
-  <code>pir-8-emu</code> - <span class="man-whatis">Implementation of the pir-8 ISA</span>
+  <code>pir-8-emu</code> - <span class="man-whatis">Emulator of the pir-8</span>
 </p>
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>pir-8-emu</code> <a href="#OPTIONS" title="OPTIONS" data-bare-link="true">OPTIONS</a></p>
+<p><code>pir-8-emu</code> [CONFIG_DIR]</p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -86,18 +88,92 @@
 
 <p>Alternatively, check the content of a binary with <a class="man-ref" href="pir-8-disasm.1.html">pir-8-disasm<span class="s">(1)</span></a>.</p>
 
+<p>To emulate, open <a class="man-ref" href="pir-8-emu.1.html">pir-8-emu<span class="s">(1)</span></a> and press <em>Ctrl+O</em> to open a binary,
+then <em>Space</em> to execute step-by-step. For more usage consult the
+in-emulator help available after pressing <em>F1</em>, or detailed below.</p>
+
+<p>Read values appear green, and written ones appear red.</p>
+
+<h2 id="CONTROLS">CONTROLS</h2>
+
+<pre><code>General key mappings:
+  F1     – Show this help message
+  Ctrl+O – Open a memory image and reset the emulation therewith
+  Ctrl+C – Close the emulator
+
+Execution key mappings:
+  Ctrl+B      – Add a breakpoint
+  Ctrl+G      – Remove a breakpoint
+  Escape      – Clear active breakpoint
+  Ctrl+U      – Update a memory address
+  Ctrl+J      – Read in a memory address, finish current μOps, and jump thereto
+  Space       – Perform the highlighted μOp if execute full instructions is OFF,
+                otherwise execute the current instruction
+  Shift+Space – Read in a frequency and press Space thereat
+  Ctrl+Space  – Silently execute until input/end/breakpoint
+
+Port-related key mappings:
+  Ctrl+R – Read a byte from a port
+  Ctrl+W – Write a byte to a port
+  Ctrl+I – Install a native port handler
+  Ctrl+K – Uninstall a port handler
+
+Config key mappings:
+  Ctrl+Shift+A – Toggle auto load next instruction
+  Ctrl+Shift+F – Toggle execute full instructions
+  Ctrl+Shift+R – Rename general-purpose registers
+</code></pre>
+
+<h2 id="PORT-HANDLERS">PORT HANDLERS</h2>
+
+<p>The <code>pir-8-emu</code> library supports all sorts of handlers that can
+take control of a <code>pir-8</code> port. However, as recompiling to
+change a handler would be less than ideal for a real-time emulator,
+this emulator allows installing native port handlers.</p>
+
+<p>A native port handler is any dynamically-loaded library that provides
+the following interface:</p>
+
+<pre><code>/// Get the amount of ports this handler handles
+///
+/// Returning `0` from this funxion will panic the emulator
+unsigned char pir_8_emu_port_count();
+
+/// Initialise the handler state with the specified ports
+///
+/// The returned value will be passed in the following funxions as the `state` argument
+void * pir_8_emu_init(const unsigned char * ports, unsigned char ports_len);
+
+/// Release all resources associated with the specified state
+void pir_8_emu_uninit(void * state);
+
+/// Handle the program reading from one of the handled ports
+unsigned char pir_8_emu_handle_read(void * state, unsigned char port);
+
+/// Handle the program writing to one of the handled ports
+void pir_8_emu_handle_write(void * state, unsigned char port, unsigned char byte);
+</code></pre>
+
+<p>Also available as <a href="https://github.com/LoungeCPP/pir-8-emu/blob/master/include/pir-8-emu/port_handler.h"><code>include/pir-8-emu/port_handler.h</code></a> in the git repo.</p>
+
+<p>For more information about native port handlers
+visit the <a href="https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/binutils/pir_8_emu/struct.RawNativePortHandler.html"><code>RawNativePortHandler</code></a> doc page.</p>
+
+<p>For more information about port handlers in general
+visit the <a href="https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/vm/struct.Ports.html"><code>Ports</code></a> doc page</p>
+
 <h2 id="OPTIONS">OPTIONS</h2>
 
-<p>  -a --all</p>
+<p>  CONFIG_DIR</p>
 
-<pre><code>Update all currently installed executables.
+<pre><code>Directory containing configuration files
 
-Required if list of packages not given.
+Default: $HOME/.pir-8-emu/
 </code></pre>
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6e;&#x61;&#98;&#x69;&#106;&#97;&#99;&#122;&#108;&#101;&#x77;&#x65;&#108;&#x69;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;" data-bare-link="true">&#110;&#x61;&#x62;&#x69;&#x6a;&#x61;&#x63;&#122;&#108;&#x65;&#x77;&#x65;&#108;&#105;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x6e;&#97;&#x62;&#105;&#106;&#x61;&#x63;&#122;&#x6c;&#101;&#119;&#101;&#108;&#x69;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#109;" data-bare-link="true">&#110;&#97;&#98;&#x69;&#x6a;&#97;&#x63;&#122;&#x6c;&#101;&#119;&#x65;&#x6c;&#x69;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#109;</a>&gt;</p>
 
 <h2 id="SPECIAL-THANKS">SPECIAL THANKS</h2>
 
