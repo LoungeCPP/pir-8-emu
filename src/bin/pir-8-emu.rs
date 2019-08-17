@@ -11,6 +11,7 @@ use dlopen::utils::PLATFORM_FILE_EXTENSION;
 use tinyfiledialogs::open_file_dialog;
 use pir_8_emu::vm::PortHandler;
 use bear_lib_terminal::Color;
+use pir_8_emu::ReadWritable;
 use time::precise_time_ns;
 use std::time::Duration;
 use std::process::exit;
@@ -107,6 +108,7 @@ fn actual_main() -> Result<(), i32> {
 
         if let Some(breakpoint_addr) = vm.active_breakpoint {
             pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Hit breakpoint", &format!("{:#06X}", breakpoint_addr));
+            println!("status: hit breakpoint for {:#06X}", breakpoint_addr);
         }
 
         Ok(new_ops)
@@ -358,7 +360,7 @@ fn actual_main() -> Result<(), i32> {
                     new_ops = true;
                 }
             }
-            Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {
+            Event::KeyPressed { key: KeyCode::Space, shift: true, ctrl: false } if !showing_help => {
                 if let Some(freq) = pir_8_emu::binutils::pir_8_emu::display::status::read_pos_float(0, 0, "Target step frequency") {
                     println!("status: stepping at target frequency {}", freq);
 
@@ -461,6 +463,26 @@ fn actual_main() -> Result<(), i32> {
                     terminal::refresh();
 
                     continue;
+                }
+            }
+            Event::KeyPressed { key: KeyCode::Space, shift: false, ctrl: true } if !showing_help => {
+                pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Stepping", "until interrupted");
+                terminal::refresh();
+
+                while !terminal::has_input() && !vm.execution_finished && !vm.active_breakpoint.is_some() {
+                    vm.ins.reset_rw();
+                    new_ops |= step(&mut vm, &config)?;
+                }
+
+                if !vm.active_breakpoint.is_some() {
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0,
+                                                                          0,
+                                                                          "Stepping",
+                                                                          if vm.execution_finished {
+                                                                              "finished"
+                                                                          } else {
+                                                                              "cancelled"
+                                                                          });
                 }
             }
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {

@@ -28,8 +28,8 @@ use std::collections::BTreeSet;
 ///
 /// vm.jump_to_addr(0x0001).unwrap();
 /// while !vm.execution_finished {
-///     vm.perform_next_op().unwrap();
 ///     vm.ins.reset_rw();
+///     vm.perform_next_op().unwrap();
 /// }
 ///
 /// assert_eq!(vm.memory[0x0420], 0x69);
@@ -120,6 +120,7 @@ impl Vm {
     /// [`NEXT_INSTRUCTION`](../../../micro/static.NEXT_INSTRUCTION.html)
     pub fn jump_to_addr(&mut self, to_addr: u16) -> Result<(), MicroOpPerformError> {
         for _ in self.curr_op..self.ops.1 {
+            self.active_breakpoint = None;
             self.perform_next_op()?;
         }
 

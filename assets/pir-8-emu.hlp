@@ -14,7 +14,7 @@ Execution key mappings:
   Space       – Perform the highlighted μOp if [color=amber]execute full instructions[/color] is [color=red]OFF[/color],
                 otherwise execute the current instruction
   Shift[color=lightest grey]+[/color]Space – Read in a frequency and press [bkcolor=darker grey]Space[/bkcolor] thereat
-
+  Ctrl[color=lightest grey]+[/color]Space  – Silently execute until input/end/breakpoint
 
 
 
