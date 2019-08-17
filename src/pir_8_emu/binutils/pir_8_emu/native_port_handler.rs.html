@@ -145,6 +145,10 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">vm</span>::<span class="ident">PortHandler</span>;
 <span class="kw">use</span> <span class="ident">dlopen</span>::<span class="ident">raw</span>::<span class="ident">Library</span> <span class="kw">as</span> <span class="ident">NativeLibrary</span>;
@@ -250,6 +254,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// void pir_8_emu_handle_write(void * state, unsigned char port, unsigned char byte);</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// These can also be obtained from the</span>
+<span class="doccomment">/// [`include/pir-8-emu/port_handler.h`](https://github.com/LoungeCPP/pir-8-emu/blob/master/include/pir-8-emu/port_handler.h)</span>
+<span class="doccomment">/// file in the git repo</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawNativePortHandler</span> {
     <span class="doccomment">/// Get the amount of ports this handler handles</span>
