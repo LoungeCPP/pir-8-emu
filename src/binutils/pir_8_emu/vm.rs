@@ -14,8 +14,8 @@ use self::super::super::super::rw::ReadWritable;
 /// # use pir_8_emu::ReadWritable;
 /// # use pir_8_emu::binutils::pir_8_emu::Vm;
 /// # use pir_8_emu::isa::instruction::Instruction;
-/// let mut vm = Vm::new();
-/// vm.reset(&[
+/// let mut vm = Vm::new("FSXYABCD").unwrap();
+/// vm.reset("FSXYABCD", &[
 ///     Instruction::Halt.into(),
 ///     Instruction::LoadImmediate { aaa: 0b000 }.into(),
 ///     0x69,

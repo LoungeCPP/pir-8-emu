@@ -30,5 +30,5 @@ fn toml() {
     fs::write(root.join("exec_cfg.toml"), b"uwu").unwrap();
 
     assert_eq!(ExecutionConfig::read_from_config_dir(root.clone()).unwrap_err().unwrap_err().to_string(),
-               "expected an equals, found eof at line 1");
+               "expected an equals, found eof at line 1 column 4");
 }

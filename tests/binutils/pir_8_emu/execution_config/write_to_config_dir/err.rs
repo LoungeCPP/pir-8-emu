@@ -9,5 +9,9 @@ fn dir() {
     fs::create_dir_all(root.join("exec_cfg.toml")).unwrap();
 
     assert_eq!(ExecutionConfig::new().write_to_config_dir(root).unwrap_err().to_string(),
-               "Access is denied. (os error 5)");
+               if cfg!(target_os = "windows") {
+                   "Access is denied. (os error 5)"
+               } else {
+                   "Is a directory (os error 21)"
+               });
 }
