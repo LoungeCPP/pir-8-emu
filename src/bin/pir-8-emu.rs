@@ -163,26 +163,23 @@ fn actual_main() -> Result<(), i32> {
         Ok(new_ops)
     };
 
-    let mut showing_help = false;
+    let mut help_page = None;
     let mut current_memory_image = None;
 
     for ev in terminal::events() {
+        let showing_help = help_page.is_some();
         let mut new_ops = false;
         match ev {
             Event::Close |
             Event::KeyPressed { key: KeyCode::C, ctrl: true, .. } => break,
             Event::KeyPressed { key: KeyCode::Escape, .. } if showing_help => {
-                showing_help = false;
+                help_page = None;
 
                 terminal::clear(None);
                 write_main_screen(&mut vm);
             }
             Event::KeyPressed { key: KeyCode::F1, .. } => {
-                showing_help = true;
-
-                terminal::clear(None);
-                terminal::print_xy(0, 0, pir_8_emu::binutils::pir_8_emu::HELP_TEXT);
-                terminal::refresh();
+                help_page = Some(0);
             }
             Event::KeyPressed { key: KeyCode::A, ctrl: true, shift: true } if !showing_help => {
                 config.auto_load_next_instruction = !config.auto_load_next_instruction;
@@ -439,13 +436,26 @@ fn actual_main() -> Result<(), i32> {
             Event::KeyPressed { key: KeyCode::Space, .. } if !showing_help => {
                 new_ops |= step(&mut vm, &config)?;
             }
+            Event::KeyPressed { key: KeyCode::Space, .. } if showing_help => {
+                let page_idx = help_page.take().unwrap();
+                if page_idx < pir_8_emu::binutils::pir_8_emu::HELP_TEXT_PAGES.len() - 1 {
+                    help_page = Some(page_idx + 1);
+                } else {
+                    terminal::clear(None);
+                    write_main_screen(&mut vm);
+                }
+            }
             _ => {}
         }
 
-        if !showing_help {
-            update_main_screen(&mut vm, new_ops);
-            terminal::refresh();
+        match help_page {
+            Some(page_idx) => {
+                terminal::clear(None);
+                terminal::print_xy(0, 0, pir_8_emu::binutils::pir_8_emu::HELP_TEXT_PAGES[page_idx]);
+            }
+            None => update_main_screen(&mut vm, new_ops),
         }
+        terminal::refresh();
     }
 
 
