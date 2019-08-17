@@ -8,6 +8,7 @@
 !Cargo.toml
 !rustfmt.toml
 !.clang-format
+!*Makefile
 !*.sublime-project
 !*.md
 !man
