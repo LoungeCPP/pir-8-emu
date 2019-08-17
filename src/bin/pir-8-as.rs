@@ -65,6 +65,7 @@ fn actual_main() -> Result<(), i32> {
             }
 
             let mut label_data = None;
+            let mut literal = None;
             if let Some(directive) = pir_8_emu::binutils::pir_8_as::AssemblerDirective::from_str(line).map_err(|err| {
                     eprintln!("Error: failed to parse assembler directive at {}:{}:", input_name, line_number);
                     eprintln!("{}", line_orig);
@@ -72,29 +73,46 @@ fn actual_main() -> Result<(), i32> {
                     8
                 })? {
 
-                if let Some(ll) = directive.obey(&mut next_output_address, &mut labels)
+                if let Some(ob) = directive.obey(&mut next_output_address, &mut labels)
                     .map_err(|err| {
                         eprintln!("Error: failed to obey assembler directive at {}:{}:", input_name, line_number);
                         eprintln!("{}", line_orig);
                         eprintln!("{}", err);
                         8
                     })? {
-                    if data_remaining != 2 {
-                        eprintln!("Error: attempted to load label data when expecting {} bytes at {}:{}:",
-                                  data_remaining,
-                                  input_name,
-                                  line_number);
-                        eprintln!("{}", line_orig);
-                        return Err(8);
-                    }
+                    match ob {
+                        Ok(ll) => {
+                            if data_remaining != 2 {
+                                eprintln!("Error: attempted to load label data when expecting {} bytes at {}:{}:",
+                                          data_remaining,
+                                          input_name,
+                                          line_number);
+                                eprintln!("{}", line_orig);
+                                return Err(8);
+                            }
 
-                    match ll {
-                        pir_8_emu::binutils::pir_8_as::LabelLoad::HaveImmediately(addr) => label_data = Some(addr),
-                        pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl, offset) => {
-                            output.wait_for_label(lbl, offset);
-                            data_remaining = 0;
-                            next_output_address = Some(next_output_address.unwrap_or(0) + 2);
-                            continue;
+                            match ll {
+                                pir_8_emu::binutils::pir_8_as::LabelLoad::HaveImmediately(addr) => label_data = Some(addr),
+                                pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl, offset) => {
+                                    output.wait_for_label(lbl, offset);
+                                    data_remaining = 0;
+                                    next_output_address = Some(next_output_address.unwrap_or(0) + 2);
+                                    continue;
+                                }
+                            }
+                        }
+                        Err(lit) => {
+                            if data_remaining != 0 {
+                                eprintln!("Error: attempted to insert literal {:?} when expecting {} bytes at {}:{}:",
+                                          lit,
+                                          data_remaining,
+                                          input_name,
+                                          line_number);
+                                eprintln!("{}", line_orig);
+                                return Err(8);
+                            }
+
+                            literal = Some(lit);
                         }
                     }
                 } else {
@@ -113,7 +131,14 @@ fn actual_main() -> Result<(), i32> {
             }
             first_output = false;
 
-            if data_remaining != 0 {
+            if let Some(lit) = literal {
+                output.write_all(lit.as_bytes(), &labels)
+                    .map_err(|err| {
+                        eprintln!("Error: failed to write literal {}: {}", lit, err);
+                        4
+                    })?;
+                next_output_address = Some(next_output_address.unwrap_or(0) + lit.as_bytes().len() as u16);
+            } else if data_remaining != 0 {
                 let line = line.trim_start();
 
                 let data: u16 = if let Some(addr) = label_data {

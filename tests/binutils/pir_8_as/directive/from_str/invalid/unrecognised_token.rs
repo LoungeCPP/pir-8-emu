@@ -1,13 +1,18 @@
 use pir_8_emu::isa::instruction::ParseInstructionError;
 use pir_8_emu::binutils::pir_8_as::AssemblerDirective;
+use rand::distributions::{Alphanumeric, Distribution};
 use self::super::unrecognised_token;
+use rand::thread_rng;
 
 
 #[test]
 fn toplevel() {
-    static TOKENS_TOPLEVEL: &[&str] = &["origin", "label"];
+    static TOKENS_TOPLEVEL: &[&str] = &["origin", "label", "literal"];
 
-    unrecognised_token("", TOKENS_TOPLEVEL, 1..25, |len, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_TOPLEVEL));
+    unrecognised_token("",
+                       TOKENS_TOPLEVEL,
+                       1..25,
+                       |len, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_TOPLEVEL));
 }
 
 #[test]
@@ -94,5 +99,42 @@ fn label_offset() {
                    Err(ParseInstructionError::UnrecognisedToken(24, TOKENS_OFFSET)),
                    "{:#x}",
                    addr);
+    }
+}
+
+#[test]
+fn literal() {
+    static TOKENS_LITERAL: &[&str] = &["\"[string]\""];
+
+    for pad_lleft in 0..5 {
+        for pad_left in 0..5 {
+            for pad_center in 1..5 {
+                for pad_right in 1..5 {
+                    for token_len in 1..10 {
+                        for (quote_pre, quote_post) in &[(false, false), (false, true), (true, false)] {
+                            for _ in 0..5 {
+                                let token = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect::<String>();
+
+                                let instr = format!("{e:wll$}:{e:wl$}literal{e:wc$}{}{}{}{e:wr$}",
+                                                    token,
+                                                    if *quote_pre { "\"" } else { "" },
+                                                    if *quote_post { "\"" } else { "" },
+                                                    e = "",
+                                                    wll = pad_lleft,
+                                                    wl = pad_left,
+                                                    wc = pad_center,
+                                                    wr = pad_right);
+
+                                assert_eq!(AssemblerDirective::from_str(&instr),
+                                           Err(ParseInstructionError::UnrecognisedToken(pad_lleft + 1 + pad_left + "literal".len() + pad_center + 1,
+                                                                                        TOKENS_LITERAL)),
+                                           "{:?}",
+                                           instr);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

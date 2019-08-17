@@ -29,6 +29,13 @@ pub enum AssemblerDirective<'s> {
     ///
     /// Syntax: `:label load-offset [name] [offset]`
     LoadLabel(&'s str, i16),
+
+    /// Blindly write the specified literal
+    ///
+    /// Attempting to insert a literal when the current instruction is expecting data is an error
+    ///
+    /// Syntax: `:literal "UwU"`
+    InsertLiteral(&'s str),
 }
 
 impl<'s> AssemblerDirective<'s> {
@@ -73,22 +80,26 @@ impl<'s> AssemblerDirective<'s> {
     ///
     /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(LabelLoad::WaitFor("owo".to_string(), 0))));
+    ///            Ok(Some(Ok(LabelLoad::WaitFor("owo".to_string(), 0)))));
     /// assert_eq!(AssemblerDirective::SaveLabel("owo")
     ///                .obey(&mut next_output_address, &mut labels),
     ///            Ok(None));
     /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(LabelLoad::HaveImmediately(0x0110))));
+    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x0110)))));
     /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0x0F)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(LabelLoad::HaveImmediately(0x011F))));
+    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x011F)))));
+    ///
+    /// assert_eq!(AssemblerDirective::InsertLiteral("EwE")
+    ///                .obey(&mut next_output_address, &mut labels),
+    ///            Ok(Some(Err("EwE"))));
     ///
     /// assert_eq!(next_output_address, Some(0x0110));
     /// assert_eq!(labels, vec![("owo".to_string(), 0x0110)].into_iter().collect());
     /// ```
     pub fn obey(&self, next_output_address: &mut Option<u16>, labels: &mut BTreeMap<String, u16>)
-                -> Result<Option<LabelLoad>, AssemblerDirectiveObeyError<'s>> {
+                -> Result<Option<Result<LabelLoad, &'s str>>, AssemblerDirectiveObeyError<'s>> {
         match &self {
             AssemblerDirective::SetOrigin(origin) => {
                 if let Some(&nao) = next_output_address.as_ref() {
@@ -115,16 +126,17 @@ impl<'s> AssemblerDirective<'s> {
             }
             AssemblerDirective::LoadLabel(lbl, offset) => {
                 match labels.get(*lbl) {
-                    None => Ok(Some(LabelLoad::WaitFor(lbl.to_string(), *offset))),
+                    None => Ok(Some(Ok(LabelLoad::WaitFor(lbl.to_string(), *offset)))),
                     Some(&addr) => {
-                        Ok(Some(LabelLoad::HaveImmediately(if *offset < 0 {
+                        Ok(Some(Ok(LabelLoad::HaveImmediately(if *offset < 0 {
                             addr.wrapping_sub(-*offset as u16)
                         } else {
                             addr.wrapping_add(*offset as u16)
-                        })))
+                        }))))
                     }
                 }
             }
+            AssemblerDirective::InsertLiteral(lit) => Ok(Some(Err(lit))),
         }
     }
 }

@@ -27,7 +27,7 @@ impl<'s> AssemblerDirective<'s> {
 
 fn parse_directive<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i str, had_colon: bool)
                                                     -> Result<Option<AssemblerDirective<'i>>, ParseInstructionError> {
-    static VALID_TOKENS: &[&str] = &["origin", "label"];
+    static VALID_TOKENS: &[&str] = &["origin", "label", "literal"];
 
     match itr.next() {
         Some(mut tok) => {
@@ -45,6 +45,8 @@ fn parse_directive<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i s
                 Ok(Some(parse_directive_origin(itr, orig_str, start_pos + 6 + 1)?))
             } else if tok.eq_ignore_ascii_case("label") {
                 Ok(Some(parse_directive_label(itr, orig_str, start_pos + 5 + 1)?))
+            } else if tok.eq_ignore_ascii_case("literal") {
+                Ok(Some(parse_directive_literal(itr, orig_str, start_pos + 7 + 1)?))
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }
@@ -84,7 +86,8 @@ fn parse_directive_label<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str:
                 Ok(AssemblerDirective::LoadLabel(parse_directive_label_name(itr, start_pos + 4 + 1)?, 0))
             } else if tok.eq_ignore_ascii_case("load-offset") {
                 let lbl = parse_directive_label_name(itr, start_pos + 11 + 1)?;
-                Ok(AssemblerDirective::LoadLabel(lbl, parse_label_offset(itr, orig_str, (lbl.as_ptr() as usize) - (orig_str.as_ptr() as usize) + lbl.len() + 1)?))
+                Ok(AssemblerDirective::LoadLabel(lbl,
+                                                 parse_label_offset(itr, orig_str, (lbl.as_ptr() as usize) - (orig_str.as_ptr() as usize) + lbl.len() + 1)?))
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }
@@ -121,6 +124,27 @@ fn parse_label_offset<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'
                 } else {
                     offset as i16
                 })
+            } else {
+                Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
+            }
+        }
+        None => Err(ParseInstructionError::MissingToken(pos, VALID_TOKENS)),
+    }
+}
+
+fn parse_directive_literal<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &'i str, pos: usize)
+                                                            -> Result<AssemblerDirective<'i>, ParseInstructionError> {
+    static VALID_TOKENS: &[&str] = &["\"[string]\""];
+
+    match itr.next() {
+        Some(tok) => {
+            let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
+
+            let lit = &orig_str[start_pos..];
+            if lit.starts_with('"') && lit.ends_with('"') {
+                itr.count();
+
+                Ok(AssemblerDirective::InsertLiteral(&lit[1..lit.len() - 1]))
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }

@@ -58,7 +58,7 @@ fn load_label_present() {
                 let mut next_output_address = None;
 
                 assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
-                           Ok(Some(LabelLoad::HaveImmediately((((token_len * 0x1A) as i16).wrapping_add(offset)) as u16))));
+                           Ok(Some(Ok(LabelLoad::HaveImmediately((((token_len * 0x1A) as i16).wrapping_add(offset)) as u16)))));
 
                 assert_eq!(next_output_address, None);
                 assert_eq!(labels, vec![(label, token_len * 0x1A)].into_iter().collect());
@@ -78,11 +78,29 @@ fn load_label_missing() {
                 let mut next_output_address = None;
 
                 assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
-                           Ok(Some(LabelLoad::WaitFor(label.clone(), offset))));
+                           Ok(Some(Ok(LabelLoad::WaitFor(label.clone(), offset)))));
 
                 assert_eq!(next_output_address, None);
                 assert_eq!(labels, BTreeMap::new());
             }
+        }
+    }
+}
+
+#[test]
+fn insert_literal() {
+    for token_len in 1..5 {
+        for _ in 0..5 {
+            let literal: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
+
+            let mut labels = BTreeMap::new();
+            let mut next_output_address = None;
+
+            assert_eq!(AssemblerDirective::InsertLiteral(&literal).obey(&mut next_output_address, &mut labels),
+                       Ok(Some(Err(&literal[..]))));
+
+            assert_eq!(next_output_address, None);
+            assert_eq!(labels, BTreeMap::new());
         }
     }
 }

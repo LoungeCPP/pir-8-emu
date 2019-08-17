@@ -384,7 +384,7 @@ fn actual_main() -> Result<(), i32> {
                         framerate_samples.push_back(1_000_000_000f64 / ((before - frame_start) as f64));
                         if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu{}{} – {:.2} steps/s",
                                                                                           if current_memory_image.is_some() {
-                                                                                              " –"
+                                                                                              " – "
                                                                                           } else {
                                                                                               ""
                                                                                           },
@@ -409,7 +409,7 @@ fn actual_main() -> Result<(), i32> {
 
                     if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu{}{}",
                                                                                       if current_memory_image.is_some() {
-                                                                                          " –"
+                                                                                          " – "
                                                                                       } else {
                                                                                           ""
                                                                                       },
