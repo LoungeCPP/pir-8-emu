@@ -22,11 +22,11 @@ JUMP
 :label load load-byte
 
 :label save post-load
+PORT OUT S
 COMP S
 JMPZ
 :label load end
 
-PORT OUT S
 ALU ADD
 MOVE S X
 JUMP

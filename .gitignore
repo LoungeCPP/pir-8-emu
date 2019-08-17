@@ -26,3 +26,5 @@
 !examples/**
 !test-data
 !test-data/**
+!handler-examples
+!handler-examples/**

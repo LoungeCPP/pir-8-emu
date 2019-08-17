@@ -47,6 +47,11 @@
 		},
 		{
 			"follow_symlinks": true,
+			"name": "Native handler examples",
+			"path": "handler-examples"
+		},
+		{
+			"follow_symlinks": true,
 			"name": "External data",
 			"path": "ext"
 		},
