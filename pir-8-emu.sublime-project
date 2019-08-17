@@ -42,6 +42,11 @@
 		},
 		{
 			"follow_symlinks": true,
+			"name": "Native headers",
+			"path": "include"
+		},
+		{
+			"follow_symlinks": true,
 			"name": "External data",
 			"path": "ext"
 		},

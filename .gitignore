@@ -7,6 +7,7 @@
 !LICENSE
 !Cargo.toml
 !rustfmt.toml
+!.clang-format
 !*.sublime-project
 !*.md
 !man
@@ -19,7 +20,9 @@
 !tests/**
 !assets
 !assets/**
-!test-data
-!test-data/**
+!include
+!include/**
 !examples
 !examples/**
+!test-data
+!test-data/**

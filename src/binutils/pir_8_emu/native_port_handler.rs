@@ -102,6 +102,10 @@ impl PortHandler for NativePortHandler {
 ///
 /// void pir_8_emu_handle_write(void * state, unsigned char port, unsigned char byte);
 /// ```
+///
+/// These can also be obtained from the
+/// [`include/pir-8-emu/port_handler.h`](https://github.com/LoungeCPP/pir-8-emu/blob/master/include/pir-8-emu/port_handler.h)
+/// file in the git repo
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RawNativePortHandler {
     /// Get the amount of ports this handler handles
