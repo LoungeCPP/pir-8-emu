@@ -192,7 +192,7 @@ impl<'de> DeserialisationVisitor<'de> for ExecutionConfigVisitor {
 fn default_letters() -> [char; GP_REGISTER_COUNT] {
     let mut ret = ['\0'; GP_REGISTER_COUNT];
 
-    for (i, reg) in GeneralPurposeRegister::defaults().into_iter().enumerate() {
+    for (i, reg) in GeneralPurposeRegister::defaults().iter().enumerate() {
         ret[i] = reg.letter();
     }
 

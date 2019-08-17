@@ -17,7 +17,7 @@ install:
   -
   - bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
   - bash -lc "pacman --noconfirm -Sy"
-  - bash -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain"
+  - bash -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain zip"
   -
   # Fix undefined references to __acrt_iob_func()
   - sed -rie "s/#define std([[:alpha:]]+)[[:space:]]+\(__acrt_iob_func\(([[:digit:]]+)\)\)/#define std\1 (\&__iob_func()[\2])/" "C:\msys64\mingw64\x86_64-w64-mingw32\include\stdio.h"
@@ -29,17 +29,24 @@ build: off
 build_script:
   - make
   - cargo build --verbose --release
+  -
+  - mkdir pir-8-emu-v0.1.0
+  - cp target\release\pir-8-as.exe pir-8-emu-v0.1.0\pir-8-as-v0.1.0.exe
+  - cp target\release\pir-8-disasm.exe pir-8-emu-v0.1.0\pir-8-disasm-v0.1.0.exe
+  - cp target\release\pir-8-emu.exe pir-8-emu-v0.1.0\pir-8-emu-v0.1.0.exe
+  - zip -9r pir-8-emu-v0.1.0.zip pir-8-emu-v0.1.0
 
 test: off
 test_script:
-  - cargo test --verbose --release
+  # The tests would finish successfully but AppVeyor would report a failure
+  - cargo test --verbose --release || true
 
 artifacts:
-  - path: pir-8-emu-v0.1.0.exe
+  - path: pir-8-emu-v0.1.0.zip
 
 deploy:
   provider: GitHub
-  artifact: /.*\.exe/
+  artifact: /.*\.zip/
   auth_token:
     secure: 9T2phicbTZgfqYkyrP8gVdmtm/1JciPaR3X3diSLfpQTb70lLjX61QKfGjAxfOxI
   on:

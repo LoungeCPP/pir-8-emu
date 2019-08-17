@@ -19,7 +19,7 @@ matrix:
       rust: stable
       addons:
         apt:
-          packages:
+          packages: &packages
             - libx11-dev
             - libxmu-dev
             - libgl1-mesa-dev
@@ -30,20 +30,14 @@ matrix:
       rust: beta
       addons:
         apt:
-          packages:
-            - libx11-dev
-            - libxmu-dev
-            - libgl1-mesa-dev
+          packages: *packages
           sources: *sources
     - env: LANGUAGE=Rust CLIPPY=true
       language: rust
       rust: nightly
       addons:
         apt:
-          packages:
-            - libx11-dev
-            - libxmu-dev
-            - libgl1-mesa-dev
+          packages: *packages
           sources: *sources
     - env: LANGUAGE=Ruby DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../pir-8-emu-man-$TRAVIS_TAG.tbz2"
       language: ruby
@@ -54,9 +48,7 @@ matrix:
       rust: stable
       addons:
         apt:
-          packages:
-            - libxmu-dev
-            - libgl1-mesa-dev
+          packages: *packages
           sources: *sources
   allow_failures:
     - rust: beta
@@ -108,10 +100,12 @@ script:
 
 after_success:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
-      cp target/release/pir-8-emu "$TRAVIS_BUILD_DIR/..";
-      pushd "$TRAVIS_BUILD_DIR/..";
-      strip --strip-all --remove-section=.comment --remove-section=.note pir-8-emu;
-      tar -caf "pir-8-emu-$TRAVIS_TAG.tbz2" pir-8-emu;
+      mkdir -p "$TRAVIS_BUILD_DIR/../release";
+      cp target/release/pir-8-as target/release/pir-8-disasm target/release/pir-8-emu "$TRAVIS_BUILD_DIR/../release";
+      pushd "$TRAVIS_BUILD_DIR/../release";
+      strip --strip-all --remove-section=.comment --remove-section=.note pir-8-*;
+      tar -caf "pir-8-emu-$TRAVIS_TAG.tbz2" pir-8-as pir-8-disasm pir-8-emu;
+      mv "pir-8-emu-$TRAVIS_TAG.tbz2" "$DEPLOY_FILE";
       popd;
     fi
   - if [ "$LANGUAGE" == "Rust-doc" ]; then
