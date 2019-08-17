@@ -197,6 +197,7 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
+<span id="200">200</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
@@ -228,8 +229,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// vm.jump_to_addr(0x0001).unwrap();</span>
 <span class="doccomment">/// while !vm.execution_finished {</span>
-<span class="doccomment">///     vm.perform_next_op().unwrap();</span>
 <span class="doccomment">///     vm.ins.reset_rw();</span>
+<span class="doccomment">///     vm.perform_next_op().unwrap();</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(vm.memory[0x0420], 0x69);</span>
@@ -320,6 +321,7 @@
     <span class="doccomment">/// [`NEXT_INSTRUCTION`](../../../micro/static.NEXT_INSTRUCTION.html)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jump_to_addr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to_addr</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MicroOpPerformError</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">curr_op</span>..<span class="self">self</span>.<span class="ident">ops</span>.<span class="number">1</span> {
+            <span class="self">self</span>.<span class="ident">active_breakpoint</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             <span class="self">self</span>.<span class="ident">perform_next_op</span>()<span class="question-mark">?</span>;
         }
 
