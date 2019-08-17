@@ -93,6 +93,10 @@ visit the [`Ports`](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu
 
     Default: $HOME/.pir-8-emu/
 
+## EXIT VALUES
+
+    1 - a fatal error occurred, please report to the issue tracker below
+
 ## AUTHOR
 
 Written by nabijaczleweli &lt;<nabijaczleweli@gmail.com>&gt;

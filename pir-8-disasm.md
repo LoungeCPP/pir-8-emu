@@ -42,7 +42,7 @@ The output consists of four columns:
 
     Must be 8-ASCII-characters-long
 
-## Exit values
+## EXIT VALUES
 
     1 - option parsing error
     2 - unused
