@@ -211,6 +211,8 @@ fn actual_main() -> Result<(), i32> {
                 if let Some(fname) = open_file_dialog("Open memory image", "", Some((&["*.p8b", "*.bin"], "Memory image files (*.p8b, *.bin)"))) {
                     match fs::read(&fname) {
                         Ok(mem) => {
+                            println!("status: loaded memory image from {}", fname);
+
                             if !terminal::set(terminal::config::Window::empty().title(format!("pir-8-emu – {}", fname))) {
                                 eprintln!("warning: failed to set window title for loaded memory image at {}", fname);
                             }
@@ -242,7 +244,7 @@ fn actual_main() -> Result<(), i32> {
             }
             Event::KeyPressed { key: KeyCode::W, ctrl: true, .. } if !showing_help => {
                 if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Write to port") {
-                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, &format!("Byte to write to port {:#04X}", port)) {
+                    if let Some(byte) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, &format!("Byte to write to port {:02X}", port)) {
                         vm.ports.write(port, byte);
                     }
                 }
@@ -251,7 +253,7 @@ fn actual_main() -> Result<(), i32> {
                 if let Some(port) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Read from port") {
                     let byte = vm.ports.read(port);
 
-                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:#04X}", port), &format!("{:#04X}", byte));
+                    pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, &format!("Byte read from port {:02X}", port), &format!("{:#04X}", byte));
                 }
             }
             Event::KeyPressed { key: KeyCode::I, ctrl: true, .. } if !showing_help => {
@@ -277,7 +279,20 @@ fn actual_main() -> Result<(), i32> {
                                         pir_8_emu::binutils::pir_8_emu::display::status::line(0,
                                                                                               0,
                                                                                               "Install port handler",
-                                                                                              &format!("ID = {:#06X}", handler_idx))
+                                                                                              &format!("ID = {:#06X}", handler_idx));
+
+                                        print!("status: installed {} as handler {:#06X} on port{} ",
+                                               fname,
+                                               handler_idx,
+                                               if ports.len() == 1 { "" } else { "s" });
+                                        for (i, port) in ports.into_iter().enumerate() {
+                                            if i != 0 {
+                                                print!(", ");
+                                            }
+
+                                            print!("{:02X}", port);
+                                        }
+                                        println!();
                                     }
                                     Err((hndl, err)) => {
                                         pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Install port handler", &err.to_string());
@@ -293,6 +308,24 @@ fn actual_main() -> Result<(), i32> {
                     }
                 }
             }
+            Event::KeyPressed { key: KeyCode::K, ctrl: true, .. } if !showing_help => {
+                if let Some(handler_idx) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Uninstall port handler") {
+                    match vm.ports.uninstall_handler(handler_idx) {
+                        Some(handler) => {
+                            pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Uninstall port handler", &format!("{:#06X} uninstalled", handler_idx));
+
+                            print!("status: uninstalled handler {:#06X}", handler_idx);
+                            if let Ok(handler) = handler.downcast::<pir_8_emu::binutils::pir_8_emu::NativePortHandler>() {
+                                print!(" ({:?})", handler.path);
+                            }
+                            println!();
+                        }
+                        None => {
+                            pir_8_emu::binutils::pir_8_emu::display::status::line(0, 0, "Uninstall port handler", &format!("{:#06X} not found", handler_idx))
+                        }
+                    }
+                }
+            }
             Event::KeyPressed { key: KeyCode::J, ctrl: true, .. } if !showing_help => {
                 if let Some(addr) = pir_8_emu::binutils::pir_8_emu::display::status::read_number(0, 0, "Jump to address") {
                     vm.jump_to_addr(addr).map_err(|err| vm_perform_err(err, &mut vm))?;
@@ -302,6 +335,8 @@ fn actual_main() -> Result<(), i32> {
             }
             Event::KeyPressed { key: KeyCode::Space, shift: true, .. } if !showing_help => {
                 if let Some(freq) = pir_8_emu::binutils::pir_8_emu::display::status::read_pos_float(0, 0, "Target step frequency") {
+                    println!("status: stepping at target frequency {}", freq);
+
                     let mut max_count = 0;
                     let mut sub_max_nanos = 1_000_000_000f64 / freq;
 

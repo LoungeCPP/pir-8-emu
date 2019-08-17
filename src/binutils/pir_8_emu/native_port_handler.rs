@@ -14,6 +14,7 @@ use libc::c_void;
 /// `uninit()`ed
 #[derive(Debug)]
 pub struct NativePortHandler {
+    /// The path passed to [`load_from_dll()`](#fn.load_from_dll) on creation
     pub path: OsString,
     lib: NativeLibrary,
     raw: RawNativePortHandler,
