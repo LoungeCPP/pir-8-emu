@@ -31,9 +31,9 @@ build_script:
   - cargo build --verbose --release
   -
   - mkdir pir-8-emu-v0.1.0
-  - cp target\release\pir-8-as.exe pir-8-emu-v0.1.0\pir-8-as-v0.1.0.exe
-  - cp target\release\pir-8-disasm.exe pir-8-emu-v0.1.0\pir-8-disasm-v0.1.0.exe
-  - cp target\release\pir-8-emu.exe pir-8-emu-v0.1.0\pir-8-emu-v0.1.0.exe
+  - cp target\release\pir-8-as.exe target\release\pir-8-disasm.exe target\release\pir-8-emu.exe pir-8-emu-v0.1.0\
+  - cp C:\BearLibTerminal.dll pir-8-emu-v0.1.0\
+  - strip --strip-all --remove-section=.comment --remove-section=.note pir-8-emu-v0.1.0/pir-8-as.exe pir-8-emu-v0.1.0/pir-8-disasm.exe pir-8-emu-v0.1.0/pir-8-emu.exe
   - zip -9r pir-8-emu-v0.1.0.zip pir-8-emu-v0.1.0
 
 test: off

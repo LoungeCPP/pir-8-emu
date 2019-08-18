@@ -2,7 +2,7 @@
 name = "pir-8-emu"
 description = "Implementation of the pir-8 ISA"
 documentation = "https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/index.html"
-repository = "https://github.com/LoungeCPP/pir-8-emu-rs"
+repository = "https://github.com/LoungeCPP/pir-8-emu"
 homepage = "https://github.com/thecoshman/pir-8"
 readme = "README.md"
 keywords = ["isa", "emulation", "cpu"]

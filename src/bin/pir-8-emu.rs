@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 extern crate bear_lib_terminal;
 extern crate tinyfiledialogs;
 extern crate arraydeque;
