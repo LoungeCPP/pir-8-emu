@@ -13,6 +13,7 @@ version = "0.1.0"
 # Remember to also update in man/*.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
+build = "build.rs"
 
 
 [dependencies]
@@ -36,3 +37,6 @@ features = ["derive"]
 
 [dev-dependencies]
 rand = "0.7"
+
+[build-dependencies]
+embed-resource = "1.2"

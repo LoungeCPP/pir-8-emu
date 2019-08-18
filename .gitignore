@@ -5,12 +5,14 @@
 !gh_rsa.enc
 !appveyor.yml
 !LICENSE
+!build.rs
 !Cargo.toml
 !rustfmt.toml
 !.clang-format
 !*Makefile
 !*.sublime-project
 !*.md
+!*.rc
 !man
 !man/**
 !ext
