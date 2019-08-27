@@ -1,4 +1,4 @@
-# pir-8-emu [![TravisCI build status](https://travis-ci.com/LoungeCPP/pir-8-emu.svg?branch=master)](https://travis-ci.com/LoungeCPP/pir-8-emu) [![AppVeyorCI build status](https://ci.appveyor.com/api/projects/status/rg4hf7w778175wnt?svg=true)](https://ci.appveyor.com/project/nabijaczleweli/pir-8-emu/branch/master) [![Licence](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+# pir-8-emu [![TravisCI build status](https://travis-ci.com/LoungeCPP/pir-8-emu.svg?branch=master)](https://travis-ci.com/LoungeCPP/pir-8-emu) [![AppVeyorCI build status](https://ci.appveyor.com/api/projects/status/rg4hf7w778175wnt?svg=true)](https://ci.appveyor.com/project/nabijaczleweli/pir-8-emu/branch/master) [![Licence](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Crates.io version](https://meritbadge.herokuapp.com/pir-8-emu)](https://crates.io/crates/pir-8-emu)
 Implementation of the [pir-8 ISA](https://github.com/thecoshman/pir-8).
 
 ## [Documentation](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/doc/pir_8_emu/index.html)

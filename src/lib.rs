@@ -6,7 +6,7 @@
 //!
 //! The first layer is the [`isa`](isa/) module,
 //! which contains a pure implementation of the [`pir-8` ISA](https://github.com/thecoshman/pir-8/blob/master/ISA.md),
-//! and can be used on its own to parse/generate binaries at the instruction level.
+//! and can be used on its own to parse/generate binaries and assembly at the instruction level.
 //!
 //! The second layer is the [`vm`](vm/) module,
 //! which contains parts of VM memory and port handling.

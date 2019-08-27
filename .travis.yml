@@ -62,10 +62,6 @@ before_install:
 install:
   - if [ "$LANGUAGE" == "Ruby" ]; then gem install ronn; fi
   -
-  - if [ ! -z "$CROSS_TARGET" ]; then
-      rustup target add $CROSS_TARGET;
-      cargo install cross --force;
-    fi
   - if [ "$CLIPPY" ]; then
       CLIPPY_INSTALLED=0 && (rustup component add clippy-preview || cargo install --git https://github.com/rust-lang/rust-clippy clippy -f) && CLIPPY_INSTALLED=1;
     fi
