@@ -1,5 +1,5 @@
-use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionStckRegisterPair,
-                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use self::super::super::GeneralPurposeRegisterBank;
 use std::fmt;
 
@@ -71,11 +71,11 @@ impl fmt::Display for InstructionStckDirection {
 }
 
 
-impl fmt::Display for InstructionStckRegisterPair {
+impl fmt::Display for InstructionRegisterPair {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InstructionStckRegisterPair::Ab => f.write_str("A&B"),
-            InstructionStckRegisterPair::Cd => f.write_str("C&D"),
+            InstructionRegisterPair::Ab => f.write_str("A&B"),
+            InstructionRegisterPair::Cd => f.write_str("C&D"),
         }
     }
 }

@@ -1,5 +1,5 @@
-use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                         InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                         InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use self::super::super::super::super::util::{parse_with_prefix, limit_to_width};
 use self::super::super::super::GeneralPurposeRegisterBank;
 use self::super::ParseInstructionError;
@@ -256,7 +256,7 @@ fn parse_instruction_stck<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
 }
 
 fn parse_instruction_stck_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize)
-                                                                         -> Result<InstructionStckRegisterPair, ParseInstructionError> {
+                                                                         -> Result<InstructionRegisterPair, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["A&B", "C&D"];
 
     match itr.next() {
@@ -264,9 +264,9 @@ fn parse_instruction_stck_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &m
             let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
 
             if tok.eq_ignore_ascii_case("A&B") {
-                Ok(InstructionStckRegisterPair::Ab)
+                Ok(InstructionRegisterPair::Ab)
             } else if tok.eq_ignore_ascii_case("C&D") {
-                Ok(InstructionStckRegisterPair::Cd)
+                Ok(InstructionRegisterPair::Cd)
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }

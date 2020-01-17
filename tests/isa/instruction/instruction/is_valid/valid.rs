@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
@@ -68,8 +68,18 @@ fn move_() {
 
 #[test]
 fn port() {
-    single_register(|r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
-    single_register(|r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+    single_register(|r| {
+        Instruction::Port {
+            d: InstructionPortDirection::In,
+            aaa: r,
+        }
+    });
+    single_register(|r| {
+        Instruction::Port {
+            d: InstructionPortDirection::Out,
+            aaa: r,
+        }
+    });
 }
 
 #[test]
@@ -80,7 +90,7 @@ fn comp() {
 #[test]
 fn stck() {
     for &d in &[InstructionStckDirection::Push, InstructionStckDirection::Pop] {
-        for &r in &[InstructionStckRegisterPair::Ab, InstructionStckRegisterPair::Cd] {
+        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
             assert!(Instruction::Stck { d: d, r: r }.is_valid());
         }
     }

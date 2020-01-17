@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::alt_gp_registers;
 
@@ -87,8 +87,18 @@ fn move_() {
 
 #[test]
 fn port() {
-    single_register("PORT IN", |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
-    single_register("PORT OUT", |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+    single_register("PORT IN", |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::In,
+            aaa: r,
+        }
+    });
+    single_register("PORT OUT", |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::Out,
+            aaa: r,
+        }
+    });
 }
 
 #[test]
@@ -101,7 +111,7 @@ fn stck() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Stck {
                            d: InstructionStckDirection::Push,
-                           r: InstructionStckRegisterPair::Ab,
+                           r: InstructionRegisterPair::Ab,
                        }
                        .display(regs)
                        .to_string(),
@@ -109,7 +119,7 @@ fn stck() {
 
         assert_eq!(Instruction::Stck {
                            d: InstructionStckDirection::Push,
-                           r: InstructionStckRegisterPair::Cd,
+                           r: InstructionRegisterPair::Cd,
                        }
                        .display(regs)
                        .to_string(),
@@ -117,7 +127,7 @@ fn stck() {
 
         assert_eq!(Instruction::Stck {
                            d: InstructionStckDirection::Pop,
-                           r: InstructionStckRegisterPair::Ab,
+                           r: InstructionRegisterPair::Ab,
                        }
                        .display(regs)
                        .to_string(),
@@ -125,7 +135,7 @@ fn stck() {
 
         assert_eq!(Instruction::Stck {
                            d: InstructionStckDirection::Pop,
-                           r: InstructionStckRegisterPair::Cd,
+                           r: InstructionRegisterPair::Cd,
                        }
                        .display(regs)
                        .to_string(),

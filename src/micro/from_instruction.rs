@@ -1,4 +1,4 @@
-use self::super::super::isa::instruction::{InstructionStckRegisterPair, InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use self::super::super::isa::instruction::{InstructionPortDirection, InstructionRegisterPair, InstructionStckDirection, AluOperation, Instruction};
 use self::super::MicroOp;
 
 
@@ -196,9 +196,9 @@ impl MicroOp {
     }
 }
 
-fn stck_address_pair(r: InstructionStckRegisterPair) -> [u8; 2] {
+fn stck_address_pair(r: InstructionRegisterPair) -> [u8; 2] {
     match r {
-        InstructionStckRegisterPair::Ab => [A_REGISTER_ADDRESS, B_REGISTER_ADDRESS],
-        InstructionStckRegisterPair::Cd => [C_REGISTER_ADDRESS, D_REGISTER_ADDRESS],
+        InstructionRegisterPair::Ab => [A_REGISTER_ADDRESS, B_REGISTER_ADDRESS],
+        InstructionRegisterPair::Cd => [C_REGISTER_ADDRESS, D_REGISTER_ADDRESS],
     }
 }

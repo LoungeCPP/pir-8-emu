@@ -11,7 +11,7 @@ use std::convert::{TryFrom, From};
 /// An instruction is a single byte, and can include some following immediate values purely for data.
 ///
 ///
-/// It is possible that the PC will overflow and wrap arround as you load an instruction,
+/// It is possible that the PC will overflow and wrap around as you load an instruction,
 /// there is no hardware level protection or detection if this happens.
 ///
 /// An example of how this can happen is if you perform a jump to `0xFFFF`,
@@ -30,14 +30,14 @@ use std::convert::{TryFrom, From};
 ///
 /// Bit Mask  | Name | Count | Description
 /// ----------|------|-------|------------
-/// 0000 XXXX |      |    16 | Reserved
+/// 0000 0XXX |      |     8 | Reserved
+/// 0000 10XX |      |     4 | Reserved
+/// 0000 11XX | MADR |     4 | Move a value to/from the ADR register, see section below
 /// 0001 0XXX | JUMP |     8 | Jump, see section below
 /// 0001 1AAA | LOAD |     8 | Load the the next byte into register `AAA`
 ///                       |||| (PC will be incremented a second time)
-/// 0010 0AAA | LOAD |     8 | Load value in address indicated by the next two bytes into register `AAA`
-///                       |||| (PC will be incremented two more times)
-/// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by the next two bytes
-///                       |||| (PC will be incremented two more times)
+/// 0010 0AAA | LOAD |     8 | Load value in address indicated by `ADR` into register `AAA`
+/// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by `ADR`
 /// 0011 XXXX | ALU  |    16 | ALU based operations, see section below
 /// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`
 /// 10XX XXXX |      |    64 | Reserved
@@ -80,7 +80,7 @@ use std::convert::{TryFrom, From};
 ///
 /// The registers A and B are paired, as are the registers C and D.
 ///
-/// Effectively, the stack works on 16 bit values, but due to the 8 bit data bus it requires two transfers,
+/// Effectively, the stack works on 16-bit values, but due to the 8-bit data bus it requires two transfers,
 /// though this is handled via the hardware/microcode.
 ///
 /// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C
@@ -97,25 +97,25 @@ use std::convert::{TryFrom, From};
 ///
 /// When PUSHing B/D will go to the address one less than the current SP, whilst A/C will go to address two less than the SP.
 ///
-/// After PUSHing, the SP will have been decremented by two, with the SP containg the address of A/C (now in memory).
+/// After PUSHing, the SP will have been decremented by two, with the SP containing the address of A/C (now in memory).
 ///
 /// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased by two.
 ///
 /// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,
-/// just like with the PC incrememnting during instruction execution.
+/// just like with the PC incrementing during instruction execution.
 ///
 /// In fact, by design, POPing the final value from the stack will result in an overflow bringing the SP back to `0x0000`.
 ///
-/// In terms of pseudocode, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:
+/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:
 ///
-/// ```plaintext
-/// # PUSH
+/// ```cpp
+/// // PUSH
 /// SP -= 1
 /// *SP = B
 /// SP -= 1
 /// *SP = A
 ///
-/// # POP
+/// // POP
 /// A = *SP
 /// SP += 1
 /// B = *SP
@@ -124,10 +124,31 @@ use std::convert::{TryFrom, From};
 ///
 /// **NB:** I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle
 /// calling and returning functions
+///
+/// ## MADR - ADR Register Manipulation
+///
+/// The ADR register is a 16-bit register, it's value can be set/read to the general purpose registers.
+///
+/// The registers A and B are paired, as are the registers C and D.
+///
+/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C registers the lesser;
+/// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.
+///
+///
+/// These ADR manipulation operations are of pattern `0000 10DR`.
+///
+/// The D bit indicates the direction; 0 for write-to and 1 for read-from the ADR register.
+///
+/// The R bit indicates the register pair; 0 for A & B and 1 for C & D.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
+    // /// Manipulate ADR, see section above
+    // Madr {
+    //     d: InstructionMadrDirection,
+    //     r: InstructionRegisterPair,
+    // },
     /// Jump, see member doc
     Jump(InstructionJumpCondition),
     /// Load the the next byte into register `AAA` (PC will be incremented a second time)
@@ -150,7 +171,7 @@ pub enum Instruction {
     /// Stack manipulation, see member doc
     Stck {
         d: InstructionStckDirection,
-        r: InstructionStckRegisterPair,
+        r: InstructionRegisterPair,
     },
     /// Clear the 'F' register, by setting it to `0000 0000`
     Clrf,
@@ -206,7 +227,7 @@ impl Instruction {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::isa::instruction::{InstructionStckRegisterPair, InstructionStckDirection, AluOperation, Instruction};
+    /// # use pir_8_emu::isa::instruction::{InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
     /// # use pir_8_emu::isa::GeneralPurposeRegister;
     /// # let registers = GeneralPurposeRegister::defaults();
     /// assert_eq!(Instruction::Clrf.display(&registers).to_string(),
@@ -215,7 +236,7 @@ impl Instruction {
     ///            "ALU OR");
     /// assert_eq!(Instruction::Stck {
     ///                d: InstructionStckDirection::Push,
-    ///                r: InstructionStckRegisterPair::Cd,
+    ///                r: InstructionRegisterPair::Cd,
     ///            }.display(&registers).to_string(),
     ///            "STCK PUSH C&D");
     ///
@@ -331,9 +352,11 @@ impl Into<u8> for Instruction {
 
 /// This Instruction takes a three bit operand indicating under what condition the jump should be performed.
 ///
-/// If the condition is met, the next two bytes after this Jump instruction are loaded into the PC.
+/// If the condition is met, the value of ADR is loaded into the PC.
 ///
-/// If the condition is not met, the PC is incremented by two, skipping over the two bytes of the target address.
+/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of loading the instruction.
+///
+/// **NB:** The value of ADR must have been set with the desired target location prior to the JUMP instruction being performed.
 ///
 ///
 /// This table shows what combination of bits to the JUMP instruction check what flags and in what combination
@@ -417,16 +440,16 @@ impl From<bool> for InstructionStckDirection {
 
 /// The R bit indicates the register pair; 0 for A & B and 1 for C & D.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InstructionStckRegisterPair {
+pub enum InstructionRegisterPair {
     Ab = 0b0,
     Cd = 0b1,
 }
 
-impl From<bool> for InstructionStckRegisterPair {
-    fn from(raw: bool) -> InstructionStckRegisterPair {
+impl From<bool> for InstructionRegisterPair {
+    fn from(raw: bool) -> InstructionRegisterPair {
         match raw {
-            false => InstructionStckRegisterPair::Ab,
-            true => InstructionStckRegisterPair::Cd,
+            false => InstructionRegisterPair::Ab,
+            true => InstructionRegisterPair::Cd,
         }
     }
 }
@@ -450,13 +473,13 @@ impl From<bool> for InstructionStckRegisterPair {
 /// -----|------|-------|------------
 /// 0000 | ADD  |   1   | Addition of register X and register Y
 /// 0001 | SUB  |   1   | Subtraction of register Y from register X (X-Y)
-/// 0010 | NOT  |   1   | Bitwise NOT
+/// 0010 | NOT  |   1   | Bitwise NOT (unary operation)
 /// 0011 |      |   1   | Reserved
 /// 0100 |  OR  |   1   | Bitwise OR
 /// 0101 | XOR  |   1   | Bitwise XOR
 /// 0110 | AND  |   1   | Bitwise AND
 /// 0111 |      |   1   | Reserved
-/// 1DTT |      |   8   | Shift or Rotate, see section below
+/// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperation {
     /// Reserved operation, contains the entire nibble
@@ -607,9 +630,9 @@ impl From<bool> for AluOperationShiftOrRotateDirection {
 /// 10 | RTC  | Rotate with carry - the Carry flag is inserted (Carry flag value before it is updated is used)
 /// 11 | RTW  | Rotate without carry - the bit shifted out is inserted
 ///
-/// An example of a Arithemtic shift right; `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.
+/// An example of a Arithmetic shift right; `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.
 ///
-/// **NB:** An 'Arithmetic shift left' is the same as performing a 'Logcal shift left', they _can_ be used interchangeably, but
+/// **NB:** An 'Arithmetic shift left' is the same as performing a 'Logical shift left', they _can_ be used interchangeably, but
 /// 'Arithmetic shift left' should be avoided.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperationShiftOrRotateType {

@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
@@ -90,8 +90,18 @@ fn move_() {
 
 #[test]
 fn port() {
-    single_register(0b1110_1000, |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
-    single_register(0b1110_0000, |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+    single_register(0b1110_1000, |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::In,
+            aaa: r,
+        }
+    });
+    single_register(0b1110_0000, |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::Out,
+            aaa: r,
+        }
+    });
 }
 
 #[test]
@@ -104,25 +114,25 @@ fn stck() {
     assert_eq!(Instruction::from(0b1111_1000),
                Instruction::Stck {
                    d: InstructionStckDirection::Push,
-                   r: InstructionStckRegisterPair::Ab,
+                   r: InstructionRegisterPair::Ab,
                });
 
     assert_eq!(Instruction::from(0b1111_1001),
                Instruction::Stck {
                    d: InstructionStckDirection::Push,
-                   r: InstructionStckRegisterPair::Cd,
+                   r: InstructionRegisterPair::Cd,
                });
 
     assert_eq!(Instruction::from(0b1111_1010),
                Instruction::Stck {
                    d: InstructionStckDirection::Pop,
-                   r: InstructionStckRegisterPair::Ab,
+                   r: InstructionRegisterPair::Ab,
                });
 
     assert_eq!(Instruction::from(0b1111_1011),
                Instruction::Stck {
                    d: InstructionStckDirection::Pop,
-                   r: InstructionStckRegisterPair::Cd,
+                   r: InstructionRegisterPair::Cd,
                });
 }
 

@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
@@ -117,8 +117,18 @@ fn move_() {
 
 #[test]
 fn port() {
-    single_register(0b1110_1000, |r| Instruction::Port { d: InstructionPortDirection::In, aaa: r });
-    single_register(0b1110_0000, |r| Instruction::Port { d: InstructionPortDirection::Out, aaa: r });
+    single_register(0b1110_1000, |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::In,
+            aaa: r,
+        }
+    });
+    single_register(0b1110_0000, |r| {
+        Instruction::Port {
+            d: InstructionPortDirection::Out,
+            aaa: r,
+        }
+    });
 }
 
 #[test]
@@ -130,28 +140,28 @@ fn comp() {
 fn stck() {
     let raw: u8 = Instruction::Stck {
             d: InstructionStckDirection::Push,
-            r: InstructionStckRegisterPair::Ab,
+            r: InstructionRegisterPair::Ab,
         }
         .into();
     assert_eq!(raw, 0b1111_1000);
 
     let raw: u8 = Instruction::Stck {
             d: InstructionStckDirection::Push,
-            r: InstructionStckRegisterPair::Cd,
+            r: InstructionRegisterPair::Cd,
         }
         .into();
     assert_eq!(raw, 0b1111_1001);
 
     let raw: u8 = Instruction::Stck {
             d: InstructionStckDirection::Pop,
-            r: InstructionStckRegisterPair::Ab,
+            r: InstructionRegisterPair::Ab,
         }
         .into();
     assert_eq!(raw, 0b1111_1010);
 
     let raw: u8 = Instruction::Stck {
             d: InstructionStckDirection::Pop,
-            r: InstructionStckRegisterPair::Cd,
+            r: InstructionRegisterPair::Cd,
         }
         .into();
     assert_eq!(raw, 0b1111_1011);

@@ -10,14 +10,19 @@ use std::fmt;
 ///
 /// All the registers will start with an initial value of `0`.
 ///
-/// There are three 16 bit registers for holding significant memory addresses and a single 8 bit register.
+/// There are three 16-bit registers for holding significant memory addresses and a single 8-bit register.
 ///
 /// Name            | Short | Bits | Description
 /// ----------------|-------|------|------------
 /// Program Counter | PC    |  16  | Address of the next instruction to be fetched
 /// Stack Pointer   | SP    |  16  | Current address of the stack (detailed later)
-/// Memory Address  | ADR   |  16  | Current address of RAM being accessed
+/// Memory Address  | ADR   |  16  | Address saved for use during certain instructions
 /// Instruction     | INS   |   8  | Instruction currently being executed
+///
+/// The address bus is controlled by either `ADR` or `PC`.
+///
+/// As the CPU is reading an instruction from RAM, the value of the `PC` will be used, for some instructions though,
+/// such as `JUMP` it is the value used in `ADR` that is used.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SpecialPurposeRegister<T: Num + Unsigned + PrimInt> {
     data: T,

@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::micro::MicroOp;
 
 
@@ -159,7 +159,7 @@ fn comp() {
 fn stck_push() {
     let ops = MicroOp::from_instruction(Instruction::Stck {
         d: InstructionStckDirection::Push,
-        r: InstructionStckRegisterPair::Ab,
+        r: InstructionRegisterPair::Ab,
     });
     let ops = &ops.0[..ops.1];
 
@@ -169,7 +169,7 @@ fn stck_push() {
 
     let ops = MicroOp::from_instruction(Instruction::Stck {
         d: InstructionStckDirection::Push,
-        r: InstructionStckRegisterPair::Cd,
+        r: InstructionRegisterPair::Cd,
     });
     let ops = &ops.0[..ops.1];
 
@@ -181,7 +181,7 @@ fn stck_push() {
 fn stck_pop() {
     let ops = MicroOp::from_instruction(Instruction::Stck {
         d: InstructionStckDirection::Pop,
-        r: InstructionStckRegisterPair::Ab,
+        r: InstructionRegisterPair::Ab,
     });
     let ops = &ops.0[..ops.1];
 
@@ -191,7 +191,7 @@ fn stck_pop() {
 
     let ops = MicroOp::from_instruction(Instruction::Stck {
         d: InstructionStckDirection::Pop,
-        r: InstructionStckRegisterPair::Cd,
+        r: InstructionRegisterPair::Cd,
     });
     let ops = &ops.0[..ops.1];
 

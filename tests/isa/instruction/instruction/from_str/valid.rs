@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionStckRegisterPair, InstructionJumpCondition,
-                                  InstructionPortDirection, InstructionStckDirection, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
+                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use std::convert::TryFrom;
@@ -165,25 +165,25 @@ fn stck() {
         assert_eq!(Instruction::from_str("STCK PUSH A&B", regs),
                    Ok(Instruction::Stck {
                        d: InstructionStckDirection::Push,
-                       r: InstructionStckRegisterPair::Ab,
+                       r: InstructionRegisterPair::Ab,
                    }));
 
         assert_eq!(Instruction::from_str("STCK PUSH C&D", regs),
                    Ok(Instruction::Stck {
                        d: InstructionStckDirection::Push,
-                       r: InstructionStckRegisterPair::Cd,
+                       r: InstructionRegisterPair::Cd,
                    }));
 
         assert_eq!(Instruction::from_str("STCK POP A&B", regs),
                    Ok(Instruction::Stck {
                        d: InstructionStckDirection::Pop,
-                       r: InstructionStckRegisterPair::Ab,
+                       r: InstructionRegisterPair::Ab,
                    }));
 
         assert_eq!(Instruction::from_str("STCK POP C&D", regs),
                    Ok(Instruction::Stck {
                        d: InstructionStckDirection::Pop,
-                       r: InstructionStckRegisterPair::Cd,
+                       r: InstructionRegisterPair::Cd,
                    }));
     }
 }
