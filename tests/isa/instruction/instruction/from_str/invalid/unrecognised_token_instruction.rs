@@ -7,7 +7,8 @@ use self::super::unrecognised_token;
 
 #[test]
 fn toplevel_raw() {
-    static TOKENS_TOP: &[&str] = &["JMPZ",
+    static TOKENS_TOP: &[&str] = &["MADR",
+                                   "JMPZ",
                                    "JMPP",
                                    "JMPG",
                                    "JMPC",
@@ -59,7 +60,8 @@ fn toplevel_raw() {
 
 #[test]
 fn toplevel() {
-    static TOKENS_TOP: &[&str] = &["JMPZ",
+    static TOKENS_TOP: &[&str] = &["MADR",
+                                   "JMPZ",
                                    "JMPP",
                                    "JMPG",
                                    "JMPC",
@@ -161,6 +163,17 @@ fn alu_sor_type() {
             }
         }
     }
+}
+
+#[test]
+fn madr() {
+    static TOKENS_MADR: &[&str] = &["WRITE", "READ"];
+
+    unrecognised_token("MADR",
+                       TOKENS_MADR,
+                       1..10,
+                       |s, _| parse_with_prefix::<u8>(s).is_none(),
+                       |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_MADR));
 }
 
 #[test]

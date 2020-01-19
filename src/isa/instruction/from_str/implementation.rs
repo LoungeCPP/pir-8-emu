@@ -1,5 +1,5 @@
 use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                         InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                         InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use self::super::super::super::super::util::{parse_with_prefix, limit_to_width};
 use self::super::super::super::GeneralPurposeRegisterBank;
 use self::super::ParseInstructionError;
@@ -70,7 +70,8 @@ fn is_invalid_character(c: char) -> bool {
 
 fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, registers: &GeneralPurposeRegisterBank)
                                                       -> Result<Instruction, ParseInstructionError> {
-    static VALID_TOKENS: &[&str] = &["JMPZ",
+    static VALID_TOKENS: &[&str] = &["MADR",
+                                     "JMPZ",
                                      "JMPP",
                                      "JMPG",
                                      "JMPC",
@@ -93,8 +94,14 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
         Some(tok) => {
             let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
 
+            // MADR start
+            if tok.eq_ignore_ascii_case("MADR") {
+                parse_instruction_madr(itr, orig_str, start_pos + 4 + 1)
+            }
+            // MADR end
+
             // JUMP start
-            if tok.eq_ignore_ascii_case("JMPZ") {
+            else if tok.eq_ignore_ascii_case("JMPZ") {
                 Ok(Instruction::Jump(InstructionJumpCondition::Jmpz))
             } else if tok.eq_ignore_ascii_case("JMPP") {
                 Ok(Instruction::Jump(InstructionJumpCondition::Jmpp))
@@ -113,11 +120,11 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
             }
             // JUMP end
 
-            // LOADs start
+            // LOAD start
             else if tok.eq_ignore_ascii_case("LOAD") {
                 parse_instruction_load(itr, orig_str, start_pos + 4 + 1, registers)
             }
-            // LOADs end
+            // LOAD end
 
             // SAVE start
             else if tok.eq_ignore_ascii_case("SAVE") {
@@ -184,6 +191,20 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
     }
 }
 
+fn parse_instruction_madr<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize) -> Result<Instruction, ParseInstructionError> {
+    fn map(d: InstructionMadrDirection, r: InstructionRegisterPair) -> Instruction {
+        Instruction::Madr { d: d, r: r }
+    }
+
+    static VALID_TOKENS: &[&str] = &["WRITE", "READ"];
+
+    parse_instruction_direction_register_pair(itr,
+                                              orig_str,
+                                              pos,
+                                              VALID_TOKENS,
+                                              &[("WRITE", |r| map(InstructionMadrDirection::Write, r)), ("READ", |r| map(InstructionMadrDirection::Read, r))])
+}
+
 fn parse_instruction_load<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, registers: &GeneralPurposeRegisterBank)
                                                            -> Result<Instruction, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["IMM", "IND"];
@@ -231,32 +252,40 @@ fn parse_instruction_port<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
 }
 
 fn parse_instruction_stck<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize) -> Result<Instruction, ParseInstructionError> {
+    fn map(d: InstructionStckDirection, r: InstructionRegisterPair) -> Instruction {
+        Instruction::Stck { d: d, r: r }
+    }
+
     static VALID_TOKENS: &[&str] = &["PUSH", "POP"];
 
+    parse_instruction_direction_register_pair(itr,
+                                              orig_str,
+                                              pos,
+                                              VALID_TOKENS,
+                                              &[("PUSH", |r| map(InstructionStckDirection::Push, r)), ("POP", |r| map(InstructionStckDirection::Pop, r))])
+}
+
+fn parse_instruction_direction_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize, tokens: &'static [&'static str],
+                                                                              mapping: &[(&str, fn(InstructionRegisterPair) -> Instruction)])
+                                                                              -> Result<Instruction, ParseInstructionError> {
     match itr.next() {
         Some(tok) => {
             let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
 
-            if tok.eq_ignore_ascii_case("PUSH") {
-                Ok(Instruction::Stck {
-                    d: InstructionStckDirection::Push,
-                    r: parse_instruction_stck_register_pair(itr, orig_str, start_pos + 4 + 1)?,
-                })
-            } else if tok.eq_ignore_ascii_case("POP") {
-                Ok(Instruction::Stck {
-                    d: InstructionStckDirection::Pop,
-                    r: parse_instruction_stck_register_pair(itr, orig_str, start_pos + 3 + 1)?,
-                })
-            } else {
-                Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
+            for (dir, map) in mapping {
+                if tok.eq_ignore_ascii_case(dir) {
+                    return Ok(map(parse_instruction_register_pair(itr, orig_str, start_pos + dir.len() + 1)?));
+                }
             }
+
+            Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, tokens))
         }
-        None => Err(ParseInstructionError::MissingToken(pos, VALID_TOKENS)),
+        None => Err(ParseInstructionError::MissingToken(pos, tokens)),
     }
 }
 
-fn parse_instruction_stck_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize)
-                                                                         -> Result<InstructionRegisterPair, ParseInstructionError> {
+fn parse_instruction_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize)
+                                                                    -> Result<InstructionRegisterPair, ParseInstructionError> {
     static VALID_TOKENS: &[&str] = &["A&B", "C&D"];
 
     match itr.next() {

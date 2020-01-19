@@ -99,14 +99,16 @@ use std::convert::{TryFrom, From};
 ///
 /// After PUSHing, the SP will have been decremented by two, with the SP containing the address of A/C (now in memory).
 ///
-/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased by two.
+/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased
+/// by two.
 ///
 /// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,
 /// just like with the PC incrementing during instruction execution.
 ///
 /// In fact, by design, POPing the final value from the stack will result in an overflow bringing the SP back to `0x0000`.
 ///
-/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:
+/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory
+/// address:
 ///
 /// ```cpp
 /// // PUSH
@@ -131,7 +133,8 @@ use std::convert::{TryFrom, From};
 ///
 /// The registers A and B are paired, as are the registers C and D.
 ///
-/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C registers the lesser;
+/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C
+/// registers the lesser;
 /// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.
 ///
 ///
@@ -144,11 +147,11 @@ use std::convert::{TryFrom, From};
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
-    // /// Manipulate ADR, see section above
-    // Madr {
-    //     d: InstructionMadrDirection,
-    //     r: InstructionRegisterPair,
-    // },
+    /// Manipulate ADR, see section above
+    Madr {
+        d: InstructionMadrDirection,
+        r: InstructionRegisterPair,
+    },
     /// Jump, see member doc
     Jump(InstructionJumpCondition),
     /// Load the the next byte into register `AAA` (PC will be incremented a second time)
@@ -210,14 +213,10 @@ impl Instruction {
     /// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);
     ///
     /// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);
-    /// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);
     /// ```
     pub fn data_length(self) -> usize {
         match self {
             Instruction::LoadImmediate { .. } => 1,
-            Instruction::LoadIndirect { .. } |
-            Instruction::Jump(..) |
-            Instruction::Save { .. } => 2,
             _ => 0,
         }
     }
@@ -289,7 +288,14 @@ impl From<u8> for Instruction {
                (raw & 0b0000_0100) != 0,
                (raw & 0b0000_0010) != 0,
                (raw & 0b0000_0001) != 0) {
-            (false, false, false, false, _, _, _, _) => Instruction::Reserved(raw),
+            (false, false, false, false, false, _, _, _) => Instruction::Reserved(raw),
+            (false, false, false, false, true, false, _, _) => Instruction::Reserved(raw),
+            (false, false, false, false, true, true, d, r) => {
+                Instruction::Madr {
+                    d: d.into(),
+                    r: r.into(),
+                }
+            }
             (false, false, false, true, false, _, _, _) => {
                 Instruction::Jump(InstructionJumpCondition::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for JUMP condition parse"))
             }
@@ -331,6 +337,7 @@ impl Into<u8> for Instruction {
     fn into(self) -> u8 {
         match self {
             Instruction::Reserved(raw) => raw,
+            Instruction::Madr { d, r } => 0b0000_1100 | (d as u8) | (r as u8),
             Instruction::Jump(cond) => 0b0001_0000 | (cond as u8),
             Instruction::LoadImmediate { aaa } => 0b0001_1000 | aaa,
             Instruction::LoadIndirect { aaa } => 0b0010_0000 | aaa,
@@ -350,11 +357,30 @@ impl Into<u8> for Instruction {
 }
 
 
+/// The `D` bit indicates the direction – `0` for write-to (`MADR WRITE`) and `1` for read-from (`MADR READ`) the `ADR`
+/// register.
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionMadrDirection {
+    Write = 0b00,
+    Read = 0b10,
+}
+
+impl From<bool> for InstructionMadrDirection {
+    fn from(raw: bool) -> InstructionMadrDirection {
+        match raw {
+            false => InstructionMadrDirection::Write,
+            true => InstructionMadrDirection::Read,
+        }
+    }
+}
+
+
 /// This Instruction takes a three bit operand indicating under what condition the jump should be performed.
 ///
 /// If the condition is met, the value of ADR is loaded into the PC.
 ///
-/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of loading the instruction.
+/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of
+/// loading the instruction.
 ///
 /// **NB:** The value of ADR must have been set with the desired target location prior to the JUMP instruction being performed.
 ///

@@ -1,6 +1,15 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
+
+#[test]
+fn madr() {
+    for &d in &[InstructionMadrDirection::Write, InstructionMadrDirection::Read] {
+        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
+            assert_eq!(Instruction::Madr { d: d, r: r }.data_length(), 0);
+        }
+    }
+}
 
 #[test]
 fn jump() {
@@ -12,7 +21,7 @@ fn jump() {
                    InstructionJumpCondition::Jmzl,
                    InstructionJumpCondition::Jmpl,
                    InstructionJumpCondition::Jump] {
-        assert_eq!(Instruction::Jump(cond).data_length(), 2);
+        assert_eq!(Instruction::Jump(cond).data_length(), 0);
     }
 }
 
@@ -23,12 +32,12 @@ fn load_immediate() {
 
 #[test]
 fn load_indirect() {
-    single_register(2, |r| Instruction::LoadIndirect { aaa: r });
+    single_register(0, |r| Instruction::LoadIndirect { aaa: r });
 }
 
 #[test]
 fn save() {
-    single_register(2, |r| Instruction::Save { aaa: r });
+    single_register(0, |r| Instruction::Save { aaa: r });
 }
 
 #[test]

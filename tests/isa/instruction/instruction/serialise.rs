@@ -1,6 +1,37 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
+
+#[test]
+fn madr() {
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Write,
+            r: InstructionRegisterPair::Ab,
+        }
+        .into();
+    assert_eq!(raw, 0b0000_1100);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Write,
+            r: InstructionRegisterPair::Cd,
+        }
+        .into();
+    assert_eq!(raw, 0b0000_1101);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Read,
+            r: InstructionRegisterPair::Ab,
+        }
+        .into();
+    assert_eq!(raw, 0b0000_1110);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Read,
+            r: InstructionRegisterPair::Cd,
+        }
+        .into();
+    assert_eq!(raw, 0b0000_1111);
+}
 
 #[test]
 fn jump() {

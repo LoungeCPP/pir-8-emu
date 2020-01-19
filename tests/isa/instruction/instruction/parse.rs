@@ -1,6 +1,33 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 
+
+#[test]
+fn madr() {
+    assert_eq!(Instruction::from(0b0000_1100),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Write,
+                   r: InstructionRegisterPair::Ab,
+               });
+
+    assert_eq!(Instruction::from(0b0000_1101),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Write,
+                   r: InstructionRegisterPair::Cd,
+               });
+
+    assert_eq!(Instruction::from(0b0000_1110),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Read,
+                   r: InstructionRegisterPair::Ab,
+               });
+
+    assert_eq!(Instruction::from(0b0000_1111),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Read,
+                   r: InstructionRegisterPair::Cd,
+               });
+}
 
 #[test]
 fn jump() {
@@ -149,21 +176,26 @@ fn halt() {
 
 #[test]
 fn reserved_block_0() {
-    reserved_block(0b0000_0000, 0b1111);
+    reserved_block(0b0000_0000, 0b111);
 }
 
 #[test]
 fn reserved_block_1() {
-    reserved_block(0b1000_0000, 0b11_1111);
+    reserved_block(0b0000_0100, 0b11);
 }
 
 #[test]
 fn reserved_block_2() {
-    reserved_block(0b1100_0000, 0b1_1111);
+    reserved_block(0b1000_0000, 0b11_1111);
 }
 
 #[test]
 fn reserved_block_3() {
+    reserved_block(0b1100_0000, 0b1_1111);
+}
+
+#[test]
+fn reserved_block_4() {
     reserved_block(0b1111_1100, 0b1);
 }
 

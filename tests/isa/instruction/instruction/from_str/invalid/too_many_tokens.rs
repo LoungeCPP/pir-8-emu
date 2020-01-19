@@ -34,6 +34,26 @@ fn raw() {
 }
 
 #[test]
+fn madr() {
+    static TOKENS_MADR_DIRECTION: &[&str] = &["WRITE", "READ"];
+    static TOKENS_MADR_REG_PAIR: &[&str] = &["A&B", "C&D"];
+
+    for d in TOKENS_MADR_DIRECTION {
+        for r in TOKENS_MADR_REG_PAIR {
+            for pad_left in 1..3 {
+                for pad_right in 1..3 {
+                    unrecognised_token(&format!("MADR{e:wl$}{}{e:wr$}{}", d, r, e = "", wl = pad_left, wr = pad_right),
+                                       &[],
+                                       1..5,
+                                       |_, _| true,
+                                       |len, _, _| ParseInstructionError::TooManyTokens(len));
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn jump_clrf_halt() {
     static TOKENS_TOP: &[&str] = &["JMPZ", "JMPP", "JMPG", "JMPC", "JMZG", "JMZL", "JMPL", "JUMP", "CLRF", "HALT"];
 

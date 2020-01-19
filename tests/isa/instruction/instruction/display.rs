@@ -1,8 +1,45 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::alt_gp_registers;
 
+
+#[test]
+fn madr() {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
+        assert_eq!(Instruction::Madr {
+                           d: InstructionMadrDirection::Write,
+                           r: InstructionRegisterPair::Ab,
+                       }
+                       .display(regs)
+                       .to_string(),
+                   "MADR WRITE A&B");
+
+        assert_eq!(Instruction::Madr {
+                           d: InstructionMadrDirection::Write,
+                           r: InstructionRegisterPair::Cd,
+                       }
+                       .display(regs)
+                       .to_string(),
+                   "MADR WRITE C&D");
+
+        assert_eq!(Instruction::Madr {
+                           d: InstructionMadrDirection::Read,
+                           r: InstructionRegisterPair::Ab,
+                       }
+                       .display(regs)
+                       .to_string(),
+                   "MADR READ A&B");
+
+        assert_eq!(Instruction::Madr {
+                           d: InstructionMadrDirection::Read,
+                           r: InstructionRegisterPair::Cd,
+                       }
+                       .display(regs)
+                       .to_string(),
+                   "MADR READ C&D");
+    }
+}
 
 #[test]
 fn jump() {

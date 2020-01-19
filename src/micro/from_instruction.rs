@@ -48,15 +48,20 @@ impl MicroOp {
                  6)
             }
 
+            Instruction::Madr { d, r } => {
+                let _ = (d, r); unimplemented!()
+            }
+
             Instruction::Jump(cond) => {
-                ([// forcebreak
-                  MicroOp::LoadImmediate,
-                  MicroOp::LoadImmediate,
-                  MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
-                  MicroOp::CheckJumpCondition(cond),
-                  MicroOp::Jump,
-                  MicroOp::Nop],
-                 5)
+                let _ = cond; unimplemented!()
+                // ([// forcebreak
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
+                //   MicroOp::CheckJumpCondition(cond),
+                //   MicroOp::Jump,
+                //   MicroOp::Nop],
+                //  5)
             }
 
             Instruction::LoadImmediate { aaa } => {
@@ -71,25 +76,27 @@ impl MicroOp {
             }
 
             Instruction::LoadIndirect { aaa } => {
-                ([// forcebreak
-                  MicroOp::LoadImmediate,
-                  MicroOp::LoadImmediate,
-                  MicroOp::FetchAddress,
-                  MicroOp::WriteRegister(aaa),
-                  MicroOp::Nop,
-                  MicroOp::Nop],
-                 4)
+                let _ = aaa; unimplemented!()
+                // ([// forcebreak
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::FetchAddress,
+                //   MicroOp::WriteRegister(aaa),
+                //   MicroOp::Nop,
+                //   MicroOp::Nop],
+                //  4)
             }
 
             Instruction::Save { aaa } => {
-                ([// forcebreak
-                  MicroOp::ReadRegister(aaa),
-                  MicroOp::LoadImmediate,
-                  MicroOp::LoadImmediate,
-                  MicroOp::WriteAddress,
-                  MicroOp::Nop,
-                  MicroOp::Nop],
-                 4)
+                let _ = aaa; unimplemented!()
+                // ([// forcebreak
+                //   MicroOp::ReadRegister(aaa),
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::LoadImmediate,
+                //   MicroOp::WriteAddress,
+                //   MicroOp::Nop,
+                //   MicroOp::Nop],
+                //  4)
             }
 
             Instruction::Alu(op) => {

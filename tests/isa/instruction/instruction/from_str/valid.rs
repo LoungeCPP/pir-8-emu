@@ -1,9 +1,38 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use std::convert::TryFrom;
 
+
+#[test]
+fn madr() {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
+        assert_eq!(Instruction::from_str("MADR WRITE A&B", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Write,
+                       r: InstructionRegisterPair::Ab,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR WRITE C&D", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Write,
+                       r: InstructionRegisterPair::Cd,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR READ A&B", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Read,
+                       r: InstructionRegisterPair::Ab,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR READ C&D", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Read,
+                       r: InstructionRegisterPair::Cd,
+                   }));
+    }
+}
 
 #[test]
 fn raw() {

@@ -7,6 +7,6 @@ mod display;
 mod execute;
 
 pub use self::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                            InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+                            InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 pub use self::from_str::ParseInstructionError;
 pub use self::display::DisplayInstruction;

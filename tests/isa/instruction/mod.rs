@@ -2,6 +2,7 @@ mod alu_operation_shift_or_rotate_direction;
 mod alu_operation_shift_or_rotate_type;
 mod instruction_jump_condition;
 mod instruction_port_direction;
+mod instruction_madr_direction;
 mod instruction_stck_direction;
 mod instruction_register_pair;
 mod alu_operation;
