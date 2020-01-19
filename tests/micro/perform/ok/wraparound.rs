@@ -87,8 +87,6 @@ fn load_immediate() {
         uni_orig.0[addr] = i;
         let _read_pc = *uni_orig.3;
         *uni_orig.3 = 0x0000;
-        let _read_adr = *uni_orig.5;
-        *uni_orig.5 = addr;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);

@@ -1,7 +1,7 @@
 //! Microcode implementation
 //!
 //! The μOp is the smallest executable atom into sets of which instructions degenerate,
-//! implementing an 8-bit a stack-based language.
+//! implementing an 8-bit stack-based language.
 //!
 //! # Examples
 //!
@@ -9,9 +9,9 @@
 //! (as in the `emulate_dumb` example):
 //!
 //! ```
+//! # use pir_8_emu::isa::instruction::{InstructionMadrDirection, InstructionRegisterPair, Instruction};
 //! # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};
 //! # use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};
-//! # use pir_8_emu::isa::instruction::Instruction;
 //! # use pir_8_emu::vm::{Memory, Ports};
 //! let mut ports     = Ports::new();
 //! let mut registers = GeneralPurposeRegister::defaults();
@@ -20,8 +20,13 @@
 //! let mut adr       = SpecialPurposeRegister::new("Memory Address", "ADR");
 //! let mut ins       = SpecialPurposeRegister::new("Instruction", "INS");
 //!
-//! let mut memory = Memory::from(&[Instruction::LoadIndirect { aaa: 0b100 }.into(),
-//!                                 0x01, 0x10,
+//! let mut memory = Memory::from(&[Instruction::LoadImmediate { aaa: 0b100 }.into(),
+//!                                 0x01,
+//!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),
+//!                                 0x10,
+//!                                 Instruction::Madr { d: InstructionMadrDirection::Write,
+//!                                                     r: InstructionRegisterPair::Ab }.into(),
+//!                                 Instruction::LoadIndirect { aaa: 0b100 }.into(),
 //!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),
 //!                                 0x69,
 //!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),

@@ -263,8 +263,6 @@ fn load_immediate() {
             uni_orig.0[addr] = i;
             let _read_pc = *uni_orig.3;
             *uni_orig.3 = addr + 1;
-            let _read_adr = *uni_orig.5;
-            *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);
@@ -288,7 +286,8 @@ fn fetch_address() {
             let mut uni_orig = universe();
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
-            let mut stack = vec![addr as u8 + 1, addr as u8];
+            let mut stack = vec![];
+            *adr = addr;
             memory[addr] = i;
 
             assert_eq!(MicroOp::FetchAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
@@ -321,7 +320,8 @@ fn write_address() {
             let mut uni_orig = universe();
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
-            let mut stack = vec![i, addr as u8 + 1, addr as u8];
+            let mut stack = vec![i];
+            *adr = addr;
 
             assert_eq!(MicroOp::WriteAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));

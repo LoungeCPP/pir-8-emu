@@ -13,12 +13,15 @@ fn ok() {
             let mut uni_orig = universe();
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
-            let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 1];
+            let mut stack = vec![1];
+            *adr = dest_addr;
             *pc = start_addr;
 
             assert_eq!(MicroOp::Jump.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
+            let _read_adr = *uni_orig.5;
+            *uni_orig.5 = dest_addr;
             *uni_orig.3 = dest_addr;
 
             assert_eq!(memory, uni_orig.0);
@@ -45,12 +48,14 @@ fn not_ok() {
             let mut uni_orig = universe();
             let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
 
-            let mut stack = vec![dest_addr as u8 + 1, dest_addr as u8, 0];
+            let mut stack = vec![0];
+            *adr = dest_addr;
             *pc = start_addr;
 
             assert_eq!(MicroOp::Jump.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
                        Ok(true));
 
+            *uni_orig.5 = dest_addr;
             *uni_orig.3 = start_addr;
 
             assert_eq!(memory, uni_orig.0);

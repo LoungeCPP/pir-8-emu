@@ -40,6 +40,12 @@ impl MicroOp {
     /// memory[0x1A00] = 0x69;
     ///
     /// let mut stack = vec![0x1A, 0x00];
+    /// assert_eq!(MicroOp::AdrWrite.perform(&mut stack, &mut memory, &mut ports, &mut registers,
+    ///                                      &mut pc, &mut sp, &mut adr, &mut ins),
+    ///            Ok(true));
+    /// assert_eq!(*adr, 0x1A00);
+    /// assert_eq!(stack, &[]);
+    ///
     /// assert_eq!(MicroOp::FetchAddress.perform(&mut stack, &mut memory, &mut ports, &mut registers,
     ///                                          &mut pc, &mut sp, &mut adr, &mut ins),
     ///            Ok(true));
@@ -62,6 +68,15 @@ impl MicroOp {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
                 **ins = byte;
+            }
+
+            MicroOp::AdrWrite => {
+                let address = pop_address(stack)?;
+
+                **adr = address;
+            }
+            MicroOp::AdrRead => {
+                push_address(stack, **adr);
             }
 
             MicroOp::StackPush => {
@@ -124,26 +139,20 @@ impl MicroOp {
 
             MicroOp::MakeImmediate(b) => stack.push(b),
             MicroOp::LoadImmediate => {
-                **adr = **pc;
-                let byte = memory[**adr];
+                let byte = memory[**pc];
                 **pc = pc.wrapping_add(1);
 
                 stack.push(byte);
             }
 
             MicroOp::FetchAddress => {
-                let address = pop_address(stack)?;
-
-                **adr = address;
                 let byte = memory[**adr];
 
                 stack.push(byte);
             }
             MicroOp::WriteAddress => {
-                let address = pop_address(stack)?;
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
-                **adr = address;
                 memory[**adr] = byte;
             }
 
@@ -156,11 +165,10 @@ impl MicroOp {
             }
             MicroOp::Jump => {
                 let is_ok = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
-                let address = pop_address(stack)?;
 
                 match is_ok {
                     0 => {}
-                    1 => **pc = address,
+                    1 => **pc = **adr,
                     _ => return Err(MicroOpPerformError::InvalidMicrostackTop(is_ok, VALID_IS_OK_VALUES)),
                 }
             }
@@ -185,6 +193,14 @@ impl MicroOp {
 fn s_reg_flags(s: u8) -> u8 {
     (if s == 0 { FLAG_MASK_ZERO } else { 0b00000 })                     | // forcebreak
     (if (s.count_ones() % 2) == 0 { FLAG_MASK_PARITY } else { 0b00000 })
+}
+
+fn push_address(stack: &mut Vec<u8>, address: u16) {
+    let high_byte = ((address >> 8) & 0xFF) as u8;
+    let low_byte = ((address >> 0) & 0xFF) as u8;
+
+    stack.push(high_byte);
+    stack.push(low_byte);
 }
 
 fn pop_address(stack: &mut Vec<u8>) -> Result<u16, MicroOpPerformError> {

@@ -1,5 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionMadrDirection,
+                                  InstructionPortDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::micro::MicroOp;
 
 
@@ -15,27 +15,76 @@ const D_REGISTER_ADDRESS: u8 = 0b111;
 
 #[test]
 fn reserved_block_0() {
-    reserved_block(0b0000_0000, 0b1111, Instruction::Reserved);
+    reserved_block(0b0000_0000, 0b111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_1() {
-    reserved_block(0b1000_0000, 0b11_1111, Instruction::Reserved);
+    reserved_block(0b0000_1000, 0b11, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_2() {
-    reserved_block(0b1100_0000, 0b1_1111, Instruction::Reserved);
+    reserved_block(0b1000_0000, 0b11_1111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_3() {
-    reserved_block(0b1110_0000, 0b1111, Instruction::Reserved);
+    reserved_block(0b1100_0000, 0b1_1111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_4() {
+    reserved_block(0b1110_0000, 0b1111, Instruction::Reserved);
+}
+
+#[test]
+fn reserved_block_5() {
     reserved_block(0b1111_1100, 0b1, Instruction::Reserved);
+}
+
+#[test]
+fn madr_write() {
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Write,
+        r: InstructionRegisterPair::Ab,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::ReadRegister(B_REGISTER_ADDRESS), MicroOp::AdrWrite]);
+
+
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Write,
+        r: InstructionRegisterPair::Cd,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::ReadRegister(C_REGISTER_ADDRESS), MicroOp::ReadRegister(D_REGISTER_ADDRESS), MicroOp::AdrWrite]);
+}
+
+#[test]
+fn madr_read() {
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Read,
+        r: InstructionRegisterPair::Ab,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::AdrRead, MicroOp::WriteRegister(B_REGISTER_ADDRESS), MicroOp::WriteRegister(A_REGISTER_ADDRESS)]);
+
+
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Read,
+        r: InstructionRegisterPair::Cd,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::AdrRead, MicroOp::WriteRegister(D_REGISTER_ADDRESS), MicroOp::WriteRegister(C_REGISTER_ADDRESS)]);
 }
 
 #[test]
@@ -52,11 +101,7 @@ fn jump() {
         let ops = &ops.0[..ops.1];
 
         assert_eq!(ops,
-                   &[MicroOp::LoadImmediate,
-                     MicroOp::LoadImmediate,
-                     MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
-                     MicroOp::CheckJumpCondition(cond),
-                     MicroOp::Jump]);
+                   &[MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS), MicroOp::CheckJumpCondition(cond), MicroOp::Jump]);
     }
 }
 
@@ -69,13 +114,13 @@ fn load_immediate() {
 #[test]
 fn load_indirect() {
     single_register(|aaa| Instruction::LoadIndirect { aaa: aaa },
-                    |aaa| vec![MicroOp::LoadImmediate, MicroOp::LoadImmediate, MicroOp::FetchAddress, MicroOp::WriteRegister(aaa)]);
+                    |aaa| vec![MicroOp::FetchAddress, MicroOp::WriteRegister(aaa)]);
 }
 
 #[test]
 fn save() {
     single_register(|aaa| Instruction::Save { aaa: aaa },
-                    |aaa| vec![MicroOp::ReadRegister(aaa), MicroOp::LoadImmediate, MicroOp::LoadImmediate, MicroOp::WriteAddress]);
+                    |aaa| vec![MicroOp::ReadRegister(aaa), MicroOp::WriteAddress]);
 }
 
 #[test]

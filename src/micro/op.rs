@@ -22,9 +22,14 @@ pub enum MicroOp {
     /// Load the top of the stack into INS
     LoadInstruction,
 
-    /// Push a byte from the top of the μstack to the stack
+    /// Write the address specified by the top two bytes of the μstack into ADR
+    AdrWrite,
+    /// Read both bytes of ADR onto the μstack
+    AdrRead,
+
+    /// Push a byte from the top of the μstack to the stack. Clobbers ADR (becomes previous value of SP)
     StackPush,
-    /// Pop a byte from the stack
+    /// Pop a byte from the stack. Clobbers ADR (becomes SP)
     StackPop,
 
     /// Perform an ALU operation
@@ -40,18 +45,18 @@ pub enum MicroOp {
 
     /// Create an immediate value at the top of the μstack
     MakeImmediate(u8),
-    /// Read a 1-byte immediate from memory @ PC to the top of the μstack, incrementing PC
+    /// Read a 1-byte immediate from memory at PC to the top of the μstack, incrementing PC
     LoadImmediate,
 
-    /// Read the value from memory at the address specified by the top two bytes of the μstack
+    /// Read the value from memory at ADR
     FetchAddress,
-    /// Write to memory at the address specified by the top two bytes of the μstack the byte at the next value on the μstack
+    /// Write to memory at ADR the byte on top of the μstack
     WriteAddress,
 
     /// Check if the specified jump condition is satisfied by the top of the μstack
     CheckJumpCondition(InstructionJumpCondition),
-    /// If the top of the μstack is `0`, pop two bytes off the top of the μstack.
-    /// If it's `1`, pop two bytes off the top of the μstack and load them into PC.
+    /// If the top of the μstack is `1`, set PC to ADR.
+    /// If it's `0`, do nothing.
     /// Otherwise, error out.
     Jump,
 

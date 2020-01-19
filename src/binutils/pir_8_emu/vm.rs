@@ -14,15 +14,18 @@ use std::collections::BTreeSet;
 /// ```
 /// # use pir_8_emu::ReadWritable;
 /// # use pir_8_emu::binutils::pir_8_emu::Vm;
-/// # use pir_8_emu::isa::instruction::Instruction;
+/// # use pir_8_emu::isa::instruction::{InstructionMadrDirection, InstructionRegisterPair, Instruction};
 /// let mut vm = Vm::new("FSXYABCD").unwrap();
 /// vm.reset("FSXYABCD", &[
 ///     Instruction::Halt.into(),
+///     Instruction::LoadImmediate { aaa: 0b100 }.into(),
+///     0x04,
+///     Instruction::LoadImmediate { aaa: 0b101 }.into(),
+///     0x20,
+///     Instruction::Madr { d: InstructionMadrDirection::Write, r: InstructionRegisterPair::Ab }.into(),
 ///     Instruction::LoadImmediate { aaa: 0b000 }.into(),
 ///     0x69,
 ///     Instruction::Save { aaa: 0b000 }.into(),
-///     0x04,
-///     0x20,
 ///     Instruction::Halt.into(),
 /// ]);
 ///
