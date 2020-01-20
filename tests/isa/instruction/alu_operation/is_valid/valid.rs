@@ -1,5 +1,6 @@
 use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};
 
+
 #[test]
 fn add() {
     assert!(AluOperation::Add.is_valid());
@@ -11,8 +12,13 @@ fn sub() {
 }
 
 #[test]
-fn not() {
-    assert!(AluOperation::Not.is_valid());
+fn addc() {
+    assert!(AluOperation::AddC.is_valid());
+}
+
+#[test]
+fn subc() {
+    assert!(AluOperation::SubC.is_valid());
 }
 
 #[test]
@@ -28,6 +34,11 @@ fn xor() {
 #[test]
 fn and() {
     assert!(AluOperation::And.is_valid());
+}
+
+#[test]
+fn not() {
+    assert!(AluOperation::Not.is_valid());
 }
 
 #[test]

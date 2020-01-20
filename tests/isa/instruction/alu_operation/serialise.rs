@@ -14,9 +14,15 @@ fn sub() {
 }
 
 #[test]
-fn not() {
-    let raw: u8 = AluOperation::Not.into();
+fn addc() {
+    let raw: u8 = AluOperation::AddC.into();
     assert_eq!(raw, 0b0010);
+}
+
+#[test]
+fn subc() {
+    let raw: u8 = AluOperation::SubC.into();
+    assert_eq!(raw, 0b0011);
 }
 
 #[test]
@@ -35,6 +41,12 @@ fn xor() {
 fn and() {
     let raw: u8 = AluOperation::And.into();
     assert_eq!(raw, 0b0110);
+}
+
+#[test]
+fn not() {
+    let raw: u8 = AluOperation::Not.into();
+    assert_eq!(raw, 0b0111);
 }
 
 
@@ -104,17 +116,4 @@ fn shift_or_rotate_rtw() {
         }
         .into();
     assert_eq!(raw, 0b1111);
-}
-
-
-#[test]
-fn reserved_block_0() {
-    let raw: u8 = AluOperation::Reserved(0b0011).into();
-    assert_eq!(raw, 0b0011);
-}
-
-#[test]
-fn reserved_block_1() {
-    let raw: u8 = AluOperation::Reserved(0b0111).into();
-    assert_eq!(raw, 0b0111);
 }

@@ -23,7 +23,7 @@ fn madr_register_pair() {
 
 #[test]
 fn alu() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     missing_token("ALU", |len, _| ParseInstructionError::MissingToken(len, TOKENS_ALU));
 }

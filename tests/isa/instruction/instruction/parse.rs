@@ -60,10 +60,12 @@ fn save() {
 fn alu_valid() {
     assert_eq!(Instruction::from(0b0011_0000), Instruction::Alu(AluOperation::Add));
     assert_eq!(Instruction::from(0b0011_0001), Instruction::Alu(AluOperation::Sub));
-    assert_eq!(Instruction::from(0b0011_0010), Instruction::Alu(AluOperation::Not));
+    assert_eq!(Instruction::from(0b0011_0010), Instruction::Alu(AluOperation::AddC));
+    assert_eq!(Instruction::from(0b0011_0011), Instruction::Alu(AluOperation::SubC));
     assert_eq!(Instruction::from(0b0011_0100), Instruction::Alu(AluOperation::Or));
     assert_eq!(Instruction::from(0b0011_0101), Instruction::Alu(AluOperation::Xor));
     assert_eq!(Instruction::from(0b0011_0110), Instruction::Alu(AluOperation::And));
+    assert_eq!(Instruction::from(0b0011_0111), Instruction::Alu(AluOperation::Not));
 }
 
 #[test]
@@ -93,12 +95,6 @@ fn alu_valid_shift_or_rotate() {
                        tt: AluOperationShiftOrRotateType::Rtw,
                    }));
     }
-}
-
-#[test]
-fn alu_reserved() {
-    assert_eq!(Instruction::from(0b0011_0011), Instruction::Alu(AluOperation::Reserved(0b0011)));
-    assert_eq!(Instruction::from(0b0011_0111), Instruction::Alu(AluOperation::Reserved(0b0111)));
 }
 
 #[test]

@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 #[test]
 fn toplevel_raw() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     for i in 0b0001_0000..=0b1111_1111 {
         assert_eq!(AluOperation::from_str(&format!("{}", i)),
@@ -34,7 +34,7 @@ fn toplevel_raw() {
 
 #[test]
 fn toplevel() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     unrecognised_token("",
                        TOKENS_ALU,

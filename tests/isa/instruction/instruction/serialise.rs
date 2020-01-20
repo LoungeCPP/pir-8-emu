@@ -83,8 +83,11 @@ fn alu_valid() {
     let raw: u8 = Instruction::Alu(AluOperation::Sub).into();
     assert_eq!(raw, 0b0011_0001);
 
-    let raw: u8 = Instruction::Alu(AluOperation::Not).into();
+    let raw: u8 = Instruction::Alu(AluOperation::AddC).into();
     assert_eq!(raw, 0b0011_0010);
+
+    let raw: u8 = Instruction::Alu(AluOperation::SubC).into();
+    assert_eq!(raw, 0b0011_0011);
 
     let raw: u8 = Instruction::Alu(AluOperation::Or).into();
     assert_eq!(raw, 0b0011_0100);
@@ -94,6 +97,9 @@ fn alu_valid() {
 
     let raw: u8 = Instruction::Alu(AluOperation::And).into();
     assert_eq!(raw, 0b0011_0110);
+
+    let raw: u8 = Instruction::Alu(AluOperation::Not).into();
+    assert_eq!(raw, 0b0011_0111);
 }
 
 #[test]
@@ -123,12 +129,6 @@ fn alu_valid_shift_or_rotate() {
                        tt: AluOperationShiftOrRotateType::Rtw,
                    }));
     }
-}
-
-#[test]
-fn alu_reserved() {
-    assert_eq!(Instruction::from(0b0011_0011), Instruction::Alu(AluOperation::Reserved(0b0011)));
-    assert_eq!(Instruction::from(0b0011_0111), Instruction::Alu(AluOperation::Reserved(0b0111)));
 }
 
 #[test]

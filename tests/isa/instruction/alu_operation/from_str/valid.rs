@@ -25,8 +25,13 @@ fn sub() {
 }
 
 #[test]
-fn not() {
-    assert_eq!(AluOperation::from_str("NOT"), Ok(AluOperation::Not));
+fn addc() {
+    assert_eq!(AluOperation::from_str("ADDC"), Ok(AluOperation::AddC));
+}
+
+#[test]
+fn subc() {
+    assert_eq!(AluOperation::from_str("SUBC"), Ok(AluOperation::SubC));
 }
 
 #[test]
@@ -42,6 +47,11 @@ fn xor() {
 #[test]
 fn and() {
     assert_eq!(AluOperation::from_str("AND"), Ok(AluOperation::And));
+}
+
+#[test]
+fn not() {
+    assert_eq!(AluOperation::from_str("NOT"), Ok(AluOperation::Not));
 }
 
 #[test]

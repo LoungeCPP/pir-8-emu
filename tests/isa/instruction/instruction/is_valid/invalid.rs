@@ -1,16 +1,5 @@
-use pir_8_emu::isa::instruction::{AluOperation, Instruction};
-use std::convert::TryFrom;
+use pir_8_emu::isa::instruction::Instruction;
 
-
-#[test]
-fn alu_reserved() {
-    for &op in &[0b0011, 0b0111] {
-        let parsed = AluOperation::try_from(op).unwrap();
-
-        assert_eq!(parsed, AluOperation::Reserved(op));
-        assert!(!Instruction::Alu(parsed).is_valid());
-    }
-}
 
 
 #[test]

@@ -13,8 +13,13 @@ fn sub() {
 }
 
 #[test]
-fn not() {
-    assert_eq!(AluOperation::try_from(0b0010), Ok(AluOperation::Not));
+fn addc() {
+    assert_eq!(AluOperation::try_from(0b0010), Ok(AluOperation::AddC));
+}
+
+#[test]
+fn subc() {
+    assert_eq!(AluOperation::try_from(0b0011), Ok(AluOperation::SubC));
 }
 
 #[test]
@@ -30,6 +35,11 @@ fn xor() {
 #[test]
 fn and() {
     assert_eq!(AluOperation::try_from(0b0110), Ok(AluOperation::And));
+}
+
+#[test]
+fn not() {
+    assert_eq!(AluOperation::try_from(0b0111), Ok(AluOperation::Not));
 }
 
 
@@ -91,15 +101,4 @@ fn shift_or_rotate_rtw() {
                    d: AluOperationShiftOrRotateDirection::Left,
                    tt: AluOperationShiftOrRotateType::Rtw,
                }));
-}
-
-
-#[test]
-fn reserved_block_0() {
-    assert_eq!(AluOperation::try_from(0b0011), Ok(AluOperation::Reserved(0b0011)));
-}
-
-#[test]
-fn reserved_block_1() {
-    assert_eq!(AluOperation::try_from(0b0111), Ok(AluOperation::Reserved(0b0111)));
 }

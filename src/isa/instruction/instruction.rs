@@ -493,18 +493,20 @@ impl From<bool> for InstructionRegisterPair {
 ///
 /// All will set the ZERO flag if the output (register S) is `0000 0000`.
 ///
-/// All will set the Parity flag if the number of high bits are even.
+/// All will set the PARITY flag if the number of high bits are even in the S register.
+///
+/// The ADD, SUB, ADDC, and SUBC operations will set the carry bit in F to carry out value from adders.
 ///
 /// FFFF | Name | Count | Description
 /// -----|------|-------|------------
 /// 0000 | ADD  |   1   | Addition of register X and register Y
 /// 0001 | SUB  |   1   | Subtraction of register Y from register X (X-Y)
-/// 0010 | NOT  |   1   | Bitwise NOT (unary operation)
-/// 0011 |      |   1   | Reserved
+/// 0010 | ADDC |   1   | Addition of register X and register Y, using the carry bit from F
+/// 0011 | SUBC |   1   | Subtraction of register Y from register X (X-Y), using the carry bit from F
 /// 0100 |  OR  |   1   | Bitwise OR
 /// 0101 | XOR  |   1   | Bitwise XOR
 /// 0110 | AND  |   1   | Bitwise AND
-/// 0111 |      |   1   | Reserved
+/// 0111 | NOT  |   1   | Bitwise NOT (unary operation)
 /// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperation {
@@ -514,14 +516,18 @@ pub enum AluOperation {
     Add,
     /// Subtraction of register Y from register X (X-Y)
     Sub,
-    /// Bitwise NOT
-    Not,
+    /// Addition of register X and register Y, using the carry bit from F
+    AddC,
+    /// Subtraction of register Y from register X (X-Y), using the carry bit from F
+    SubC,
     /// Bitwise OR
     Or,
     /// Bitwise XOR
     Xor,
     /// Bitwise AND
     And,
+    /// Bitwise NOT
+    Not,
     /// Shift or Rotate, see member doc
     ShiftOrRotate {
         d: AluOperationShiftOrRotateDirection,
@@ -584,12 +590,12 @@ impl TryFrom<u8> for AluOperation {
         Ok(match ((nib & 0b1000) != 0, (nib & 0b0100) != 0, (nib & 0b0010) != 0, (nib & 0b0001) != 0) {
             (false, false, false, false) => AluOperation::Add,
             (false, false, false, true) => AluOperation::Sub,
-            (false, false, true, false) => AluOperation::Not,
-            (false, false, true, true) => AluOperation::Reserved(nib),
+            (false, false, true, false) => AluOperation::AddC,
+            (false, false, true, true) => AluOperation::SubC,
             (false, true, false, false) => AluOperation::Or,
             (false, true, false, true) => AluOperation::Xor,
             (false, true, true, false) => AluOperation::And,
-            (false, true, true, true) => AluOperation::Reserved(nib),
+            (false, true, true, true) => AluOperation::Not,
             (true, d, _, _) => {
                 AluOperation::ShiftOrRotate {
                     d: d.into(),
@@ -606,10 +612,12 @@ impl Into<u8> for AluOperation {
             AluOperation::Reserved(raw) => raw,
             AluOperation::Add => 0b0000,
             AluOperation::Sub => 0b0001,
-            AluOperation::Not => 0b0010,
+            AluOperation::AddC => 0b0010,
+            AluOperation::SubC => 0b0011,
             AluOperation::Or => 0b0100,
             AluOperation::Xor => 0b0101,
             AluOperation::And => 0b0110,
+            AluOperation::Not => 0b0111,
             AluOperation::ShiftOrRotate { d, tt } => {
                 let tt_b: u8 = tt.into();
                 0b1000 | (d as u8) | tt_b

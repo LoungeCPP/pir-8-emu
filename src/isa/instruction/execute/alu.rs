@@ -1,6 +1,13 @@
 use self::super::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, AluOperation};
 
 
+enum RespectCarry {
+    No,
+    YesAdd,
+    YesSub,
+}
+
+
 impl AluOperation {
     pub(in self::super::super) fn perform_impl(self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
         match self {
@@ -9,11 +16,14 @@ impl AluOperation {
                 0
             }
 
-            AluOperation::Add => add(lhs, rhs, carry),
+            AluOperation::Add => add(lhs, rhs, carry, RespectCarry::No),
             // [11:38] Cat Plus Plus: Or basically: just do it as addition but two-complement negate the second operand
             // [11:38] Cat Plus Plus: So 0x02 - 0x04 is 0x02 + 0xFC
             // https://discordapp.com/channels/145079846832308224/411537636994449418/600259783072940044
-            AluOperation::Sub => add(lhs, (!rhs).checked_add(1).unwrap_or(0), carry),
+            AluOperation::Sub => add(lhs, (!rhs).checked_add(1).unwrap_or(0), carry, RespectCarry::No),
+
+            AluOperation::AddC => add(lhs, rhs, carry, RespectCarry::YesAdd),
+            AluOperation::SubC => add(lhs, (!rhs).checked_add(1).unwrap_or(0), carry, RespectCarry::YesSub),
 
             AluOperation::Not => !lhs,
             AluOperation::Or => lhs | rhs,
@@ -63,8 +73,15 @@ impl AluOperation {
     }
 }
 
-fn add(lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
-    let sum = (lhs as u16) + (rhs as u16);
+fn add(lhs: u8, rhs: u8, carry: &mut bool, respect: RespectCarry) -> u8 {
+    let mut sum = (lhs as u16) + (rhs as u16);
+
+    match (*carry, respect) {
+        (false, _) |
+        (true, RespectCarry::No) => {}
+        (true, RespectCarry::YesAdd) => sum += 1,
+        (true, RespectCarry::YesSub) => sum -= 1,
+    }
 
     *carry = (sum & 0b1_0000_0000) != 0;
 

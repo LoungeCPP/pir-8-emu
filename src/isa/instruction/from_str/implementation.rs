@@ -305,7 +305,7 @@ fn parse_instruction_register_pair<'i, I: Iterator<Item = &'i str>>(itr: &mut I,
 }
 
 fn parse_alu_operation<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &str, pos: usize) -> Result<AluOperation, ParseInstructionError> {
-    static VALID_TOKENS: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static VALID_TOKENS: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     match itr.next() {
         Some(tok) => {
@@ -315,14 +315,18 @@ fn parse_alu_operation<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &
                 Ok(AluOperation::Add)
             } else if tok.eq_ignore_ascii_case("SUB") {
                 Ok(AluOperation::Sub)
-            } else if tok.eq_ignore_ascii_case("NOT") {
-                Ok(AluOperation::Not)
+            } else if tok.eq_ignore_ascii_case("ADDC") {
+                Ok(AluOperation::AddC)
+            } else if tok.eq_ignore_ascii_case("SUBC") {
+                Ok(AluOperation::SubC)
             } else if tok.eq_ignore_ascii_case("OR") {
                 Ok(AluOperation::Or)
             } else if tok.eq_ignore_ascii_case("XOR") {
                 Ok(AluOperation::Xor)
             } else if tok.eq_ignore_ascii_case("AND") {
                 Ok(AluOperation::And)
+            } else if tok.eq_ignore_ascii_case("NOT") {
+                Ok(AluOperation::Not)
             } else if tok.eq_ignore_ascii_case("SOR") {
                 parse_alu_operation_shift_or_rotate(itr, orig_str, start_pos + 3 + 1)
             } else if let Some(raw) = parse_with_prefix::<u8>(tok).and_then(|n| limit_to_width(n, 4)) {

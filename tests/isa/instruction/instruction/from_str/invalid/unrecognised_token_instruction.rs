@@ -89,7 +89,7 @@ fn toplevel() {
 
 #[test]
 fn alu_raw() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for i in 0b0001_0000..=0b1111_1111 {
@@ -126,7 +126,7 @@ fn alu_raw() {
 
 #[test]
 fn alu() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND", "SOR", "[raw operation literal]"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT", "SOR", "[raw operation literal]"];
 
     unrecognised_token("ALU",
                        TOKENS_ALU,

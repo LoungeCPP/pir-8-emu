@@ -98,10 +98,12 @@ impl fmt::Display for AluOperation {
             AluOperation::Reserved(raw) => write!(f, "{:#06b}", raw),
             AluOperation::Add => f.write_str("ADD"),
             AluOperation::Sub => f.write_str("SUB"),
-            AluOperation::Not => f.write_str("NOT"),
+            AluOperation::AddC => f.write_str("ADDC"),
+            AluOperation::SubC => f.write_str("SUBC"),
             AluOperation::Or => f.write_str("OR"),
             AluOperation::Xor => f.write_str("XOR"),
             AluOperation::And => f.write_str("AND"),
+            AluOperation::Not => f.write_str("NOT"),
             AluOperation::ShiftOrRotate { d, tt } => write!(f, "SOR {} {}", d, tt),
         }
     }

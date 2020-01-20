@@ -12,8 +12,13 @@ fn sub() {
 }
 
 #[test]
-fn not() {
-    assert_eq!(AluOperation::Not.to_string(), "NOT");
+fn addc() {
+    assert_eq!(AluOperation::AddC.to_string(), "ADDC");
+}
+
+#[test]
+fn subc() {
+    assert_eq!(AluOperation::SubC.to_string(), "SUBC");
 }
 
 #[test]
@@ -29,6 +34,11 @@ fn xor() {
 #[test]
 fn and() {
     assert_eq!(AluOperation::And.to_string(), "AND");
+}
+
+#[test]
+fn not() {
+    assert_eq!(AluOperation::Not.to_string(), "NOT");
 }
 
 
@@ -82,15 +92,4 @@ fn shift_or_rotate_rtw() {
                    d: AluOperationShiftOrRotateDirection::Left,
                    tt: AluOperationShiftOrRotateType::Rtw,
                }.to_string(), "SOR LEFT RTW");
-}
-
-
-#[test]
-fn reserved_block_0() {
-    assert_eq!(AluOperation::Reserved(0b0011).to_string(), "0b0011");
-}
-
-#[test]
-fn reserved_block_1() {
-    assert_eq!(AluOperation::Reserved(0b0111).to_string(), "0b0111");
 }
