@@ -44,10 +44,12 @@ fn save() {
 fn alu_valid() {
     assert_eq!(Instruction::Alu(AluOperation::Add).data_length(), 0);
     assert_eq!(Instruction::Alu(AluOperation::Sub).data_length(), 0);
-    assert_eq!(Instruction::Alu(AluOperation::Not).data_length(), 0);
+    assert_eq!(Instruction::Alu(AluOperation::AddC).data_length(), 0);
+    assert_eq!(Instruction::Alu(AluOperation::SubC).data_length(), 0);
     assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);
     assert_eq!(Instruction::Alu(AluOperation::Xor).data_length(), 0);
     assert_eq!(Instruction::Alu(AluOperation::And).data_length(), 0);
+    assert_eq!(Instruction::Alu(AluOperation::Not).data_length(), 0);
 }
 
 #[test]
@@ -60,12 +62,6 @@ fn alu_valid_shift_or_rotate() {
             assert_eq!(Instruction::Alu(AluOperation::ShiftOrRotate { d: d, tt: tt }).data_length(), 0);
         }
     }
-}
-
-#[test]
-fn alu_reserved() {
-    assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0011)).data_length(), 0);
-    assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0111)).data_length(), 0);
 }
 
 #[test]

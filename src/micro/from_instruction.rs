@@ -1,5 +1,4 @@
-use self::super::super::isa::instruction::{InstructionMadrDirection, InstructionPortDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation,
-                                           Instruction};
+use self::super::super::isa::instruction::{InstructionMadrDirection, InstructionPortDirection, InstructionStckDirection, InstructionRegisterPair, Instruction};
 use self::super::MicroOp;
 
 
@@ -37,8 +36,7 @@ impl MicroOp {
     /// ```
     pub fn from_instruction(instr: Instruction) -> (MicroOpBlock, usize) {
         match instr {
-            Instruction::Reserved(_) |
-            Instruction::Alu(AluOperation::Reserved(_)) => {
+            Instruction::Reserved(_) => {
                 ([// forcebreak
                   MicroOp::Nop,
                   MicroOp::Nop,

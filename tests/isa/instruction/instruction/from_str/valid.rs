@@ -103,10 +103,12 @@ fn alu() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::from_str("ALU ADD", regs), Ok(Instruction::Alu(AluOperation::Add)));
         assert_eq!(Instruction::from_str("ALU SUB", regs), Ok(Instruction::Alu(AluOperation::Sub)));
-        assert_eq!(Instruction::from_str("ALU NOT", regs), Ok(Instruction::Alu(AluOperation::Not)));
+        assert_eq!(Instruction::from_str("ALU ADDC", regs), Ok(Instruction::Alu(AluOperation::AddC)));
+        assert_eq!(Instruction::from_str("ALU SUBC", regs), Ok(Instruction::Alu(AluOperation::SubC)));
         assert_eq!(Instruction::from_str("ALU OR", regs), Ok(Instruction::Alu(AluOperation::Or)));
         assert_eq!(Instruction::from_str("ALU XOR", regs), Ok(Instruction::Alu(AluOperation::Xor)));
         assert_eq!(Instruction::from_str("ALU AND", regs), Ok(Instruction::Alu(AluOperation::And)));
+        assert_eq!(Instruction::from_str("ALU NOT", regs), Ok(Instruction::Alu(AluOperation::Not)));
 
         assert_eq!(Instruction::from_str("ALU SOR LEFT LSF", regs),
                    Ok(Instruction::Alu(AluOperation::ShiftOrRotate {

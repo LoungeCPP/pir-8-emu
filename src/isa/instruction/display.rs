@@ -95,7 +95,6 @@ impl fmt::Display for InstructionRegisterPair {
 impl fmt::Display for AluOperation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AluOperation::Reserved(raw) => write!(f, "{:#06b}", raw),
             AluOperation::Add => f.write_str("ADD"),
             AluOperation::Sub => f.write_str("SUB"),
             AluOperation::AddC => f.write_str("ADDC"),

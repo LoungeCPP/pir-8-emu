@@ -124,18 +124,15 @@ fn save() {
 }
 
 #[test]
-fn alu_reserved_block_0() {
-    reserved_block(0b0011, 0, |o| Instruction::Alu(AluOperation::Reserved(o)));
-}
-
-#[test]
-fn alu_reserved_block_1() {
-    reserved_block(0b0111, 0, |o| Instruction::Alu(AluOperation::Reserved(o)));
-}
-
-#[test]
 fn alu() {
-    for &op in &[AluOperation::Add, AluOperation::Sub, AluOperation::Not, AluOperation::Or, AluOperation::Xor, AluOperation::And] {
+    for &op in &[AluOperation::Add,
+                 AluOperation::Sub,
+                 AluOperation::AddC,
+                 AluOperation::SubC,
+                 AluOperation::Or,
+                 AluOperation::Xor,
+                 AluOperation::And,
+                 AluOperation::Not] {
         alu_impl(op);
     }
 }
@@ -154,8 +151,8 @@ fn alu_sor() {
 
 #[test]
 fn move_() {
-    for aaa in 0..0b111 {
-        for bbb in 0..0b111 {
+    for aaa in 0..=0b111 {
+        for bbb in 0..=0b111 {
             let ops = MicroOp::from_instruction(Instruction::Move {
                 aaa: aaa,
                 bbb: bbb,

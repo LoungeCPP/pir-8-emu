@@ -15,7 +15,7 @@ fn raw() {
 
 #[test]
 fn toplevel() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT"];
 
     for tok in TOKENS_ALU {
         unrecognised_token(tok, &[], 1..5, |_| true, |len, _| ParseInstructionError::TooManyTokens(len));

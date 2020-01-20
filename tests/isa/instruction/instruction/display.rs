@@ -75,10 +75,12 @@ fn alu_valid() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         assert_eq!(Instruction::Alu(AluOperation::Add).display(regs).to_string(), "ALU ADD");
         assert_eq!(Instruction::Alu(AluOperation::Sub).display(regs).to_string(), "ALU SUB");
-        assert_eq!(Instruction::Alu(AluOperation::Not).display(regs).to_string(), "ALU NOT");
+        assert_eq!(Instruction::Alu(AluOperation::AddC).display(regs).to_string(), "ALU ADDC");
+        assert_eq!(Instruction::Alu(AluOperation::SubC).display(regs).to_string(), "ALU SUBC");
         assert_eq!(Instruction::Alu(AluOperation::Or).display(regs).to_string(), "ALU OR");
         assert_eq!(Instruction::Alu(AluOperation::Xor).display(regs).to_string(), "ALU XOR");
         assert_eq!(Instruction::Alu(AluOperation::And).display(regs).to_string(), "ALU AND");
+        assert_eq!(Instruction::Alu(AluOperation::Not).display(regs).to_string(), "ALU NOT");
     }
 }
 
@@ -94,14 +96,6 @@ fn alu_valid_shift_or_rotate() {
                            format!("ALU SOR {} {}", d, tt));
             }
         }
-    }
-}
-
-#[test]
-fn alu_reserved() {
-    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0011)).display(regs).to_string(), "ALU 0b0011");
-        assert_eq!(Instruction::Alu(AluOperation::Reserved(0b0111)).display(regs).to_string(), "ALU 0b0111");
     }
 }
 

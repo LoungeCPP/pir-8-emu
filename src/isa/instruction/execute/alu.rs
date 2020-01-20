@@ -11,11 +11,6 @@ enum RespectCarry {
 impl AluOperation {
     pub(in self::super::super) fn perform_impl(self, lhs: u8, rhs: u8, carry: &mut bool) -> u8 {
         match self {
-            AluOperation::Reserved(_) => {
-                *carry = true;
-                0
-            }
-
             AluOperation::Add => add(lhs, rhs, carry, RespectCarry::No),
             // [11:38] Cat Plus Plus: Or basically: just do it as addition but two-complement negate the second operand
             // [11:38] Cat Plus Plus: So 0x02 - 0x04 is 0x02 + 0xFC

@@ -109,7 +109,7 @@ fn alu_raw() {
 
 #[test]
 fn alu() {
-    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "NOT", "OR", "XOR", "AND"];
+    static TOKENS_ALU: &[&str] = &["ADD", "SUB", "ADDC", "SUBC", "OR", "XOR", "AND", "NOT"];
 
     for tok in TOKENS_ALU {
         for pad in 1..5 {

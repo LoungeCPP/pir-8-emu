@@ -3,7 +3,6 @@ use std::convert::TryFrom;
 
 mod serialise;
 mod from_str;
-mod is_valid;
 mod parse_ok;
 mod display;
 mod perform;

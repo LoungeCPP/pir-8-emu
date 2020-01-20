@@ -44,10 +44,12 @@ fn save() {
 fn alu() {
     assert!(Instruction::Alu(AluOperation::Add).is_valid());
     assert!(Instruction::Alu(AluOperation::Sub).is_valid());
-    assert!(Instruction::Alu(AluOperation::Not).is_valid());
+    assert!(Instruction::Alu(AluOperation::AddC).is_valid());
+    assert!(Instruction::Alu(AluOperation::SubC).is_valid());
     assert!(Instruction::Alu(AluOperation::Or).is_valid());
     assert!(Instruction::Alu(AluOperation::Xor).is_valid());
     assert!(Instruction::Alu(AluOperation::And).is_valid());
+    assert!(Instruction::Alu(AluOperation::Not).is_valid());
 }
 
 #[test]

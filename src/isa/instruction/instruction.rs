@@ -193,12 +193,10 @@ impl Instruction {
     /// assert!(Instruction::Alu(AluOperation::Or).is_valid());
     ///
     /// assert!(!Instruction::Reserved(0).is_valid());
-    /// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());
     /// ```
     pub fn is_valid(self) -> bool {
         match self {
             Instruction::Reserved(_) => false,
-            Instruction::Alu(op) => op.is_valid(),
             _ => true,
         }
     }
@@ -510,8 +508,6 @@ impl From<bool> for InstructionRegisterPair {
 /// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AluOperation {
-    /// Reserved operation, contains the entire nibble
-    Reserved(u8),
     /// Addition of register X and register Y
     Add,
     /// Subtraction of register Y from register X (X-Y)
@@ -536,23 +532,6 @@ pub enum AluOperation {
 }
 
 impl AluOperation {
-    /// Check if this operation doesn't use reserved space
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use pir_8_emu::isa::instruction::AluOperation;
-    /// assert!(AluOperation::Or.is_valid());
-    ///
-    /// assert!(!AluOperation::Reserved(0b0011).is_valid());
-    /// ```
-    pub fn is_valid(self) -> bool {
-        match self {
-            AluOperation::Reserved(_) => false,
-            _ => true,
-        }
-    }
-
     /// Perform the ALU operation on the specified operands
     ///
     /// Returns `0` and sets carry for reserved ops.
@@ -609,7 +588,6 @@ impl TryFrom<u8> for AluOperation {
 impl Into<u8> for AluOperation {
     fn into(self) -> u8 {
         match self {
-            AluOperation::Reserved(raw) => raw,
             AluOperation::Add => 0b0000,
             AluOperation::Sub => 0b0001,
             AluOperation::AddC => 0b0010,
