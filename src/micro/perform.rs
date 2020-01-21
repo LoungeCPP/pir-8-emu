@@ -83,12 +83,10 @@ impl MicroOp {
                 let byte = stack.pop().ok_or(MicroOpPerformError::MicrostackUnderflow)?;
 
                 **sp = sp.wrapping_sub(1);
-                **adr = **sp;
-                memory[**adr] = byte;
+                memory[**sp] = byte;
             }
             MicroOp::StackPop => {
-                **adr = **sp;
-                let byte = memory[**adr];
+                let byte = memory[**sp];
                 **sp = sp.wrapping_add(1);
 
                 stack.push(byte);

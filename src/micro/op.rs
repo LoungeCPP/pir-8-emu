@@ -27,9 +27,9 @@ pub enum MicroOp {
     /// Read both bytes of ADR onto the μstack
     AdrRead,
 
-    /// Push a byte from the top of the μstack to the stack. Clobbers ADR (becomes previous value of SP)
+    /// Push a byte from the top of the μstack to the stack
     StackPush,
-    /// Pop a byte from the stack. Clobbers ADR (becomes SP)
+    /// Pop a byte from the stack to the μstack
     StackPop,
 
     /// Perform an ALU operation

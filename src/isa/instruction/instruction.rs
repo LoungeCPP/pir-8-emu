@@ -499,8 +499,8 @@ impl From<bool> for InstructionRegisterPair {
 /// -----|------|-------|------------
 /// 0000 | ADD  |   1   | Addition of register X and register Y
 /// 0001 | SUB  |   1   | Subtraction of register Y from register X (X-Y)
-/// 0010 | ADDC |   1   | Addition of register X and register Y, using the carry bit from F
-/// 0011 | SUBC |   1   | Subtraction of register Y from register X (X-Y), using the carry bit from F
+/// 0010 | ADDC |   1   | Addition of register X and register Y, using the carry bit from F (X+Y+C)
+/// 0011 | SUBC |   1   | Subtraction of register Y from register X (X-Y), using the carry bit from F (X-Y-C)
 /// 0100 |  OR  |   1   | Bitwise OR
 /// 0101 | XOR  |   1   | Bitwise XOR
 /// 0110 | AND  |   1   | Bitwise AND
