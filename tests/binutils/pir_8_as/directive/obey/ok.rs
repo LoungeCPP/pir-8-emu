@@ -1,4 +1,4 @@
-use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelLoad};
+use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelFragment, LabelLoad};
 use rand::distributions::{Alphanumeric, Distribution};
 use std::collections::BTreeMap;
 use rand::thread_rng;
@@ -49,19 +49,21 @@ fn save_label() {
 
 #[test]
 fn load_label_present() {
-    for offset in -0x10..0x10 {
-        for token_len in 1..5 {
-            for _ in 0..5 {
-                let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
+    for frag in &[LabelFragment::Full, LabelFragment::High, LabelFragment::Low] {
+        for offset in -0x10..0x10 {
+            for token_len in 1..5 {
+                for _ in 0..5 {
+                    let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
 
-                let mut labels = vec![(label.clone(), token_len * 0x1A)].into_iter().collect();
-                let mut next_output_address = None;
+                    let mut labels = vec![(label.clone(), token_len * 0x1A)].into_iter().collect();
+                    let mut next_output_address = None;
 
-                assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
-                           Ok(Some(Ok(LabelLoad::HaveImmediately((((token_len * 0x1A) as i16).wrapping_add(offset)) as u16)))));
+                    assert_eq!(AssemblerDirective::LoadLabel(&label, offset, *frag).obey(&mut next_output_address, &mut labels),
+                               Ok(Some(Ok(LabelLoad::HaveImmediately((((token_len * 0x1A) as i16).wrapping_add(offset)) as u16, *frag)))));
 
-                assert_eq!(next_output_address, None);
-                assert_eq!(labels, vec![(label, token_len * 0x1A)].into_iter().collect());
+                    assert_eq!(next_output_address, None);
+                    assert_eq!(labels, vec![(label, token_len * 0x1A)].into_iter().collect());
+                }
             }
         }
     }
@@ -69,19 +71,21 @@ fn load_label_present() {
 
 #[test]
 fn load_label_missing() {
-    for offset in -0x10..0x10 {
-        for token_len in 1..5 {
-            for _ in 0..5 {
-                let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
+    for frag in &[LabelFragment::Full, LabelFragment::High, LabelFragment::Low] {
+        for offset in -0x10..0x10 {
+            for token_len in 1..5 {
+                for _ in 0..5 {
+                    let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len as usize).collect();
 
-                let mut labels = BTreeMap::new();
-                let mut next_output_address = None;
+                    let mut labels = BTreeMap::new();
+                    let mut next_output_address = None;
 
-                assert_eq!(AssemblerDirective::LoadLabel(&label, offset).obey(&mut next_output_address, &mut labels),
-                           Ok(Some(Ok(LabelLoad::WaitFor(label.clone(), offset)))));
+                    assert_eq!(AssemblerDirective::LoadLabel(&label, offset, *frag).obey(&mut next_output_address, &mut labels),
+                               Ok(Some(Ok(LabelLoad::WaitFor(label.clone(), offset, *frag)))));
 
-                assert_eq!(next_output_address, None);
-                assert_eq!(labels, BTreeMap::new());
+                    assert_eq!(next_output_address, None);
+                    assert_eq!(labels, BTreeMap::new());
+                }
             }
         }
     }

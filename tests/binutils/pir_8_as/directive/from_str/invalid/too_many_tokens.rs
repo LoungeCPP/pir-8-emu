@@ -24,7 +24,11 @@ fn save_label() {
 
 #[test]
 fn load_label() {
-    label("load");
+    for frag in &["full", "high", "low"] {
+        for pad in 1..5 {
+            label(&format!("load{e:w$}{}", frag, e = "", w = pad));
+        }
+    }
 }
 
 

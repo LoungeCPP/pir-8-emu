@@ -82,21 +82,28 @@ fn actual_main() -> Result<(), i32> {
                     })? {
                     match ob {
                         Ok(ll) => {
-                            if data_remaining != 2 {
-                                eprintln!("Error: attempted to load label data when expecting {} bytes at {}:{}:",
+                            let width_err = |data_remaining, frag: pir_8_emu::binutils::pir_8_as::LabelFragment| if data_remaining != frag.len() {
+                                eprintln!("Error: attempted to load {}-byte label data when expecting {} bytes at {}:{}:",
+                                          frag.len(),
                                           data_remaining,
                                           input_name,
                                           line_number);
                                 eprintln!("{}", line_orig);
-                                return Err(8);
-                            }
+                                Err(8)
+                            } else {
+                                Ok(())
+                            };
 
                             match ll {
-                                pir_8_emu::binutils::pir_8_as::LabelLoad::HaveImmediately(addr) => label_data = Some(addr),
-                                pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl, offset) => {
-                                    output.wait_for_label(lbl, offset);
+                                pir_8_emu::binutils::pir_8_as::LabelLoad::HaveImmediately(addr, frag) => {
+                                    width_err(data_remaining, frag)?;
+                                    label_data = Some((addr, frag));
+                                }
+                                pir_8_emu::binutils::pir_8_as::LabelLoad::WaitFor(lbl, offset, frag) => {
+                                    width_err(data_remaining, frag)?;
+                                    output.wait_for_label(lbl, offset, frag);
                                     data_remaining = 0;
-                                    next_output_address = Some(next_output_address.unwrap_or(0) + 2);
+                                    next_output_address = Some(next_output_address.unwrap_or(0) + frag.len() as u16);
                                     continue;
                                 }
                             }
@@ -141,24 +148,25 @@ fn actual_main() -> Result<(), i32> {
             } else if data_remaining != 0 {
                 let line = line.trim_start();
 
-                let data: u16 = if let Some(addr) = label_data {
-                    addr
-                } else {
-                    pir_8_emu::util::parse_with_prefix(line).and_then(|data| pir_8_emu::util::limit_to_width(data, data_remaining * 8))
-                        .ok_or_else(|| {
-                            eprintln!("Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:",
-                                      last_instruction.display(&registers),
-                                      data_remaining,
-                                      input_name,
-                                      line_number);
-                            eprintln!("{}", line_orig);
-                            eprintln!("{}",
-                                      pir_8_emu::isa::instruction::ParseInstructionError::UnrecognisedToken((line.as_ptr() as usize) -
-                                                                                                            (line_orig.as_ptr() as usize),
-                                                                                                            DATA_REMAINING_EXPECTEDS[data_remaining as usize -
-                                                                                                            1]));
-                            7
-                        })?
+                let data: u16 = match label_data {
+                    Some((addr, pir_8_emu::binutils::pir_8_as::LabelFragment::Full)) => addr,
+                    Some((addr, pir_8_emu::binutils::pir_8_as::LabelFragment::High)) => addr >> 8,
+                    Some((addr, pir_8_emu::binutils::pir_8_as::LabelFragment::Low)) => addr & 0xFF,
+                    None =>
+                        pir_8_emu::util::parse_with_prefix(line).and_then(|data| pir_8_emu::util::limit_to_width(data, data_remaining * 8))
+                            .ok_or_else(|| {
+                                eprintln!("Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:",
+                                          last_instruction.display(&registers),
+                                          data_remaining,
+                                          input_name,
+                                          line_number);
+                                eprintln!("{}", line_orig);
+                                eprintln!("{}",
+                                          pir_8_emu::isa::instruction::ParseInstructionError::UnrecognisedToken(
+                                              (line.as_ptr() as usize) - (line_orig.as_ptr() as usize),
+                                              DATA_REMAINING_EXPECTEDS[data_remaining as usize - 1]));
+                                7
+                            })?,
                 };
 
                 let data_length = data_remaining; // pir_8_emu::util::min_byte_width(data) doesn't handle, e.g. JUMP 0x0000

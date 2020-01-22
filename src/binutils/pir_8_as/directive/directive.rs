@@ -1,6 +1,6 @@
 use self::super::super::super::super::isa::instruction::ParseInstructionError;
+use self::super::super::{LabelFragment, LabelLoad};
 use self::super::AssemblerDirectiveObeyError;
-use self::super::super::LabelLoad;
 use std::collections::BTreeMap;
 
 
@@ -19,16 +19,18 @@ pub enum AssemblerDirective<'s> {
     /// Syntax: `:label save [name]`
     SaveLabel(&'s str),
 
-    /// Load the label with the specified name, or wait for it to be saved later, adding the specified offset
+    /// Load the specified part of the label with the specified name, or wait for it to be saved later, adding the specified
+    /// offset
     ///
     /// Not having saved all previously loaded labels by the end of input is an error
     ///
-    /// Attempting to load a label when the current instruction doesn't expect 2-byte data is an error
+    /// Attempting to load a full label when the current instruction doesn't expect 2-byte data is an error, and
+    /// attempting to load a partial label when the current instruction doesn't expect 1-byte data is an error.
     ///
-    /// Syntax: `:label load [name]`
+    /// Syntax: `:label load [full|high|low] [name]`
     ///
-    /// Syntax: `:label load-offset [name] [offset]`
-    LoadLabel(&'s str, i16),
+    /// Syntax: `:label load-offset [full|high|low] [name] [offset]`
+    LoadLabel(&'s str, i16, LabelFragment),
 
     /// Blindly write the specified literal
     ///
@@ -46,15 +48,15 @@ impl<'s> AssemblerDirective<'s> {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::binutils::pir_8_as::AssemblerDirective;
+    /// # use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelFragment};
     /// assert_eq!(AssemblerDirective::from_str(":origin 0x0110"),
     ///            Ok(Some(AssemblerDirective::SetOrigin(0x0110))));
     ///
-    /// assert_eq!(AssemblerDirective::from_str(": label load OwO"),
-    ///            Ok(Some(AssemblerDirective::LoadLabel("OwO", 0))));
+    /// assert_eq!(AssemblerDirective::from_str(": label load full OwO"),
+    ///            Ok(Some(AssemblerDirective::LoadLabel("OwO", 0, LabelFragment::Full))));
     ///
-    /// assert_eq!(AssemblerDirective::from_str(": label load-offset OwO -1"),
-    ///            Ok(Some(AssemblerDirective::LoadLabel("OwO", -1))));
+    /// assert_eq!(AssemblerDirective::from_str(": label load-offset high OwO -1"),
+    ///            Ok(Some(AssemblerDirective::LoadLabel("OwO", -1, LabelFragment::High))));
     ///
     /// assert_eq!(AssemblerDirective::from_str("label save uwu"),
     ///            Ok(None));
@@ -69,7 +71,7 @@ impl<'s> AssemblerDirective<'s> {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelLoad};
+    /// # use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelFragment, LabelLoad};
     /// # use std::collections::BTreeMap;
     /// let mut next_output_address = None;
     /// let mut labels = BTreeMap::new();
@@ -78,18 +80,18 @@ impl<'s> AssemblerDirective<'s> {
     ///                .obey(&mut next_output_address, &mut labels),
     ///            Ok(None));
     ///
-    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0)
+    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0, LabelFragment::Full)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(Ok(LabelLoad::WaitFor("owo".to_string(), 0)))));
+    ///            Ok(Some(Ok(LabelLoad::WaitFor("owo".to_string(), 0, LabelFragment::Full)))));
     /// assert_eq!(AssemblerDirective::SaveLabel("owo")
     ///                .obey(&mut next_output_address, &mut labels),
     ///            Ok(None));
-    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0)
+    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0, LabelFragment::High)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x0110)))));
-    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0x0F)
+    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x0110, LabelFragment::High)))));
+    /// assert_eq!(AssemblerDirective::LoadLabel("owo", 0x0F, LabelFragment::Low)
     ///                .obey(&mut next_output_address, &mut labels),
-    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x011F)))));
+    ///            Ok(Some(Ok(LabelLoad::HaveImmediately(0x011F, LabelFragment::Low)))));
     ///
     /// assert_eq!(AssemblerDirective::InsertLiteral("EwE")
     ///                .obey(&mut next_output_address, &mut labels),
@@ -124,15 +126,16 @@ impl<'s> AssemblerDirective<'s> {
                     Err(AssemblerDirectiveObeyError::LabelNameTaken(lbl))
                 }
             }
-            AssemblerDirective::LoadLabel(lbl, offset) => {
+            AssemblerDirective::LoadLabel(lbl, offset, fragment) => {
                 match labels.get(*lbl) {
-                    None => Ok(Some(Ok(LabelLoad::WaitFor(lbl.to_string(), *offset)))),
+                    None => Ok(Some(Ok(LabelLoad::WaitFor(lbl.to_string(), *offset, *fragment)))),
                     Some(&addr) => {
                         Ok(Some(Ok(LabelLoad::HaveImmediately(if *offset < 0 {
-                            addr.wrapping_sub(-*offset as u16)
-                        } else {
-                            addr.wrapping_add(*offset as u16)
-                        }))))
+                                                                  addr.wrapping_sub(-*offset as u16)
+                                                              } else {
+                                                                  addr.wrapping_add(*offset as u16)
+                                                              },
+                                                              *fragment))))
                     }
                 }
             }

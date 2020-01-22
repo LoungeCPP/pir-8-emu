@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use self::super::LabelFragment;
 use std::io::{self, Write};
 
 
@@ -7,7 +8,7 @@ use std::io::{self, Write};
 /// # Examples
 ///
 /// ```
-/// # use pir_8_emu::binutils::pir_8_as::OutputWithQueue;
+/// # use pir_8_emu::binutils::pir_8_as::{OutputWithQueue, LabelFragment};
 /// # use std::collections::BTreeMap;
 /// let mut dest = vec![];
 /// # let mut output = OutputWithQueue::new(unsafe { &mut *(&mut dest as *mut _) });
@@ -19,26 +20,26 @@ use std::io::{self, Write};
 /// output.write_all(&[0xFE], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("OwO".to_string(), 0);
+/// output.wait_for_label("OwO".to_string(), 0, LabelFragment::Full);
 /// output.write_all(&[0xFF], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("OwO".to_string(), 0x0F);
+/// output.wait_for_label("OwO".to_string(), 0x0F, LabelFragment::Low);
 /// output.write_all(&[0xFF], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("eWe".to_string(), 0);
+/// output.wait_for_label("eWe".to_string(), 0, LabelFragment::Full);
 /// output.write_all(&[0x4C], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
-/// output.wait_for_label("ЦшЦ".to_string(), 0);
+/// output.wait_for_label("ЦшЦ".to_string(), 0, LabelFragment::Full);
 /// output.write_all(&[0xEC], &labels).unwrap();
 /// assert_eq!(&dest, &[0xFEu8]);
 ///
 /// labels.insert("OwO".to_string(), 0x0110);
 /// labels.insert("ЦшЦ".to_string(), 0x0420);
 /// output.write_all(&[0xFA], &labels).unwrap();
-/// assert_eq!(&dest, &[0xFEu8, 0x01, 0x10, 0xFF, 0x01, 0x1F, 0xFF]);
+/// assert_eq!(&dest, &[0xFEu8, 0x01, 0x10, 0xFF, 0x1F, 0xFF]);
 ///
 /// assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
 /// ```
@@ -61,8 +62,8 @@ impl OutputWithQueue {
     }
 
     /// Queue all output going forward until a label with the specified name shows up, and offset it by the specified amount
-    pub fn wait_for_label(&mut self, label: String, offset: i16) {
-        self.buffer.push_back(BufferedData::new(label, offset))
+    pub fn wait_for_label(&mut self, label: String, offset: i16, fragment: LabelFragment) {
+        self.buffer.push_back(BufferedData::new(label, offset, fragment))
     }
 
     /// Write the specified bytes to the output or queue them
@@ -118,14 +119,16 @@ impl OutputWithQueue {
 struct BufferedData {
     pub label: String,
     pub offset: i16,
+    pub fragment: LabelFragment,
     pub byte_stream: Vec<u8>,
 }
 
 impl BufferedData {
-    pub fn new(label: String, offset: i16) -> BufferedData {
+    pub fn new(label: String, offset: i16, fragment: LabelFragment) -> BufferedData {
         BufferedData {
             label: label,
             offset: offset,
+            fragment: fragment,
             byte_stream: vec![],
         }
     }
@@ -138,8 +141,14 @@ impl BufferedData {
                 } else {
                     addr.wrapping_add(self.offset as u16)
                 };
+                let addr_hi = (addr >> 8) as u8;
+                let addr_lo = (addr & 0b1111_1111) as u8;
 
-                to.write_all(&[(addr >> 8) as u8, (addr & 0b1111_1111) as u8])?;
+                match self.fragment {
+                    LabelFragment::Full => to.write_all(&[addr_hi, addr_lo])?,
+                    LabelFragment::High => to.write_all(&[addr_hi])?,
+                    LabelFragment::Low => to.write_all(&[addr_lo])?,
+                }
                 to.write_all(&self.byte_stream)?;
 
                 Ok(true)

@@ -47,19 +47,20 @@ Start with a colon, not limited to ASCII:
 
     Save the current output address to be recalled anywhere else in the program assembly
 
-  :label load <NAME>
+  :label load <full|high|low> <NAME>
 
-    Substitute the output address of previously saved label called NAME in this place
+    Substitute a fragment of the output address of previously saved label called NAME in this place
 
     If the NAME label wasn't yet specified, output will be buffered until it's declared
 
-    Using this when the current instruction isn't expecting two data bytes will yield an error
+    Using this with "full" when the current instruction isn't expecting two data bytes will yield an error, and
+    using this with "high" or "low" when the current instruction isn't expecting one data byte will yield an error.
 
     Having specified this with a NAME without a corresponding :label save directive will yield an error
 
-  :label load-offset <NAME> <OFFSET>
+  :label load-offset <full|high|low> <NAME> <OFFSET>
 
-    Like :label load NAME, but add (signed) OFFSET afterwards
+    Like :label load FRAGMENT NAME, but add (signed) OFFSET afterwards
 
     The resulting address will wrap around both sides
 

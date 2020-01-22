@@ -1,4 +1,4 @@
-use pir_8_emu::binutils::pir_8_as::OutputWithQueue;
+use pir_8_emu::binutils::pir_8_as::{OutputWithQueue, LabelFragment};
 use std::collections::BTreeMap;
 
 
@@ -7,9 +7,9 @@ fn wait_for_label_write_no() {
     let mut dest = vec![];
     let mut output = OutputWithQueue::new(unsafe { &mut *(&mut dest as *mut _) });
 
-    output.wait_for_label("owo".to_string(), 0);
+    output.wait_for_label("owo".to_string(), 0, LabelFragment::Low);
     output.write_all(&['U' as u8, 'w' as u8, 'U' as u8], &BTreeMap::new()).unwrap();
-    output.wait_for_label("eWe".to_string(), 0);
+    output.wait_for_label("eWe".to_string(), 0, LabelFragment::Low);
     output.write_all(&['O' as u8, 'm' as u8, 'O' as u8], &BTreeMap::new()).unwrap();
 
     assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()].into_iter().collect()));
@@ -23,13 +23,13 @@ fn wait_for_label_write_yes() {
 
     let labels = vec![("owo".to_string(), 0x0110)].into_iter().collect();
 
-    output.wait_for_label("owo".to_string(), 1);
+    output.wait_for_label("owo".to_string(), 1, LabelFragment::Low);
     output.write_all(&['U' as u8, 'w' as u8, 'U' as u8], &labels).unwrap();
-    output.wait_for_label("eWe".to_string(), 0);
+    output.wait_for_label("eWe".to_string(), 0, LabelFragment::Low);
     output.write_all(&['O' as u8, 'm' as u8, 'O' as u8], &labels).unwrap();
 
     assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
-    assert_eq!(&dest, &[0x01, 0x11, 'U' as u8, 'w' as u8, 'U' as u8]);
+    assert_eq!(&dest, &[0x11, 'U' as u8, 'w' as u8, 'U' as u8]);
 }
 
 #[test]
@@ -37,8 +37,8 @@ fn flush_no() {
     let mut dest = vec![];
     let mut output = OutputWithQueue::new(unsafe { &mut *(&mut dest as *mut _) });
 
-    output.wait_for_label("owo".to_string(), 0);
-    output.wait_for_label("eWe".to_string(), 0);
+    output.wait_for_label("owo".to_string(), 0, LabelFragment::Low);
+    output.wait_for_label("eWe".to_string(), 0, LabelFragment::Low);
     output.flush(&BTreeMap::new()).unwrap();
 
     assert_eq!(output.unfound_labels(&BTreeMap::new()), Some(vec!["owo".to_string(), "eWe".to_string()].into_iter().collect()));
@@ -52,10 +52,10 @@ fn flush_yes() {
 
     let labels = vec![("owo".to_string(), 0x0110)].into_iter().collect();
 
-    output.wait_for_label("owo".to_string(), 0);
-    output.wait_for_label("eWe".to_string(), 0);
+    output.wait_for_label("owo".to_string(), 0, LabelFragment::Low);
+    output.wait_for_label("eWe".to_string(), 0, LabelFragment::Low);
     output.flush(&labels).unwrap();
 
     assert_eq!(output.unfound_labels(&labels), Some(vec!["eWe".to_string()].into_iter().collect()));
-    assert_eq!(&dest, &[0x01u8, 0x10]);
+    assert_eq!(&dest, &[0x10u8]);
 }

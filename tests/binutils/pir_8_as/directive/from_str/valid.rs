@@ -1,4 +1,4 @@
-use pir_8_emu::binutils::pir_8_as::AssemblerDirective;
+use pir_8_emu::binutils::pir_8_as::{AssemblerDirective, LabelFragment};
 use rand::distributions::{Alphanumeric, Distribution};
 use rand::thread_rng;
 
@@ -26,14 +26,26 @@ fn save_label() {
 
 #[test]
 fn load_label() {
-    label("load", "", |l| AssemblerDirective::LoadLabel(l, 0));
+    for (frag, frag_s) in &[(LabelFragment::Full, "full"), (LabelFragment::High, "high"), (LabelFragment::Low, "low")] {
+        for pad in 1..5 {
+            label(&format!("load{e:w$}{}", frag_s, e = "", w = pad), "", |l| AssemblerDirective::LoadLabel(l, 0, *frag));
+        }
+    }
 }
 
 #[test]
 fn load_label_offset() {
-    for i in -0x10..0x10 {
-        label("load-offset", &format!("{}", i), |l| AssemblerDirective::LoadLabel(l, i));
-        label("load-offset", &format!("{:#x}", i), |l| AssemblerDirective::LoadLabel(l, i));
+    for (frag, frag_s) in &[(LabelFragment::Full, "full"), (LabelFragment::High, "high"), (LabelFragment::Low, "low")] {
+        for pad in 1..=1 {
+            for i in -0x10..0x10 {
+                label(&format!("load-offset{e:w$}{}", frag_s, e = "", w = pad),
+                      &format!("{}", i),
+                      |l| AssemblerDirective::LoadLabel(l, i, *frag));
+                label(&format!("load-offset{e:w$}{}", frag_s, e = "", w = pad),
+                      &format!("{:#x}", i),
+                      |l| AssemblerDirective::LoadLabel(l, i, *frag));
+            }
+        }
     }
 }
 
@@ -45,7 +57,7 @@ fn label<F: Fn(&str) -> AssemblerDirective<'_>>(op: &str, suff: &str, dir: F) {
                 for pad_right in 1..5 {
                     for pad_rright in 1..5 {
                         for token_len in 1..5 {
-                            for _ in 0..5 {
+                            for _ in 0..3 {
                                 let label: String = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect();
 
                                 let dir_str = format!("{e:wll$}:{e:wl$}label{e:wc$}{}{e:wr$}{}{e:wrr$}{}",
