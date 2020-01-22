@@ -19,6 +19,16 @@ fn load_instruction() {
 }
 
 #[test]
+fn adr_write() {
+    constant(MicroOp::AdrWrite, "AdrWrite");
+}
+
+#[test]
+fn adr_read() {
+    constant(MicroOp::AdrRead, "AdrRead");
+}
+
+#[test]
 fn stack_push() {
     constant(MicroOp::StackPush, "StackPush");
 }

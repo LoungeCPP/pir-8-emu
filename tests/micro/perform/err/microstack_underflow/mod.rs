@@ -6,6 +6,35 @@ mod alu;
 
 
 #[test]
+fn adr_write() {
+    for stack_depth in 0..2 {
+        for addr in 0x11..0x22u8 {
+            let uni_orig = universe();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
+
+            let mut stack = match stack_depth {
+                0 => vec![],
+                1 => vec![addr],
+                _ => unreachable!(),
+            };
+
+            assert_eq!(MicroOp::AdrWrite.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
+                       Err(MicroOpPerformError::MicrostackUnderflow));
+
+            assert_eq!(memory, uni_orig.0);
+            assert_eq!(ports, uni_orig.1);
+            assert_eq!(registers, uni_orig.2);
+            assert_eq!(pc, uni_orig.3);
+            assert_eq!(sp, uni_orig.4);
+            assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
+
+            assert_eq!(stack, vec![]);
+        }
+    }
+}
+
+#[test]
 fn load_instruction() {
     let uni_orig = universe();
     let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();

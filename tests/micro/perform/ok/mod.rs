@@ -62,6 +62,69 @@ fn load_instruction() {
 }
 
 #[test]
+fn adr_write() {
+    for i in 1..=0xFF {
+        for addr in 0..0x11u16 {
+            let addr = addr | ((addr + 1) << 8);
+
+            let mut uni_orig = universe();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
+
+            let mut stack = vec![(addr >> 8) as u8, (addr & 0xFF) as u8];
+
+            assert_eq!(MicroOp::AdrWrite.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
+                       Ok(true));
+
+            *uni_orig.5 = addr;
+
+            assert_eq!(memory, uni_orig.0);
+            assert_eq!(ports, uni_orig.1);
+            assert_eq!(registers, uni_orig.2);
+            assert_eq!(pc, uni_orig.3);
+            assert_eq!(sp, uni_orig.4);
+            assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
+
+            assert_eq!(stack, vec![]);
+        }
+    }
+}
+
+#[test]
+fn adr_read() {
+    for i in 1..=0xFF {
+        for addr in 0..0x11u16 {
+            let addr = addr | ((addr + 1) << 8);
+
+            let mut uni_orig = universe();
+            let (mut memory, mut ports, mut registers, mut pc, mut sp, mut adr, mut ins) = universe();
+
+            let mut stack = vec![];
+
+            *adr = addr;
+            adr.reset_rw();
+
+            assert_eq!(MicroOp::AdrRead.perform(&mut stack, &mut memory, &mut ports, &mut registers, &mut pc, &mut sp, &mut adr, &mut ins),
+                       Ok(true));
+
+            *uni_orig.5 = addr;
+            uni_orig.5.reset_rw();
+            let _read_adr = *uni_orig.5;
+
+            assert_eq!(memory, uni_orig.0);
+            assert_eq!(ports, uni_orig.1);
+            assert_eq!(registers, uni_orig.2);
+            assert_eq!(pc, uni_orig.3);
+            assert_eq!(sp, uni_orig.4);
+            assert_eq!(adr, uni_orig.5);
+            assert_eq!(ins, uni_orig.6);
+
+            assert_eq!(stack, vec![(addr >> 8) as u8, (addr & 0xFF) as u8]);
+        }
+    }
+}
+
+#[test]
 fn stack_push() {
     for i in 1..=0xFF {
         for addr in 0..0x11u16 {
@@ -79,8 +142,6 @@ fn stack_push() {
             uni_orig.0[addr - 1] = i;
             let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr - 1;
-            let _read_adr = *uni_orig.5;
-            *uni_orig.5 = addr - 1;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);
@@ -115,8 +176,6 @@ fn stack_pop() {
             uni_orig.0[addr] = i;
             let _read_sp = *uni_orig.4;
             *uni_orig.4 = addr + 1;
-            let _read_adr = *uni_orig.5;
-            *uni_orig.5 = addr;
 
             assert_eq!(memory, uni_orig.0);
             assert_eq!(ports, uni_orig.1);

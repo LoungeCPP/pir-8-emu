@@ -19,8 +19,6 @@ fn stack_push() {
         uni_orig.0[0xFFFF] = i;
         let _read_sp = *uni_orig.4;
         *uni_orig.4 = 0xFFFF;
-        let _read_adr = *uni_orig.5;
-        *uni_orig.5 = 0xFFFF;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);
@@ -53,8 +51,6 @@ fn stack_pop() {
         uni_orig.0[addr] = i;
         let _read_sp = *uni_orig.4;
         *uni_orig.4 = 0x0000;
-        let _read_adr = *uni_orig.5;
-        *uni_orig.5 = addr;
 
         assert_eq!(memory, uni_orig.0);
         assert_eq!(ports, uni_orig.1);
