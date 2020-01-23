@@ -83,10 +83,6 @@ use std::convert::{TryFrom, From};
 /// Effectively, the stack works on 16-bit values, but due to the 8-bit data bus it requires two transfers,
 /// though this is handled via the hardware/microcode.
 ///
-/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C
-/// registers the lesser; the more significant byte will be stored at the lower address in the stack,
-/// the pair of registers are big-endian.
-///
 ///
 /// The Stack manipulation operations are of pattern `1111 10DR`.
 ///
@@ -133,7 +129,7 @@ use std::convert::{TryFrom, From};
 ///
 /// The registers A and B are paired, as are the registers C and D.
 ///
-/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C
+/// Although still two distinct bytes, the A and C registers should be considered the more significant byte whilst B and D
 /// registers the lesser;
 /// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.
 ///
