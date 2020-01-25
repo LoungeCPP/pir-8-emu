@@ -1,0 +1,67 @@
+LOAD IMM C
+:label load high message
+LOAD IMM X
+:label load low  message
+LOAD IMM Y
+1
+ALU SUB
+MOVE S X
+MOVE S D
+
+:label save loop
+MOVE D X
+LOAD IMM Y
+1
+ALU ADD
+MOVE S D
+MOVE C X
+LOAD IMM Y
+0
+ALU ADDC
+MOVE S C
+MADR WRITE C&D
+
+LOAD IMM A
+0           ; port number
+LOAD IND B
+PORT OUT B
+
+MOVE B S
+COMP S
+
+LOAD IMM A
+:label load high end
+LOAD IMM B
+:label load low  end
+MADR WRITE A&B
+JMZG
+LOAD IMM A
+:label load high loop
+LOAD IMM B
+:label load low  loop
+MADR WRITE A&B
+JUMP
+
+:label save end
+HALT
+
+
+:label save message  ; 655-byte long section of the ISA at time of writing
+:literal "Unless stated otherwise, bits are always represented from MSB to LSB (reading left to right) and multi-bytes sequences are big-endian."
+0x0A
+:literal "So, a jump instruction followed by a two byte address would have the following sequence of bytes jump, high address byte, low address byte."
+0x0A
+0x0A
+:literal "# Registers"
+0x0A
+0x0A
+:literal "All the registers will start with an initial value of `0x0`."
+0x0A
+0x0A
+:literal "## Special Purpose Registers"
+0x0A
+0x0A
+:literal "There are some special purpose registers that you cannot directly read/write from, these are used by the CPU for its internal state."
+0x0A
+0x0A
+:literal "There are three 16-bit registers for holding significant memory addresses and a single 8-bit register."
