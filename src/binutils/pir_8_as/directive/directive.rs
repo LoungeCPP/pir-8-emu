@@ -113,7 +113,7 @@ impl<'s> AssemblerDirective<'s> {
             }
             AssemblerDirective::SaveLabel(lbl) => {
                 if !labels.contains_key(*lbl) {
-                    labels.insert(lbl.to_string(),
+                    labels.insert((*lbl).to_string(),
                                   if let Some(&oa) = next_output_address.as_ref() {
                                       oa
                                   } else {
@@ -128,7 +128,7 @@ impl<'s> AssemblerDirective<'s> {
             }
             AssemblerDirective::LoadLabel(lbl, offset, fragment) => {
                 match labels.get(*lbl) {
-                    None => Ok(Some(Ok(LabelLoad::WaitFor(lbl.to_string(), *offset, *fragment)))),
+                    None => Ok(Some(Ok(LabelLoad::WaitFor((*lbl).to_string(), *offset, *fragment)))),
                     Some(&addr) => {
                         Ok(Some(Ok(LabelLoad::HaveImmediately(if *offset < 0 {
                                                                   addr.wrapping_sub(-*offset as u16)

@@ -96,7 +96,7 @@ impl OutputWithQueue {
     /// This repeats until the queue is empty or the label thereatfront doesn't exist in the labelset
     pub fn flush(&mut self, labels: &BTreeMap<String, u16>) -> io::Result<()> {
         while !self.buffer.is_empty() {
-            if self.buffer[0].write_if_ready(&mut self.phys_out, labels)? {
+            if self.buffer[0].write_if_ready(self.phys_out.as_mut(), labels)? {
                 self.buffer.pop_front();
             } else {
                 break;
@@ -133,7 +133,7 @@ impl BufferedData {
         }
     }
 
-    pub fn write_if_ready(&self, to: &mut Box<dyn Write>, labels: &BTreeMap<String, u16>) -> io::Result<bool> {
+    pub fn write_if_ready(&self, to: &mut dyn Write, labels: &BTreeMap<String, u16>) -> io::Result<bool> {
         match labels.get(&self.label) {
             Some(addr) => {
                 let addr = if self.offset < 0 {

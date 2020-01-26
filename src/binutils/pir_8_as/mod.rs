@@ -39,7 +39,7 @@ impl LabelFragment {
     /// assert_eq!(LabelFragment::Full.len(), 2);
     /// assert_eq!(LabelFragment::High.len(), 1);
     /// ```
-    pub fn len(&self) -> u8 {
+    pub fn len(self) -> u8 {
         match self {
             LabelFragment::Full => 2,
             LabelFragment::High | LabelFragment::Low => 1,

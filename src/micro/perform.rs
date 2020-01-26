@@ -194,8 +194,8 @@ fn s_reg_flags(s: u8) -> u8 {
 }
 
 fn push_address(stack: &mut Vec<u8>, address: u16) {
-    let high_byte = ((address >> 8) & 0xFF) as u8;
-    let low_byte = ((address >> 0) & 0xFF) as u8;
+    let high_byte = (address >> 8) as u8;
+    let low_byte = (address & 0xFF) as u8;
 
     stack.push(high_byte);
     stack.push(low_byte);
