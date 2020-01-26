@@ -1,4 +1,4 @@
-version: 0.1.1-{build}
+version: 1.0.0-{build}
 
 skip_tags: false
 
@@ -30,11 +30,11 @@ build_script:
   - make
   - cargo build --verbose --release
   -
-  - mkdir pir-8-emu-v0.1.1
-  - cp target\release\pir-8-as.exe target\release\pir-8-disasm.exe target\release\pir-8-emu.exe pir-8-emu-v0.1.1\
-  - cp C:\BearLibTerminal.dll pir-8-emu-v0.1.1\
-  - strip --strip-all --remove-section=.comment --remove-section=.note pir-8-emu-v0.1.1/pir-8-as.exe pir-8-emu-v0.1.1/pir-8-disasm.exe pir-8-emu-v0.1.1/pir-8-emu.exe
-  - zip -9r pir-8-emu-v0.1.1.zip pir-8-emu-v0.1.1
+  - mkdir pir-8-emu-v1.0.0
+  - cp target\release\pir-8-as.exe target\release\pir-8-disasm.exe target\release\pir-8-emu.exe pir-8-emu-v1.0.0\
+  - cp C:\BearLibTerminal.dll pir-8-emu-v1.0.0\
+  - strip --strip-all --remove-section=.comment --remove-section=.note pir-8-emu-v1.0.0/pir-8-as.exe pir-8-emu-v1.0.0/pir-8-disasm.exe pir-8-emu-v1.0.0/pir-8-emu.exe
+  - zip -9r pir-8-emu-v1.0.0.zip pir-8-emu-v1.0.0
 
 test: off
 test_script:
@@ -42,7 +42,7 @@ test_script:
   - cargo test --verbose --release || true
 
 artifacts:
-  - path: pir-8-emu-v0.1.1.zip
+  - path: pir-8-emu-v1.0.0.zip
 
 deploy:
   provider: GitHub

@@ -36,48 +36,56 @@
 //! An assembler with an… idiosyncratic syntax:
 //!
 //! ```p8a
-//! JUMP
-//! :label load text
-//!
-//! :literal "*pounces on u* OwO what's whis?"
-//! 0x00
-//!
-//! :label save text
+//! LOAD IMM C
+//! :label load high message
+//! LOAD IMM X
+//! :label load low  message
 //! LOAD IMM Y
 //! 1
+//! ALU SUB
+//! MOVE S X
+//! MOVE S D
+//!
+//! :label save loop
+//! MOVE D X
+//! LOAD IMM Y
+//! 1
+//! ALU ADD
+//! MOVE S D
+//! MOVE C X
+//! LOAD IMM Y
+//! 0
+//! ALU ADDC
+//! MOVE S C
+//! MADR WRITE C&D
 //!
 //! LOAD IMM A
-//! 0x00
+//! 0           ; port number
+//! LOAD IND B
+//! PORT OUT B
 //!
-//! LOAD IMM X
-//! 0x03
-//!
-//! :label save loop-head
-//! SAVE X
-//! :label load-offset load-byte 2
-//!
-//! JUMP
-//! :label load load-byte
-//!
-//! :label save post-load
-//! PORT OUT S
+//! MOVE B S
 //! COMP S
-//! JMPZ
-//! :label load end
 //!
-//! ALU ADD
-//! MOVE S X
+//! LOAD IMM A
+//! :label load high end
+//! LOAD IMM B
+//! :label load low  end
+//! MADR WRITE A&B
+//! JMZG
+//! LOAD IMM A
+//! :label load high loop
+//! LOAD IMM B
+//! :label load low  loop
+//! MADR WRITE A&B
 //! JUMP
-//! :label load loop-head
 //!
 //! :label save end
 //! HALT
 //!
-//! :label save load-byte
-//! LOAD IND S
-//! 0x0000
-//! JUMP
-//! :label load post-load
+//!
+//! :label save message
+//! :literal "*pounces on u* OwO what's whis?"
 //! ```
 //!
 //! If you'd rather use a more normal syntax, [CatPlusPlus](https://github.com/TheCatPlusPlus) has also made
@@ -124,17 +132,47 @@
 //! A dissassembler with a [`ndisasm`](https://www.nasm.us)-based frontend:
 //!
 //! ```plaintext
-//! $ pir-8-disasm -k 1,7 test-data/xor-swap-with-loads.p8b
-//! 00000000   24   LOAD IND A
-//! 00000002 0110 D 0x0110
-//! 00000003   1D   LOAD IMM B
-//! 00000004   69 D 0x69
-//! 00000005   62   MOVE A X
-//! 00000006   6B   MOVE B Y
-//! 00000007   35   ALU XOR
-//! 00000008      S skipping 0x07 bytes
-//! 00000010   4C   MOVE S A
-//! 00000011   FF   HALT
+//! $ pir-8-disasm -k 0x27,31 test-data/copy-any-length-literal-to-port.p8b
+//! 00000000   1E   LOAD IMM C
+//! 00000001   00 D 0x00
+//! 00000002   1A   LOAD IMM X
+//! 00000003   27 D 0x27
+//! 00000004   1B   LOAD IMM Y
+//! 00000005   01 D 0x01
+//! 00000006   31   ALU SUB
+//! 00000007   4A   MOVE S X
+//! 00000008   4F   MOVE S D
+//! 00000009   7A   MOVE D X
+//! 0000000A   1B   LOAD IMM Y
+//! 0000000B   01 D 0x01
+//! 0000000C   30   ALU ADD
+//! 0000000D   4F   MOVE S D
+//! 0000000E   72   MOVE C X
+//! 0000000F   1B   LOAD IMM Y
+//! 00000010   00 D 0x00
+//! 00000011   32   ALU ADDC
+//! 00000012   4E   MOVE S C
+//! 00000013   0D   MADR WRITE C&D
+//! 00000014   1C   LOAD IMM A
+//! 00000015   00 D 0x00
+//! 00000016   25   LOAD IND B
+//! 00000017   E5   PORT OUT B
+//! 00000018   69   MOVE B S
+//! 00000019   F1   COMP S
+//! 0000001A   1C   LOAD IMM A
+//! 0000001B   00 D 0x00
+//! 0000001C   1D   LOAD IMM B
+//! 0000001D   26 D 0x26
+//! 0000001E   0C   MADR WRITE A&B
+//! 0000001F   14   JMZG
+//! 00000020   1C   LOAD IMM A
+//! 00000021   00 D 0x00
+//! 00000022   1D   LOAD IMM B
+//! 00000023   09 D 0x09
+//! 00000024   0C   MADR WRITE A&B
+//! 00000025   17   JUMP
+//! 00000026   FF   HALT
+//! 00000027      S skipping 0x1F bytes
 //! ```
 //!
 //! ## [`pir-8-emu`](https://rawcdn.githack.com/LoungeCPP/pir-8-emu/man/pir-8-emu.1.html)
