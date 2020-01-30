@@ -11,7 +11,7 @@ Assembler for the pir-8.
 
 Specified input files (or "-" for stdin) are assembled sequentially into the output file.
 
-The comment characer is ";".
+The comment character is ";".
 
 The assembly format is as follows:
 
