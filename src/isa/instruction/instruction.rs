@@ -30,24 +30,72 @@ use std::convert::{TryFrom, From};
 ///
 /// Bit Mask  | Name | Count | Description
 /// ----------|------|-------|------------
-/// 0000 0XXX |      |     8 | Reserved
-/// 0000 10XX |      |     4 | Reserved
-/// 0000 11XX | MADR |     4 | Move a value to/from the ADR register, see section below
-/// 0001 0XXX | JUMP |     8 | Jump, see section below
-/// 0001 1AAA | LOAD |     8 | Load the the next byte into register `AAA`
-///                       |||| (PC will be incremented a second time)
-/// 0010 0AAA | LOAD |     8 | Load value in address indicated by `ADR` into register `AAA`
+/// 000X XXXX | LOAD |    32 | Load, see section below
+/// 0010 0XXX | JUMP |     8 | Jump, see section below
 /// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by `ADR`
 /// 0011 XXXX | ALU  |    16 | ALU based operations, see section below
 /// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`
 /// 10XX XXXX |      |    64 | Reserved
-/// 110X XXXX |      |    32 | Reserved
+/// 1100 XXXX |      |    16 | Reserved
+/// 1101 0XXX |      |     8 | Reserved
+/// 1101 10XX | MADR |     4 | Move a value to/from the ADR register, see section below
+/// 1101 11XX |      |     4 | Reserved
 /// 1110 XXXX | PORT |    16 | Perform I/O, see section below
 /// 1111 0AAA | COMP |     8 | Compare register S with register `AAA`, see section below
 /// 1111 10XX | STCK |     4 | Stack manipulation, see section below
 /// 1111 110X |      |     2 | Reserved
 /// 1111 1110 | CLRF |     1 | Clear the 'F' register, by setting it to `0000 0000`
 /// 1111 1111 | HALT |     1 | Stop the CPU from doing any more execution
+///
+/// ## LOAD
+///
+/// There are various types of load instruction, all under the same `000X XXXX` pattern.
+/// They may further increment that PC, as described in their relevant sub-sections.
+/// Some of the potential 'LOAD' instruction patterns are actually reserved instruction codes.
+///
+/// The following table is a break down of possible LOAD instructions.
+/// If you consider load instruction pattern as `000M XXXX`, the M bit is 0 for single byte loads and 1 for multi-byte loads.
+///
+/// Bit Mask | Load Type      | Description
+/// ---------|----------------|------------
+///   0 0AAA | Byte immediate | Load the the next byte into register `AAA`
+///   0 1AAA | From memory    | Load the byte address by `ADR` into register `AAA`
+///   1 00XX | Wide immediate | Load the the next two bytes into a register pair
+///   1 01XX |                | Reserved
+///   1 1XXX |                | Reserved
+///
+/// ### Wide Immediate
+///
+/// When performing a wide immediate load, two bytes are read from memory into a pair of registers, as indicated by the two
+/// bits `RR`.
+///
+/// The first byte read (after the actual LOAD instruction itself) is loaded as the high byte, the second is the low byte;
+/// registers A, C and X are considered the 'high byte' for this purpose;
+/// if loading into ADR, the high/low bytes are loaded as the high/low byte of the address for ADR.
+///
+/// RR | Registers
+/// ---|----------
+/// 00 | A and B
+/// 01 | C and D
+/// 10 | X and Y
+/// 11 | ADR
+///
+/// The PC is incremented twice more.
+///
+/// ### Byte Immediate
+///
+/// When performing a byte immediate load, the next byte (after this instruction) is read from memory into a register, as
+/// indicated by the bits `AAA`.
+/// The register line up with the previously defined table for one of FSXYABCD.
+///
+/// The PC is incremented once more.
+///
+/// ### From memory
+///
+/// For loading from memory, the memory address to load from should have already been set in the ADR register and the
+/// instruction says what register to load into.
+///
+/// The PC is not incremented any further.
 ///
 /// ## PORT - I/O
 ///
@@ -143,23 +191,25 @@ use std::convert::{TryFrom, From};
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
-    /// Manipulate ADR, see section above
-    Madr {
-        d: InstructionMadrDirection,
-        r: InstructionRegisterPair,
-    },
+    /// Load the the next byte into register `AAA` (PC will be incremented a second time), see section above
+    LoadImmediateByte { aaa: u8, },
+    /// Load the the next two byte into register pair `RR` (PC will be incremented two more times), see section above
+    LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair, },
+    /// Load the byte at the address specified by `ADR` into register `AAA`, see section above
+    LoadIndirect { aaa: u8, },
     /// Jump, see member doc
     Jump(InstructionJumpCondition),
-    /// Load the the next byte into register `AAA` (PC will be incremented a second time)
-    LoadImmediate { aaa: u8, },
-    /// Load value in address indicated by the next two bytes into register `AAA` (PC will be incremented two more times)
-    LoadIndirect { aaa: u8, },
     /// Store value in register `AAA` in address indicated by the next two bytes (PC will be incremented two more times)
     Save { aaa: u8, },
     /// ALU based operations, see member doc
     Alu(AluOperation),
     /// Move a value from register `AAA` to register `BBB`
     Move { aaa: u8, bbb: u8, },
+    /// Manipulate ADR, see section above
+    Madr {
+        d: InstructionMadrDirection,
+        r: InstructionRegisterPair,
+    },
     /// Perform I/O, see section above
     Port {
         d: InstructionPortDirection,
@@ -202,15 +252,17 @@ impl Instruction {
     /// # Examples
     ///
     /// ```
-    /// # use pir_8_emu::isa::instruction::{AluOperation, Instruction};
+    /// # use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperation, Instruction};
     /// assert_eq!(Instruction::Clrf.data_length(), 0);
     /// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);
     ///
-    /// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);
+    /// assert_eq!(Instruction::LoadImmediateByte { aaa: 0 }.data_length(), 1);
+    /// assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.data_length(), 2);
     /// ```
     pub fn data_length(self) -> usize {
         match self {
-            Instruction::LoadImmediate { .. } => 1,
+            Instruction::LoadImmediateByte { .. } => 1,
+            Instruction::LoadImmediateWide { .. } => 2,
             _ => 0,
         }
     }
@@ -282,19 +334,20 @@ impl From<u8> for Instruction {
                (raw & 0b0000_0100) != 0,
                (raw & 0b0000_0010) != 0,
                (raw & 0b0000_0001) != 0) {
-            (false, false, false, false, false, _, _, _) => Instruction::Reserved(raw),
-            (false, false, false, false, true, false, _, _) => Instruction::Reserved(raw),
-            (false, false, false, false, true, true, d, r) => {
-                Instruction::Madr {
-                    d: d.into(),
-                    r: r.into(),
+            (false, false, false, false, false, _, _, _) => Instruction::LoadImmediateByte { aaa: raw & 0b0000_0111 },
+            (false, false, false, false, true, _, _, _) => Instruction::LoadIndirect { aaa: raw & 0b0000_0111 },
+            (false, false, false, true, false, false, _, _) => {
+                Instruction::LoadImmediateWide {
+                    rr: InstructionLoadImmediateWideRegisterPair::try_from(raw & 0b0000_0011)
+                        .expect("Wrong raw instruction slicing for LOAD IMM WIDE register pair parse"),
                 }
             }
+            (false, false, false, true, false, true, _, _) => Instruction::Reserved(raw),
+            (false, false, false, true, true, _, _, _) => Instruction::Reserved(raw),
+
             (false, false, false, true, false, _, _, _) => {
                 Instruction::Jump(InstructionJumpCondition::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for JUMP condition parse"))
             }
-            (false, false, false, true, true, _, _, _) => Instruction::LoadImmediate { aaa: raw & 0b0000_0111 },
-            (false, false, true, false, false, _, _, _) => Instruction::LoadIndirect { aaa: raw & 0b0000_0111 },
             (false, false, true, false, true, _, _, _) => Instruction::Save { aaa: raw & 0b0000_0111 },
             (false, false, true, true, _, _, _, _) => {
                 Instruction::Alu(AluOperation::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for ALU op parse"))
@@ -305,8 +358,15 @@ impl From<u8> for Instruction {
                     bbb: raw & 0b0000_0111,
                 }
             }
-            (true, false, _, _, _, _, _, _) => Instruction::Reserved(raw),
-            (true, true, false, _, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, false, false, _, _, _, _) => Instruction::Reserved(raw),
+            (true, true, false, true, false, _, _, _) => Instruction::Reserved(raw),
+            (true, true, false, true, true, false, d, r) => {
+                Instruction::Madr {
+                    d: d.into(),
+                    r: r.into(),
+                }
+            }
+            (true, true, false, true, true, true, _, _) => Instruction::Reserved(raw),
             (true, true, true, false, d, _, _, _) => {
                 Instruction::Port {
                     d: d.into(),
@@ -331,16 +391,18 @@ impl Into<u8> for Instruction {
     fn into(self) -> u8 {
         match self {
             Instruction::Reserved(raw) => raw,
-            Instruction::Madr { d, r } => 0b0000_1100 | (d as u8) | (r as u8),
-            Instruction::Jump(cond) => 0b0001_0000 | (cond as u8),
-            Instruction::LoadImmediate { aaa } => 0b0001_1000 | aaa,
+            Instruction::LoadImmediateByte { aaa } => 0b0000_0000 | 0b0_0000 | aaa,
+            Instruction::LoadIndirect { aaa } => 0b0000_0000 | 0b0_1000 | aaa,
+            Instruction::LoadImmediateWide { rr } => 0b0000_0000 | 0b1_0000 | (rr as u8),
             Instruction::LoadIndirect { aaa } => 0b0010_0000 | aaa,
+            Instruction::Jump(cond) => 0b0001_0000 | (cond as u8),
             Instruction::Save { aaa } => 0b0010_1000 | aaa,
             Instruction::Alu(op) => {
                 let op_b: u8 = op.into();
                 0b0011_0000u8 | op_b
             }
             Instruction::Move { aaa, bbb } => 0b0100_0000 | (aaa << 3) | bbb,
+            Instruction::Madr { d, r } => 0b1101_1000 | (d as u8) | (r as u8),
             Instruction::Port { d, aaa } => 0b1110_0000 | (d as u8) | aaa,
             Instruction::Comp { aaa } => 0b1111_0000 | aaa,
             Instruction::Stck { d, r } => 0b1111_1000 | (d as u8) | (r as u8),
@@ -454,6 +516,38 @@ impl From<bool> for InstructionStckDirection {
             false => InstructionStckDirection::Push,
             true => InstructionStckDirection::Pop,
         }
+    }
+}
+
+
+/// When performing a wide immediate load, two bytes are read from memory into a pair of registers, as indicated by the two
+/// bits `RR`.
+///
+/// RR | Registers
+/// ---|----------
+/// 00 | A and B
+/// 01 | C and D
+/// 10 | X and Y
+/// 11 | ADR
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InstructionLoadImmediateWideRegisterPair {
+    Ab = 0b00,
+    Cd = 0b01,
+    Xy = 0b10,
+    Adr = 0b11,
+}
+
+impl TryFrom<u8> for InstructionLoadImmediateWideRegisterPair {
+    type Error = ();
+
+    fn try_from(raw: u8) -> Result<InstructionLoadImmediateWideRegisterPair, ()> {
+        let nib = limit_to_width(raw, 2).ok_or(())?;
+        Ok(match ((nib & 0b0010) != 0, (nib & 0b0001) != 0) {
+            (false, false) => InstructionLoadImmediateWideRegisterPair::Ab,
+            (false, true) => InstructionLoadImmediateWideRegisterPair::Cd,
+            (true, false) => InstructionLoadImmediateWideRegisterPair::Xy,
+            (true, true) => InstructionLoadImmediateWideRegisterPair::Adr,
+        })
     }
 }
 

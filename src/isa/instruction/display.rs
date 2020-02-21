@@ -1,5 +1,5 @@
-use self::super::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use self::super::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition,
+                  InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
 use self::super::super::GeneralPurposeRegisterBank;
 use std::fmt;
 
@@ -19,13 +19,14 @@ impl<'a> fmt::Display for DisplayInstruction<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.instr {
             Instruction::Reserved(raw) => write!(f, "{:#06b}_{:04b}", (raw & 0b1111_0000) >> 4, raw & 0b0000_1111),
-            Instruction::Madr { d, r } => write!(f, "MADR {} {}", d, r),
-            Instruction::Jump(cond) => cond.fmt(f),
-            Instruction::LoadImmediate { aaa } => write!(f, "LOAD IMM {}", self.registers[*aaa as usize].letter()),
+            Instruction::LoadImmediateByte { aaa } => write!(f, "LOAD IMM BYTE {}", self.registers[*aaa as usize].letter()),
             Instruction::LoadIndirect { aaa } => write!(f, "LOAD IND {}", self.registers[*aaa as usize].letter()),
+            Instruction::LoadImmediateWide { rr } => write!(f, "LOAD IMM WIDE {}", rr),
+            Instruction::Jump(cond) => cond.fmt(f),
             Instruction::Save { aaa } => write!(f, "SAVE {}", self.registers[*aaa as usize].letter()),
             Instruction::Alu(op) => write!(f, "ALU {}", op),
             Instruction::Move { aaa, bbb } => write!(f, "MOVE {} {}", self.registers[*aaa as usize].letter(), self.registers[*bbb as usize].letter()),
+            Instruction::Madr { d, r } => write!(f, "MADR {} {}", d, r),
             Instruction::Port { d, aaa } => write!(f, "PORT {} {}", d, self.registers[*aaa as usize].letter()),
             Instruction::Comp { aaa } => write!(f, "COMP {}", self.registers[*aaa as usize].letter()),
             Instruction::Stck { d, r } => write!(f, "STCK {} {}", d, r),
@@ -77,6 +78,18 @@ impl fmt::Display for InstructionStckDirection {
         match self {
             InstructionStckDirection::Push => f.write_str("PUSH"),
             InstructionStckDirection::Pop => f.write_str("POP"),
+        }
+    }
+}
+
+
+impl fmt::Display for InstructionLoadImmediateWideRegisterPair {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InstructionLoadImmediateWideRegisterPair::Ab => f.write_str("A&B"),
+            InstructionLoadImmediateWideRegisterPair::Cd => f.write_str("C&D"),
+            InstructionLoadImmediateWideRegisterPair::Xy => f.write_str("X&Y"),
+            InstructionLoadImmediateWideRegisterPair::Adr => f.write_str("ADR"),
         }
     }
 }
