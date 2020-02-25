@@ -19,10 +19,10 @@ use std::fmt;
 /// Memory Address  | ADR   |  16  | Address saved for use during certain instructions
 /// Instruction     | INS   |   8  | Instruction currently being executed
 ///
-/// The address bus is controlled by either `PC`, `SP` or `ADR`.
+/// The address bus is controlled by either PC, SP or ADR.
 ///
-/// As the CPU is reading an instruction from RAM, the value of the `PC` will be used, for some instructions though,
-/// such as `JUMP` or `STACK`, it is value of `ADR` or `SP` respectively that is used.
+/// As the CPU is reading an instruction from system memory, the value of the PC will be used, for some instructions though,
+/// such as JUMP or STACK, it is value of ADR or SP (respectively) that is used.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SpecialPurposeRegister<T: Num + Unsigned + PrimInt> {
     data: T,
