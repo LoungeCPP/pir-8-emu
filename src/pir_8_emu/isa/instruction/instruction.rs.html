@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/isa/instruction/instruction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instruction.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../pir_8_emu/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/isa/instruction/instruction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instruction.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../pir_8_emu/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -647,6 +647,29 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -661,7 +684,7 @@
 <span class="doccomment">/// An instruction is a single byte, and can include some following immediate values purely for data.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// It is possible that the PC will overflow and wrap arround as you load an instruction,</span>
+<span class="doccomment">/// It is possible that the PC will overflow and wrap around as you load an instruction,</span>
 <span class="doccomment">/// there is no hardware level protection or detection if this happens.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// An example of how this can happen is if you perform a jump to `0xFFFF`,</span>
@@ -680,14 +703,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Bit Mask  | Name | Count | Description</span>
 <span class="doccomment">/// ----------|------|-------|------------</span>
-<span class="doccomment">/// 0000 XXXX |      |    16 | Reserved</span>
+<span class="doccomment">/// 0000 0XXX |      |     8 | Reserved</span>
+<span class="doccomment">/// 0000 10XX |      |     4 | Reserved</span>
+<span class="doccomment">/// 0000 11XX | MADR |     4 | Move a value to/from the ADR register, see section below</span>
 <span class="doccomment">/// 0001 0XXX | JUMP |     8 | Jump, see section below</span>
 <span class="doccomment">/// 0001 1AAA | LOAD |     8 | Load the the next byte into register `AAA`</span>
 <span class="doccomment">///                       |||| (PC will be incremented a second time)</span>
-<span class="doccomment">/// 0010 0AAA | LOAD |     8 | Load value in address indicated by the next two bytes into register `AAA`</span>
-<span class="doccomment">///                       |||| (PC will be incremented two more times)</span>
-<span class="doccomment">/// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by the next two bytes</span>
-<span class="doccomment">///                       |||| (PC will be incremented two more times)</span>
+<span class="doccomment">/// 0010 0AAA | LOAD |     8 | Load value in address indicated by `ADR` into register `AAA`</span>
+<span class="doccomment">/// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by `ADR`</span>
 <span class="doccomment">/// 0011 XXXX | ALU  |    16 | ALU based operations, see section below</span>
 <span class="doccomment">/// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`</span>
 <span class="doccomment">/// 10XX XXXX |      |    64 | Reserved</span>
@@ -730,7 +753,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The registers A and B are paired, as are the registers C and D.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Effectively, the stack works on 16 bit values, but due to the 8 bit data bus it requires two transfers,</span>
+<span class="doccomment">/// Effectively, the stack works on 16-bit values, but due to the 8-bit data bus it requires two transfers,</span>
 <span class="doccomment">/// though this is handled via the hardware/microcode.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C</span>
@@ -747,25 +770,25 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// When PUSHing B/D will go to the address one less than the current SP, whilst A/C will go to address two less than the SP.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// After PUSHing, the SP will have been decremented by two, with the SP containg the address of A/C (now in memory).</span>
+<span class="doccomment">/// After PUSHing, the SP will have been decremented by two, with the SP containing the address of A/C (now in memory).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased by two.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,</span>
-<span class="doccomment">/// just like with the PC incrememnting during instruction execution.</span>
+<span class="doccomment">/// just like with the PC incrementing during instruction execution.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// In fact, by design, POPing the final value from the stack will result in an overflow bringing the SP back to `0x0000`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// In terms of pseudocode, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:</span>
+<span class="doccomment">/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```plaintext</span>
-<span class="doccomment">/// # PUSH</span>
+<span class="doccomment">/// ```cpp</span>
+<span class="doccomment">/// // PUSH</span>
 <span class="doccomment">/// SP -= 1</span>
 <span class="doccomment">/// *SP = B</span>
 <span class="doccomment">/// SP -= 1</span>
 <span class="doccomment">/// *SP = A</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # POP</span>
+<span class="doccomment">/// // POP</span>
 <span class="doccomment">/// A = *SP</span>
 <span class="doccomment">/// SP += 1</span>
 <span class="doccomment">/// B = *SP</span>
@@ -774,10 +797,31 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** I Think I might update this to allow pushing/popping the PC, this would make it very easy (hardware wise) to handle</span>
 <span class="doccomment">/// calling and returning functions</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## MADR - ADR Register Manipulation</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The ADR register is a 16-bit register, it&#39;s value can be set/read to the general purpose registers.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The registers A and B are paired, as are the registers C and D.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C registers the lesser;</span>
+<span class="doccomment">/// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// These ADR manipulation operations are of pattern `0000 10DR`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The D bit indicates the direction; 0 for write-to and 1 for read-from the ADR register.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// Reserved instruction, contains the entire byte</span>
     <span class="ident">Reserved</span>(<span class="ident">u8</span>),
+    <span class="comment">// /// Manipulate ADR, see section above</span>
+    <span class="comment">// Madr {</span>
+    <span class="comment">//     d: InstructionMadrDirection,</span>
+    <span class="comment">//     r: InstructionRegisterPair,</span>
+    <span class="comment">// },</span>
     <span class="doccomment">/// Jump, see member doc</span>
     <span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>),
     <span class="doccomment">/// Load the the next byte into register `AAA` (PC will be incremented a second time)</span>
@@ -800,7 +844,7 @@
     <span class="doccomment">/// Stack manipulation, see member doc</span>
     <span class="ident">Stck</span> {
         <span class="ident">d</span>: <span class="ident">InstructionStckDirection</span>,
-        <span class="ident">r</span>: <span class="ident">InstructionStckRegisterPair</span>,
+        <span class="ident">r</span>: <span class="ident">InstructionRegisterPair</span>,
     },
     <span class="doccomment">/// Clear the &#39;F&#39; register, by setting it to `0000 0000`</span>
     <span class="ident">Clrf</span>,
@@ -821,11 +865,11 @@
     <span class="doccomment">/// assert!(!Instruction::Reserved(0).is_valid());</span>
     <span class="doccomment">/// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
         }
     }
 
@@ -841,13 +885,13 @@
     <span class="doccomment">/// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);</span>
     <span class="doccomment">/// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=&gt;</span> <span class="number">1</span>,
+            <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { .. } <span class="op">|</span>
             <span class="ident">Instruction</span>::<span class="ident">Jump</span>(..) <span class="op">|</span>
-            <span class="ident">Instruction</span>::<span class="ident">Save</span> { .. } <span class="op">=&gt;</span> <span class="number">2</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="number">0</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Save</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
         }
     }
 
@@ -856,7 +900,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{InstructionStckRegisterPair, InstructionStckDirection, AluOperation, Instruction};</span>
+    <span class="doccomment">/// # use pir_8_emu::isa::instruction::{InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};</span>
     <span class="doccomment">/// # use pir_8_emu::isa::GeneralPurposeRegister;</span>
     <span class="doccomment">/// # let registers = GeneralPurposeRegister::defaults();</span>
     <span class="doccomment">/// assert_eq!(Instruction::Clrf.display(&amp;registers).to_string(),</span>
@@ -865,14 +909,14 @@
     <span class="doccomment">///            &quot;ALU OR&quot;);</span>
     <span class="doccomment">/// assert_eq!(Instruction::Stck {</span>
     <span class="doccomment">///                d: InstructionStckDirection::Push,</span>
-    <span class="doccomment">///                r: InstructionStckRegisterPair::Cd,</span>
+    <span class="doccomment">///                r: InstructionRegisterPair::Cd,</span>
     <span class="doccomment">///            }.display(&amp;registers).to_string(),</span>
     <span class="doccomment">///            &quot;STCK PUSH C&amp;D&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(Instruction::Reserved(0b1111_0000).display(&amp;registers).to_string(),</span>
     <span class="doccomment">///            &quot;0b1111_0000&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;s</span>: <span class="lifetime">&#39;r</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="self">self</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">GeneralPurposeRegisterBank</span>) <span class="op">-&gt;</span> <span class="ident">DisplayInstruction</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;s</span>: <span class="lifetime">&#39;r</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="self">self</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">GeneralPurposeRegisterBank</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DisplayInstruction</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
         <span class="ident">DisplayInstruction</span> {
             <span class="ident">instr</span>: <span class="self">self</span>,
             <span class="ident">registers</span>: <span class="ident">registers</span>,
@@ -903,77 +947,77 @@
     <span class="doccomment">///            })));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
         <span class="ident">Instruction</span>::<span class="ident">from_str_impl</span>(<span class="ident">s</span>, <span class="ident">registers</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instruction</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">Instruction</span> {
-        <span class="kw">match</span> ((<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b1000_0000</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0100_0000</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0010_0000</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0001_0000</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1000</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0100</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span>) <span class="op">!=</span> <span class="number">0</span>,
-               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span>) <span class="op">!=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instruction</span> {
+        <span class="kw">match</span> ((<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b1000_0000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0100_0000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0010_0000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0001_0000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+               (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for JUMP condition parse&quot;</span>))
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">AluOperation</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for ALU op parse&quot;</span>))
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Move</span> {
-                    <span class="ident">aaa</span>: (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0011_1000</span>) <span class="op">&gt;&gt;</span> <span class="number">3</span>,
+                    <span class="ident">aaa</span>: (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0011_1000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>,
                     <span class="ident">bbb</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Port</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
                     <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="ident">r</span>) <span class="op">=&gt;</span> {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Stck</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
                     <span class="ident">r</span>: <span class="ident">r</span>.<span class="ident">into</span>(),
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Clrf</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Halt</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Clrf</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Halt</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instruction</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=&gt;</span> <span class="ident">raw</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=&gt;</span> <span class="number">0b0001_0000</span> <span class="op">|</span> (<span class="ident">cond</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0001_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0010_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b0010_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001_0000</span> <span class="op">|</span> (<span class="ident">cond</span> <span class="kw">as</span> <span class="ident">u8</span>),
+            <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">op_b</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">into</span>();
                 <span class="number">0b0011_0000u8</span> <span class="op">|</span> <span class="ident">op_b</span>
             }
-            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">aaa</span>, <span class="ident">bbb</span> } <span class="op">=&gt;</span> <span class="number">0b0100_0000</span> <span class="op">|</span> (<span class="ident">aaa</span> <span class="op">&lt;&lt;</span> <span class="number">3</span>) <span class="op">|</span> <span class="ident">bbb</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>, <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b1110_0000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span> } <span class="op">=&gt;</span> <span class="number">0b1111_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=&gt;</span> <span class="number">0b1111_1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=&gt;</span> <span class="number">0b1111_1110</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Halt</span> <span class="op">=&gt;</span> <span class="number">0b1111_1111</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">aaa</span>, <span class="ident">bbb</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0100_0000</span> <span class="op">|</span> (<span class="ident">aaa</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">|</span> <span class="ident">bbb</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>, <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1110_0000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
+            <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1110</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Halt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1111</span>,
         }
     }
 }
@@ -981,9 +1025,11 @@
 
 <span class="doccomment">/// This Instruction takes a three bit operand indicating under what condition the jump should be performed.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the condition is met, the next two bytes after this Jump instruction are loaded into the PC.</span>
+<span class="doccomment">/// If the condition is met, the value of ADR is loaded into the PC.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the condition is not met, the PC is incremented by two, skipping over the two bytes of the target address.</span>
+<span class="doccomment">/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of loading the instruction.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **NB:** The value of ADR must have been set with the desired target location prior to the JUMP instruction being performed.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This table shows what combination of bits to the JUMP instruction check what flags and in what combination</span>
@@ -1014,17 +1060,17 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionJumpCondition</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InstructionJumpCondition</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InstructionJumpCondition</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nib</span> <span class="op">=</span> <span class="ident">limit_to_width</span>(<span class="ident">raw</span>, <span class="number">3</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpz</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpp</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpg</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpc</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzg</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzl</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpl</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jump</span>,
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpz</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpp</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpg</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpc</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzg</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmzl</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpl</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionJumpCondition</span>::<span class="ident">Jump</span>,
         })
     }
 }
@@ -1039,10 +1085,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionPortDirection</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">InstructionPortDirection</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstructionPortDirection</span> {
         <span class="kw">match</span> <span class="ident">raw</span> {
-            <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>,
-            <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>,
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>,
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>,
         }
     }
 }
@@ -1056,10 +1102,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionStckDirection</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">InstructionStckDirection</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstructionStckDirection</span> {
         <span class="kw">match</span> <span class="ident">raw</span> {
-            <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="ident">InstructionStckDirection</span>::<span class="ident">Push</span>,
-            <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">InstructionStckDirection</span>::<span class="ident">Pop</span>,
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionStckDirection</span>::<span class="ident">Push</span>,
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionStckDirection</span>::<span class="ident">Pop</span>,
         }
     }
 }
@@ -1067,16 +1113,16 @@
 
 <span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionStckRegisterPair</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionRegisterPair</span> {
     <span class="ident">Ab</span> <span class="op">=</span> <span class="number">0b0</span>,
     <span class="ident">Cd</span> <span class="op">=</span> <span class="number">0b1</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionStckRegisterPair</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">InstructionStckRegisterPair</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionRegisterPair</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstructionRegisterPair</span> {
         <span class="kw">match</span> <span class="ident">raw</span> {
-            <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="ident">InstructionStckRegisterPair</span>::<span class="ident">Ab</span>,
-            <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">InstructionStckRegisterPair</span>::<span class="ident">Cd</span>,
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionRegisterPair</span>::<span class="ident">Ab</span>,
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionRegisterPair</span>::<span class="ident">Cd</span>,
         }
     }
 }
@@ -1100,13 +1146,13 @@
 <span class="doccomment">/// -----|------|-------|------------</span>
 <span class="doccomment">/// 0000 | ADD  |   1   | Addition of register X and register Y</span>
 <span class="doccomment">/// 0001 | SUB  |   1   | Subtraction of register Y from register X (X-Y)</span>
-<span class="doccomment">/// 0010 | NOT  |   1   | Bitwise NOT</span>
+<span class="doccomment">/// 0010 | NOT  |   1   | Bitwise NOT (unary operation)</span>
 <span class="doccomment">/// 0011 |      |   1   | Reserved</span>
 <span class="doccomment">/// 0100 |  OR  |   1   | Bitwise OR</span>
 <span class="doccomment">/// 0101 | XOR  |   1   | Bitwise XOR</span>
 <span class="doccomment">/// 0110 | AND  |   1   | Bitwise AND</span>
 <span class="doccomment">/// 0111 |      |   1   | Reserved</span>
-<span class="doccomment">/// 1DTT |      |   8   | Shift or Rotate, see section below</span>
+<span class="doccomment">/// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AluOperation</span> {
     <span class="doccomment">/// Reserved operation, contains the entire nibble</span>
@@ -1141,10 +1187,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(!AluOperation::Reserved(0b0011).is_valid());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
         }
     }
 
@@ -1172,7 +1218,7 @@
     <span class="doccomment">/// assert_eq!(carry, true);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">perform_impl</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>)
     }
 }
@@ -1180,18 +1226,18 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperation</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AluOperation</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AluOperation</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nib</span> <span class="op">=</span> <span class="ident">limit_to_width</span>(<span class="ident">raw</span>, <span class="number">4</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b1000</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Add</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Sub</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Not</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Or</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Xor</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">And</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
-            (<span class="bool-val">true</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b1000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Add</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Sub</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Not</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Or</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Xor</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">And</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
+            (<span class="bool-val">true</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">AluOperation</span>::<span class="ident">ShiftOrRotate</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
                     <span class="ident">tt</span>: <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">try_from</span>(<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0011</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for ALU Shift or Rotate Type parse&quot;</span>),
@@ -1202,16 +1248,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperation</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=&gt;</span> <span class="ident">raw</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=&gt;</span> <span class="number">0b0000</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=&gt;</span> <span class="number">0b0001</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Not</span> <span class="op">=&gt;</span> <span class="number">0b0010</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Or</span> <span class="op">=&gt;</span> <span class="number">0b0100</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Xor</span> <span class="op">=&gt;</span> <span class="number">0b0101</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">And</span> <span class="op">=&gt;</span> <span class="number">0b0110</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">ShiftOrRotate</span> { <span class="ident">d</span>, <span class="ident">tt</span> } <span class="op">=&gt;</span> {
+            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Not</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Or</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0100</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Xor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0101</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">And</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0110</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">ShiftOrRotate</span> { <span class="ident">d</span>, <span class="ident">tt</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">tt_b</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">tt</span>.<span class="ident">into</span>();
                 <span class="number">0b1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">tt_b</span>
             }
@@ -1229,10 +1275,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperationShiftOrRotateDirection</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span> {
         <span class="kw">match</span> <span class="ident">raw</span> {
-            <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span>::<span class="ident">Left</span>,
-            <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span>::<span class="ident">Right</span>,
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span>::<span class="ident">Left</span>,
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateDirection</span>::<span class="ident">Right</span>,
         }
     }
 }
@@ -1257,9 +1303,9 @@
 <span class="doccomment">/// 10 | RTC  | Rotate with carry - the Carry flag is inserted (Carry flag value before it is updated is used)</span>
 <span class="doccomment">/// 11 | RTW  | Rotate without carry - the bit shifted out is inserted</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// An example of a Arithemtic shift right; `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.</span>
+<span class="doccomment">/// An example of a Arithmetic shift right; `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// **NB:** An &#39;Arithmetic shift left&#39; is the same as performing a &#39;Logcal shift left&#39;, they _can_ be used interchangeably, but</span>
+<span class="doccomment">/// **NB:** An &#39;Arithmetic shift left&#39; is the same as performing a &#39;Logical shift left&#39;, they _can_ be used interchangeably, but</span>
 <span class="doccomment">/// &#39;Arithmetic shift left&#39; should be avoided.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AluOperationShiftOrRotateType</span> {
@@ -1276,26 +1322,26 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperationShiftOrRotateType</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AluOperationShiftOrRotateType</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">raw</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AluOperationShiftOrRotateType</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nib</span> <span class="op">=</span> <span class="ident">limit_to_width</span>(<span class="ident">raw</span>, <span class="number">2</span>).<span class="ident">ok_or</span>(())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b10</span>) <span class="op">!=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b01</span>) <span class="op">!=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Lsf</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Asf</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtc</span>,
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtw</span>,
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b10</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b01</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Lsf</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Asf</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtc</span>,
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtw</span>,
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperationShiftOrRotateType</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Lsf</span> <span class="op">=&gt;</span> <span class="number">0b00</span>,
-            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Asf</span> <span class="op">=&gt;</span> <span class="number">0b01</span>,
-            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtc</span> <span class="op">=&gt;</span> <span class="number">0b10</span>,
-            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtw</span> <span class="op">=&gt;</span> <span class="number">0b11</span>,
+            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Lsf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b00</span>,
+            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Asf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b01</span>,
+            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b10</span>,
+            <span class="ident">AluOperationShiftOrRotateType</span>::<span class="ident">Rtw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b11</span>,
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

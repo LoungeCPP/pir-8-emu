@@ -6,5 +6,4 @@ implementors["bear_lib_terminal"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

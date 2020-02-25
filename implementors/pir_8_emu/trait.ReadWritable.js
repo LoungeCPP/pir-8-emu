@@ -6,5 +6,4 @@ implementors["pir_8_emu"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

@@ -1,1 +1,1 @@
-initSidebarItems({});
+initSidebarItems({"fn":[["actual_main",""],["main",""]]});
