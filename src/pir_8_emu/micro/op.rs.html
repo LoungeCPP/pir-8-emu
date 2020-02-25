@@ -87,6 +87,11 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionJumpCondition</span>, <span class="ident">AluOperation</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
@@ -112,9 +117,14 @@
     <span class="doccomment">/// Load the top of the stack into INS</span>
     <span class="ident">LoadInstruction</span>,
 
-    <span class="doccomment">/// Push a byte from the top of the μstack to the stack</span>
+    <span class="doccomment">/// Write the address specified by the top two bytes of the μstack into ADR</span>
+    <span class="ident">AdrWrite</span>,
+    <span class="doccomment">/// Read both bytes of ADR onto the μstack</span>
+    <span class="ident">AdrRead</span>,
+
+    <span class="doccomment">/// Push a byte from the top of the μstack to the stack. Clobbers ADR (becomes previous value of SP)</span>
     <span class="ident">StackPush</span>,
-    <span class="doccomment">/// Pop a byte from the stack</span>
+    <span class="doccomment">/// Pop a byte from the stack. Clobbers ADR (becomes SP)</span>
     <span class="ident">StackPop</span>,
 
     <span class="doccomment">/// Perform an ALU operation</span>
@@ -130,18 +140,18 @@
 
     <span class="doccomment">/// Create an immediate value at the top of the μstack</span>
     <span class="ident">MakeImmediate</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// Read a 1-byte immediate from memory @ PC to the top of the μstack, incrementing PC</span>
+    <span class="doccomment">/// Read a 1-byte immediate from memory at PC to the top of the μstack, incrementing PC</span>
     <span class="ident">LoadImmediate</span>,
 
-    <span class="doccomment">/// Read the value from memory at the address specified by the top two bytes of the μstack</span>
+    <span class="doccomment">/// Read the value from memory at ADR</span>
     <span class="ident">FetchAddress</span>,
-    <span class="doccomment">/// Write to memory at the address specified by the top two bytes of the μstack the byte at the next value on the μstack</span>
+    <span class="doccomment">/// Write to memory at ADR the byte on top of the μstack</span>
     <span class="ident">WriteAddress</span>,
 
     <span class="doccomment">/// Check if the specified jump condition is satisfied by the top of the μstack</span>
     <span class="ident">CheckJumpCondition</span>(<span class="ident">InstructionJumpCondition</span>),
-    <span class="doccomment">/// If the top of the μstack is `0`, pop two bytes off the top of the μstack.</span>
-    <span class="doccomment">/// If it&#39;s `1`, pop two bytes off the top of the μstack and load them into PC.</span>
+    <span class="doccomment">/// If the top of the μstack is `1`, set PC to ADR.</span>
+    <span class="doccomment">/// If it&#39;s `0`, do nothing.</span>
     <span class="doccomment">/// Otherwise, error out.</span>
     <span class="ident">Jump</span>,
 

@@ -117,9 +117,20 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">InstructionJumpCondition</span>, <span class="ident">InstructionPortDirection</span>,
-                  <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
+                  <span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
@@ -139,6 +150,7 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">instr</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:#06b}_{:04b}&quot;</span>, (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b1111_0000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>, <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>),
+            <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;MADR {} {}&quot;</span>, <span class="ident">d</span>, <span class="ident">r</span>),
             <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cond</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;LOAD IMM {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;LOAD IND {}&quot;</span>, <span class="self">self</span>.<span class="ident">registers</span>[<span class="kw-2">*</span><span class="ident">aaa</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">letter</span>()),
@@ -150,6 +162,16 @@
             <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;STCK {} {}&quot;</span>, <span class="ident">d</span>, <span class="ident">r</span>),
             <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CLRF&quot;</span>),
             <span class="ident">Instruction</span>::<span class="ident">Halt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;HALT&quot;</span>),
+        }
+    }
+}
+
+
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">InstructionMadrDirection</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">InstructionMadrDirection</span>::<span class="ident">Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;WRITE&quot;</span>),
+            <span class="ident">InstructionMadrDirection</span>::<span class="ident">Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;READ&quot;</span>),
         }
     }
 }

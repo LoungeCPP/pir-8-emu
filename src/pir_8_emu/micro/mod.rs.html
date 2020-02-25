@@ -78,11 +78,16 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Microcode implementation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The μOp is the smallest executable atom into sets of which instructions degenerate,</span>
-<span class="doccomment">//! implementing an 8-bit a stack-based language.</span>
+<span class="doccomment">//! implementing an 8-bit stack-based language.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
 <span class="doccomment">//!</span>
@@ -90,9 +95,9 @@
 <span class="doccomment">//! (as in the `emulate_dumb` example):</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//! # use pir_8_emu::isa::instruction::{InstructionMadrDirection, InstructionRegisterPair, Instruction};</span>
 <span class="doccomment">//! # use pir_8_emu::isa::{GeneralPurposeRegister, SpecialPurposeRegister};</span>
 <span class="doccomment">//! # use pir_8_emu::micro::{MicroOp, NEXT_INSTRUCTION};</span>
-<span class="doccomment">//! # use pir_8_emu::isa::instruction::Instruction;</span>
 <span class="doccomment">//! # use pir_8_emu::vm::{Memory, Ports};</span>
 <span class="doccomment">//! let mut ports     = Ports::new();</span>
 <span class="doccomment">//! let mut registers = GeneralPurposeRegister::defaults();</span>
@@ -101,8 +106,13 @@
 <span class="doccomment">//! let mut adr       = SpecialPurposeRegister::new(&quot;Memory Address&quot;, &quot;ADR&quot;);</span>
 <span class="doccomment">//! let mut ins       = SpecialPurposeRegister::new(&quot;Instruction&quot;, &quot;INS&quot;);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! let mut memory = Memory::from(&amp;[Instruction::LoadIndirect { aaa: 0b100 }.into(),</span>
-<span class="doccomment">//!                                 0x01, 0x10,</span>
+<span class="doccomment">//! let mut memory = Memory::from(&amp;[Instruction::LoadImmediate { aaa: 0b100 }.into(),</span>
+<span class="doccomment">//!                                 0x01,</span>
+<span class="doccomment">//!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),</span>
+<span class="doccomment">//!                                 0x10,</span>
+<span class="doccomment">//!                                 Instruction::Madr { d: InstructionMadrDirection::Write,</span>
+<span class="doccomment">//!                                                     r: InstructionRegisterPair::Ab }.into(),</span>
+<span class="doccomment">//!                                 Instruction::LoadIndirect { aaa: 0b100 }.into(),</span>
 <span class="doccomment">//!                                 Instruction::LoadImmediate { aaa: 0b101 }.into(),</span>
 <span class="doccomment">//!                                 0x69,</span>
 <span class="doccomment">//!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),</span>

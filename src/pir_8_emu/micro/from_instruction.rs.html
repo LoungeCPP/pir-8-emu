@@ -202,8 +202,35 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>,
+                                           <span class="ident">Instruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MicroOp</span>;
 
 
@@ -253,15 +280,40 @@
                  <span class="number">6</span>)
             }
 
+            <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>: <span class="ident">InstructionMadrDirection</span>::<span class="ident">Write</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> [<span class="ident">f</span>, <span class="ident">s</span>] <span class="op">=</span> <span class="ident">stck_address_pair</span>(<span class="ident">r</span>);
+
+                ([<span class="comment">// forcebreak</span>
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">f</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">s</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">AdrWrite</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
+                 <span class="number">3</span>)
+            }
+            <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>: <span class="ident">InstructionMadrDirection</span>::<span class="ident">Read</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> [<span class="ident">f</span>, <span class="ident">s</span>] <span class="op">=</span> <span class="ident">stck_address_pair</span>(<span class="ident">r</span>);
+
+                ([<span class="comment">// forcebreak</span>
+                  <span class="ident">MicroOp</span>::<span class="ident">AdrRead</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">s</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">f</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
+                 <span class="number">3</span>)
+            }
+
             <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">FLAG_REGISTER_ADDRESS</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">CheckJumpCondition</span>(<span class="ident">cond</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Jump</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
-                 <span class="number">5</span>)
+                 <span class="number">3</span>)
             }
 
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
@@ -277,24 +329,24 @@
 
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">FetchAddress</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
-                 <span class="number">4</span>)
+                 <span class="number">2</span>)
             }
 
             <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>),
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">WriteAddress</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
+                  <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
-                 <span class="number">4</span>)
+                 <span class="number">2</span>)
             }
 
             <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> {

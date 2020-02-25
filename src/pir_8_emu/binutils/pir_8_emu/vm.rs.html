@@ -198,6 +198,9 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">GeneralPurposeRegister</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">micro</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOpBlock</span>, <span class="ident">MicroOp</span>, <span class="ident">NEXT_INSTRUCTION</span>};
@@ -215,15 +218,18 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # use pir_8_emu::ReadWritable;</span>
 <span class="doccomment">/// # use pir_8_emu::binutils::pir_8_emu::Vm;</span>
-<span class="doccomment">/// # use pir_8_emu::isa::instruction::Instruction;</span>
+<span class="doccomment">/// # use pir_8_emu::isa::instruction::{InstructionMadrDirection, InstructionRegisterPair, Instruction};</span>
 <span class="doccomment">/// let mut vm = Vm::new(&quot;FSXYABCD&quot;).unwrap();</span>
 <span class="doccomment">/// vm.reset(&quot;FSXYABCD&quot;, &amp;[</span>
 <span class="doccomment">///     Instruction::Halt.into(),</span>
+<span class="doccomment">///     Instruction::LoadImmediate { aaa: 0b100 }.into(),</span>
+<span class="doccomment">///     0x04,</span>
+<span class="doccomment">///     Instruction::LoadImmediate { aaa: 0b101 }.into(),</span>
+<span class="doccomment">///     0x20,</span>
+<span class="doccomment">///     Instruction::Madr { d: InstructionMadrDirection::Write, r: InstructionRegisterPair::Ab }.into(),</span>
 <span class="doccomment">///     Instruction::LoadImmediate { aaa: 0b000 }.into(),</span>
 <span class="doccomment">///     0x69,</span>
 <span class="doccomment">///     Instruction::Save { aaa: 0b000 }.into(),</span>
-<span class="doccomment">///     0x04,</span>
-<span class="doccomment">///     0x20,</span>
 <span class="doccomment">///     Instruction::Halt.into(),</span>
 <span class="doccomment">/// ]);</span>
 <span class="doccomment">///</span>

@@ -406,9 +406,38 @@
 <span id="406">406</span>
 <span id="407">407</span>
 <span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">InstructionJumpCondition</span>, <span class="ident">InstructionPortDirection</span>,
-                         <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
+                         <span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::{<span class="ident">parse_with_prefix</span>, <span class="ident">limit_to_width</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">GeneralPurposeRegisterBank</span>;
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">ParseInstructionError</span>;
@@ -479,7 +508,8 @@
 
 <span class="kw">fn</span> <span class="ident">parse_instruction</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>)
                                                       <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
-    <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;JMPZ&quot;</span>,
+    <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;MADR&quot;</span>,
+                                     <span class="string">&quot;JMPZ&quot;</span>,
                                      <span class="string">&quot;JMPP&quot;</span>,
                                      <span class="string">&quot;JMPG&quot;</span>,
                                      <span class="string">&quot;JMPC&quot;</span>,
@@ -502,8 +532,14 @@
         <span class="prelude-val">Some</span>(<span class="ident">tok</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">start_pos</span> <span class="op">=</span> (<span class="ident">tok</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> (<span class="ident">orig_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>);
 
+            <span class="comment">// MADR start</span>
+            <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;MADR&quot;</span>) {
+                <span class="ident">parse_instruction_madr</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>)
+            }
+            <span class="comment">// MADR end</span>
+
             <span class="comment">// JUMP start</span>
-            <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;JMPZ&quot;</span>) {
+            <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;JMPZ&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpz</span>))
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;JMPP&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">Jmpp</span>))
@@ -522,11 +558,11 @@
             }
             <span class="comment">// JUMP end</span>
 
-            <span class="comment">// LOADs start</span>
+            <span class="comment">// LOAD start</span>
             <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;LOAD&quot;</span>) {
                 <span class="ident">parse_instruction_load</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)
             }
-            <span class="comment">// LOADs end</span>
+            <span class="comment">// LOAD end</span>
 
             <span class="comment">// SAVE start</span>
             <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;SAVE&quot;</span>) {
@@ -593,6 +629,20 @@
     }
 }
 
+<span class="kw">fn</span> <span class="ident">parse_instruction_madr</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">d</span>: <span class="ident">InstructionMadrDirection</span>, <span class="ident">r</span>: <span class="ident">InstructionRegisterPair</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instruction</span> {
+        <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>: <span class="ident">d</span>, <span class="ident">r</span>: <span class="ident">r</span> }
+    }
+
+    <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;WRITE&quot;</span>, <span class="string">&quot;READ&quot;</span>];
+
+    <span class="ident">parse_instruction_direction_register_pair</span>(<span class="ident">itr</span>,
+                                              <span class="ident">orig_str</span>,
+                                              <span class="ident">pos</span>,
+                                              <span class="ident">VALID_TOKENS</span>,
+                                              <span class="kw-2">&amp;</span>[(<span class="string">&quot;WRITE&quot;</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">map</span>(<span class="ident">InstructionMadrDirection</span>::<span class="ident">Write</span>, <span class="ident">r</span>)), (<span class="string">&quot;READ&quot;</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">map</span>(<span class="ident">InstructionMadrDirection</span>::<span class="ident">Read</span>, <span class="ident">r</span>))])
+}
+
 <span class="kw">fn</span> <span class="ident">parse_instruction_load</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>, <span class="ident">registers</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralPurposeRegisterBank</span>)
                                                            <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
     <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;IMM&quot;</span>, <span class="string">&quot;IND&quot;</span>];
@@ -640,32 +690,40 @@
 }
 
 <span class="kw">fn</span> <span class="ident">parse_instruction_stck</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">d</span>: <span class="ident">InstructionStckDirection</span>, <span class="ident">r</span>: <span class="ident">InstructionRegisterPair</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instruction</span> {
+        <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>: <span class="ident">d</span>, <span class="ident">r</span>: <span class="ident">r</span> }
+    }
+
     <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;PUSH&quot;</span>, <span class="string">&quot;POP&quot;</span>];
 
+    <span class="ident">parse_instruction_direction_register_pair</span>(<span class="ident">itr</span>,
+                                              <span class="ident">orig_str</span>,
+                                              <span class="ident">pos</span>,
+                                              <span class="ident">VALID_TOKENS</span>,
+                                              <span class="kw-2">&amp;</span>[(<span class="string">&quot;PUSH&quot;</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">map</span>(<span class="ident">InstructionStckDirection</span>::<span class="ident">Push</span>, <span class="ident">r</span>)), (<span class="string">&quot;POP&quot;</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">map</span>(<span class="ident">InstructionStckDirection</span>::<span class="ident">Pop</span>, <span class="ident">r</span>))])
+}
+
+<span class="kw">fn</span> <span class="ident">parse_instruction_direction_register_pair</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>, <span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
+                                                                              <span class="ident">mapping</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw">fn</span>(<span class="ident">InstructionRegisterPair</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instruction</span>)])
+                                                                              <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instruction</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">itr</span>.<span class="ident">next</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">tok</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">start_pos</span> <span class="op">=</span> (<span class="ident">tok</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> (<span class="ident">orig_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>);
 
-            <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;PUSH&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Stck</span> {
-                    <span class="ident">d</span>: <span class="ident">InstructionStckDirection</span>::<span class="ident">Push</span>,
-                    <span class="ident">r</span>: <span class="ident">parse_instruction_stck_register_pair</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>,
-                })
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;POP&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Stck</span> {
-                    <span class="ident">d</span>: <span class="ident">InstructionStckDirection</span>::<span class="ident">Pop</span>,
-                    <span class="ident">r</span>: <span class="ident">parse_instruction_stck_register_pair</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>,
-                })
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>(<span class="ident">start_pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">VALID_TOKENS</span>))
+            <span class="kw">for</span> (<span class="ident">dir</span>, <span class="ident">map</span>) <span class="kw">in</span> <span class="ident">mapping</span> {
+                <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">dir</span>) {
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">map</span>(<span class="ident">parse_instruction_register_pair</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="ident">dir</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>));
+                }
             }
+
+            <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>(<span class="ident">start_pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">tokens</span>))
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">MissingToken</span>(<span class="ident">pos</span>, <span class="ident">VALID_TOKENS</span>)),
+        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">MissingToken</span>(<span class="ident">pos</span>, <span class="ident">tokens</span>)),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_instruction_stck_register_pair</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>)
-                                                                         <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InstructionRegisterPair</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_instruction_register_pair</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>)
+                                                                    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InstructionRegisterPair</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
     <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;A&amp;B&quot;</span>, <span class="string">&quot;C&amp;D&quot;</span>];
 
     <span class="kw">match</span> <span class="ident">itr</span>.<span class="ident">next</span>() {

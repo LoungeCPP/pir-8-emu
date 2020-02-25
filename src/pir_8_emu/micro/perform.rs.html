@@ -193,6 +193,22 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOp</span>};
@@ -236,6 +252,12 @@
     <span class="doccomment">/// memory[0x1A00] = 0x69;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut stack = vec![0x1A, 0x00];</span>
+    <span class="doccomment">/// assert_eq!(MicroOp::AdrWrite.perform(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
+    <span class="doccomment">///                                      &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
+    <span class="doccomment">///            Ok(true));</span>
+    <span class="doccomment">/// assert_eq!(*adr, 0x1A00);</span>
+    <span class="doccomment">/// assert_eq!(stack, &amp;[]);</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(MicroOp::FetchAddress.perform(&amp;mut stack, &amp;mut memory, &amp;mut ports, &amp;mut registers,</span>
     <span class="doccomment">///                                          &amp;mut pc, &amp;mut sp, &amp;mut adr, &amp;mut ins),</span>
     <span class="doccomment">///            Ok(true));</span>
@@ -258,6 +280,15 @@
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
 
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ins</span> <span class="op">=</span> <span class="ident">byte</span>;
+            }
+
+            <span class="ident">MicroOp</span>::<span class="ident">AdrWrite</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>)<span class="question-mark">?</span>;
+
+                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="ident">address</span>;
+            }
+            <span class="ident">MicroOp</span>::<span class="ident">AdrRead</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">push_address</span>(<span class="ident">stack</span>, <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>);
             }
 
             <span class="ident">MicroOp</span>::<span class="ident">StackPush</span> <span class="op">=</span><span class="op">&gt;</span> {
@@ -320,26 +351,20 @@
 
             <span class="ident">MicroOp</span>::<span class="ident">MakeImmediate</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">b</span>),
             <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span>];
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="ident">pc</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
             }
 
             <span class="ident">MicroOp</span>::<span class="ident">FetchAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>)<span class="question-mark">?</span>;
-
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="ident">address</span>;
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
             }
             <span class="ident">MicroOp</span>::<span class="ident">WriteAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
 
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="ident">address</span>;
                 <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>] <span class="op">=</span> <span class="ident">byte</span>;
             }
 
@@ -352,11 +377,10 @@
             }
             <span class="ident">MicroOp</span>::<span class="ident">Jump</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">is_ok</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">is_ok</span> {
                     <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {}
-                    <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="ident">address</span>,
+                    <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pc</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>,
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">InvalidMicrostackTop</span>(<span class="ident">is_ok</span>, <span class="ident">VALID_IS_OK_VALUES</span>)),
                 }
             }
@@ -381,6 +405,14 @@
 <span class="kw">fn</span> <span class="ident">s_reg_flags</span>(<span class="ident">s</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
     (<span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="ident">FLAG_MASK_ZERO</span> } <span class="kw">else</span> { <span class="number">0b00000</span> })                     <span class="op">|</span> <span class="comment">// forcebreak</span>
     (<span class="kw">if</span> (<span class="ident">s</span>.<span class="ident">count_ones</span>() <span class="op">%</span> <span class="number">2</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="ident">FLAG_MASK_PARITY</span> } <span class="kw">else</span> { <span class="number">0b00000</span> })
+}
+
+<span class="kw">fn</span> <span class="ident">push_address</span>(<span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">address</span>: <span class="ident">u16</span>) {
+    <span class="kw">let</span> <span class="ident">high_byte</span> <span class="op">=</span> ((<span class="ident">address</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0xFF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="kw">let</span> <span class="ident">low_byte</span> <span class="op">=</span> ((<span class="ident">address</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0xFF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+
+    <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">high_byte</span>);
+    <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">low_byte</span>);
 }
 
 <span class="kw">fn</span> <span class="ident">pop_address</span>(<span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u16</span>, <span class="ident">MicroOpPerformError</span><span class="op">&gt;</span> {

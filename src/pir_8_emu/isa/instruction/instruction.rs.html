@@ -670,6 +670,32 @@
 <span id="670">670</span>
 <span id="671">671</span>
 <span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -772,14 +798,16 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// After PUSHing, the SP will have been decremented by two, with the SP containing the address of A/C (now in memory).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased by two.</span>
+<span class="doccomment">/// When POPing, the same respective pairs of memory locations will be read to the same pair of registers, and the SP increased</span>
+<span class="doccomment">/// by two.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Care must be taken, especially when POPing the stack, as there is no under/overflow protection or detection,</span>
 <span class="doccomment">/// just like with the PC incrementing during instruction execution.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// In fact, by design, POPing the final value from the stack will result in an overflow bringing the SP back to `0x0000`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory address:</span>
+<span class="doccomment">/// In terms of pseudo-code, a PUSH followed by a POP can view as the following microcode, where SP is a pointer to the memory</span>
+<span class="doccomment">/// address:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```cpp</span>
 <span class="doccomment">/// // PUSH</span>
@@ -804,7 +832,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The registers A and B are paired, as are the registers C and D.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C registers the lesser;</span>
+<span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C</span>
+<span class="doccomment">/// registers the lesser;</span>
 <span class="doccomment">/// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
@@ -817,11 +846,11 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// Reserved instruction, contains the entire byte</span>
     <span class="ident">Reserved</span>(<span class="ident">u8</span>),
-    <span class="comment">// /// Manipulate ADR, see section above</span>
-    <span class="comment">// Madr {</span>
-    <span class="comment">//     d: InstructionMadrDirection,</span>
-    <span class="comment">//     r: InstructionRegisterPair,</span>
-    <span class="comment">// },</span>
+    <span class="doccomment">/// Manipulate ADR, see section above</span>
+    <span class="ident">Madr</span> {
+        <span class="ident">d</span>: <span class="ident">InstructionMadrDirection</span>,
+        <span class="ident">r</span>: <span class="ident">InstructionRegisterPair</span>,
+    },
     <span class="doccomment">/// Jump, see member doc</span>
     <span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>),
     <span class="doccomment">/// Load the the next byte into register `AAA` (PC will be incremented a second time)</span>
@@ -883,14 +912,10 @@
     <span class="doccomment">/// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(Instruction::LoadImmediate{ aaa: 0 }.data_length(), 1);</span>
-    <span class="doccomment">/// assert_eq!(Instruction::Save { aaa: 0 }.data_length(), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { .. } <span class="op">|</span>
-            <span class="ident">Instruction</span>::<span class="ident">Jump</span>(..) <span class="op">|</span>
-            <span class="ident">Instruction</span>::<span class="ident">Save</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
         }
     }
@@ -962,7 +987,14 @@
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="ident">d</span>, <span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Instruction</span>::<span class="ident">Madr</span> {
+                    <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
+                    <span class="ident">r</span>: <span class="ident">r</span>.<span class="ident">into</span>(),
+                }
+            }
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for JUMP condition parse&quot;</span>))
             }
@@ -1004,6 +1036,7 @@
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_1100</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001_0000</span> <span class="op">|</span> (<span class="ident">cond</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediate</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
@@ -1023,11 +1056,30 @@
 }
 
 
+<span class="doccomment">/// The `D` bit indicates the direction – `0` for write-to (`MADR WRITE`) and `1` for read-from (`MADR READ`) the `ADR`</span>
+<span class="doccomment">/// register.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionMadrDirection</span> {
+    <span class="ident">Write</span> <span class="op">=</span> <span class="number">0b00</span>,
+    <span class="ident">Read</span> <span class="op">=</span> <span class="number">0b10</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InstructionMadrDirection</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InstructionMadrDirection</span> {
+        <span class="kw">match</span> <span class="ident">raw</span> {
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionMadrDirection</span>::<span class="ident">Write</span>,
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InstructionMadrDirection</span>::<span class="ident">Read</span>,
+        }
+    }
+}
+
+
 <span class="doccomment">/// This Instruction takes a three bit operand indicating under what condition the jump should be performed.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the condition is met, the value of ADR is loaded into the PC.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of loading the instruction.</span>
+<span class="doccomment">/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of</span>
+<span class="doccomment">/// loading the instruction.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** The value of ADR must have been set with the desired target location prior to the JUMP instruction being performed.</span>
 <span class="doccomment">///</span>
