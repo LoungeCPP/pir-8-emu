@@ -1,3 +1,4 @@
+mod instruction_load_immediate_wide_register_pair;
 mod alu_operation_shift_or_rotate_direction;
 mod alu_operation_shift_or_rotate_type;
 mod instruction_jump_condition;

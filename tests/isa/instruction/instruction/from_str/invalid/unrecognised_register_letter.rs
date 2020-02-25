@@ -7,6 +7,22 @@ use rand::thread_rng;
 
 
 #[test]
+fn load_immedate_byte() {
+    for pad_left in 1..5 {
+        for pad_right in 1..5 {
+            unrecognised_register_letter(&format!("LOAD{e:wl$}IMM{e:wr$}BYTE", e = "", wl = pad_left, wr = pad_right));
+        }
+    }
+}
+
+#[test]
+fn load_indirect() {
+    for pad in 1..5 {
+        unrecognised_register_letter(&format!("LOAD{e:w$}IND", e = "", w = pad));
+    }
+}
+
+#[test]
 fn save() {
     unrecognised_register_letter("SAVE");
 }
@@ -64,15 +80,6 @@ fn move_bbb() {
 #[test]
 fn comp() {
     unrecognised_register_letter("COMP");
-}
-
-#[test]
-fn load() {
-    for var in &["IMM", "IND"] {
-        for pad in 1..5 {
-            unrecognised_register_letter(&format!("LOAD{e:w$}{}", var, e = "", w = pad));
-        }
-    }
 }
 
 #[test]

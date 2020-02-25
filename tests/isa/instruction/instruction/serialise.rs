@@ -1,73 +1,58 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
-fn madr() {
-    let raw: u8 = Instruction::Madr {
-            d: InstructionMadrDirection::Write,
-            r: InstructionRegisterPair::Ab,
-        }
-        .into();
-    assert_eq!(raw, 0b0000_1100);
+fn load_immediate_byte() {
+    single_register(0b0000_0000 | 0b0_0000, |r| Instruction::LoadImmediateByte { aaa: r });
+}
 
-    let raw: u8 = Instruction::Madr {
-            d: InstructionMadrDirection::Write,
-            r: InstructionRegisterPair::Cd,
-        }
-        .into();
-    assert_eq!(raw, 0b0000_1101);
+#[test]
+fn load_indirect() {
+    single_register(0b0000_0000 | 0b0_1000, |r| Instruction::LoadIndirect { aaa: r });
+}
 
-    let raw: u8 = Instruction::Madr {
-            d: InstructionMadrDirection::Read,
-            r: InstructionRegisterPair::Ab,
-        }
-        .into();
-    assert_eq!(raw, 0b0000_1110);
+#[test]
+fn load_immediate_wide() {
+    let raw: u8 = Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.into();
+    assert_eq!(raw, 0b0000_0000 | 0b1_0000 | 0b00);
 
-    let raw: u8 = Instruction::Madr {
-            d: InstructionMadrDirection::Read,
-            r: InstructionRegisterPair::Cd,
-        }
-        .into();
-    assert_eq!(raw, 0b0000_1111);
+    let raw: u8 = Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Cd }.into();
+    assert_eq!(raw, 0b0000_0000 | 0b1_0000 | 0b01);
+
+    let raw: u8 = Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Xy }.into();
+    assert_eq!(raw, 0b0000_0000 | 0b1_0000 | 0b10);
+
+    let raw: u8 = Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.into();
+    assert_eq!(raw, 0b0000_0000 | 0b1_0000 | 0b11);
 }
 
 #[test]
 fn jump() {
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpz).into();
-    assert_eq!(raw, 0b0001_0000);
+    assert_eq!(raw, 0b0010_0000);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpp).into();
-    assert_eq!(raw, 0b0001_0001);
+    assert_eq!(raw, 0b0010_0001);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpg).into();
-    assert_eq!(raw, 0b0001_0010);
+    assert_eq!(raw, 0b0010_0010);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpc).into();
-    assert_eq!(raw, 0b0001_0011);
+    assert_eq!(raw, 0b0010_0011);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmzg).into();
-    assert_eq!(raw, 0b0001_0100);
+    assert_eq!(raw, 0b0010_0100);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmzl).into();
-    assert_eq!(raw, 0b0001_0101);
+    assert_eq!(raw, 0b0010_0101);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jmpl).into();
-    assert_eq!(raw, 0b0001_0110);
+    assert_eq!(raw, 0b0010_0110);
 
     let raw: u8 = Instruction::Jump(InstructionJumpCondition::Jump).into();
-    assert_eq!(raw, 0b0001_0111);
-}
-
-#[test]
-fn load_immediate() {
-    single_register(0b0001_1000, |r| Instruction::LoadImmediate { aaa: r });
-}
-
-#[test]
-fn load_indirect() {
-    single_register(0b0010_0000, |r| Instruction::LoadIndirect { aaa: r });
+    assert_eq!(raw, 0b0010_0111);
 }
 
 #[test]
@@ -147,6 +132,37 @@ fn move_() {
 }
 
 #[test]
+fn madr() {
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Write,
+            r: InstructionRegisterPair::Ab,
+        }
+        .into();
+    assert_eq!(raw, 0b1101_1000);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Write,
+            r: InstructionRegisterPair::Cd,
+        }
+        .into();
+    assert_eq!(raw, 0b1101_1001);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Read,
+            r: InstructionRegisterPair::Ab,
+        }
+        .into();
+    assert_eq!(raw, 0b1101_1010);
+
+    let raw: u8 = Instruction::Madr {
+            d: InstructionMadrDirection::Read,
+            r: InstructionRegisterPair::Cd,
+        }
+        .into();
+    assert_eq!(raw, 0b1101_1011);
+}
+
+#[test]
 fn port() {
     single_register(0b1110_1000, |r| {
         Instruction::Port {
@@ -213,23 +229,39 @@ fn halt() {
 
 #[test]
 fn reserved_block_0() {
-    reserved_block(0b0000_0000, 0b1111);
+    reserved_block(0b0001_0100, 0b11);
 }
 
 #[test]
 fn reserved_block_1() {
-    reserved_block(0b1000_0000, 0b11_1111);
+    reserved_block(0b0001_1000, 0b111);
 }
 
 #[test]
 fn reserved_block_2() {
-    reserved_block(0b1100_0000, 0b1_1111);
+    reserved_block(0b1000_0000, 0b111111);
 }
 
 #[test]
 fn reserved_block_3() {
+    reserved_block(0b1100_0000, 0b1111);
+}
+
+#[test]
+fn reserved_block_4() {
+    reserved_block(0b1101_0000, 0b111);
+}
+
+#[test]
+fn reserved_block_5() {
+    reserved_block(0b1101_1100, 0b11);
+}
+
+#[test]
+fn reserved_block_6() {
     reserved_block(0b1111_1100, 0b1);
 }
+
 
 
 fn single_register(base: u8, wanted: fn(u8) -> Instruction) {

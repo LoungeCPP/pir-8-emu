@@ -345,7 +345,7 @@ impl From<u8> for Instruction {
             (false, false, false, true, false, true, _, _) => Instruction::Reserved(raw),
             (false, false, false, true, true, _, _, _) => Instruction::Reserved(raw),
 
-            (false, false, false, true, false, _, _, _) => {
+            (false, false, true, false, false, _, _, _) => {
                 Instruction::Jump(InstructionJumpCondition::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for JUMP condition parse"))
             }
             (false, false, true, false, true, _, _, _) => Instruction::Save { aaa: raw & 0b0000_0111 },
@@ -358,6 +358,7 @@ impl From<u8> for Instruction {
                     bbb: raw & 0b0000_0111,
                 }
             }
+            (true, false, _, _, _, _, _, _) => Instruction::Reserved(raw),
             (true, true, false, false, _, _, _, _) => Instruction::Reserved(raw),
             (true, true, false, true, false, _, _, _) => Instruction::Reserved(raw),
             (true, true, false, true, true, false, d, r) => {
@@ -394,8 +395,7 @@ impl Into<u8> for Instruction {
             Instruction::LoadImmediateByte { aaa } => 0b0000_0000 | 0b0_0000 | aaa,
             Instruction::LoadIndirect { aaa } => 0b0000_0000 | 0b0_1000 | aaa,
             Instruction::LoadImmediateWide { rr } => 0b0000_0000 | 0b1_0000 | (rr as u8),
-            Instruction::LoadIndirect { aaa } => 0b0010_0000 | aaa,
-            Instruction::Jump(cond) => 0b0001_0000 | (cond as u8),
+            Instruction::Jump(cond) => 0b0010_0000 | (cond as u8),
             Instruction::Save { aaa } => 0b0010_1000 | aaa,
             Instruction::Alu(op) => {
                 let op_b: u8 = op.into();

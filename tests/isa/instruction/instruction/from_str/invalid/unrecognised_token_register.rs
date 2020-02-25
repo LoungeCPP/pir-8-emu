@@ -10,6 +10,30 @@ static TOKENS_REGISTER: &[&str] = &["[register letter]"];
 
 
 #[test]
+fn load_immedate_byte() {
+    for pad_left in 1..5 {
+        for pad_right in 1..5 {
+            unrecognised_token(&format!("LOAD{e:wl$}IMM{e:wr$}BYTE", e = "", wl = pad_left, wr = pad_right),
+                               &[],
+                               2..5,
+                               |_, _| true,
+                               |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_REGISTER));
+        }
+    }
+}
+
+#[test]
+fn load_indirect() {
+    for pad in 1..5 {
+        unrecognised_token(&format!("LOAD{e:w$}IND", e = "", w = pad),
+                               &[],
+                               2..5,
+                               |_, _| true,
+                               |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_REGISTER));
+    }
+}
+
+#[test]
 fn save() {
     unrecognised_token("SAVE",
                        &[],
@@ -70,19 +94,6 @@ fn comp() {
                        2..5,
                        |_, _| true,
                        |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_REGISTER));
-}
-
-#[test]
-fn load() {
-    for var in &["IMM", "IND"] {
-        for pad in 1..5 {
-            unrecognised_token(&format!("LOAD{e:w$}{}", var, e = "", w = pad),
-                               &[],
-                               2..5,
-                               |_, _| true,
-                               |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_REGISTER));
-        }
-    }
 }
 
 #[test]

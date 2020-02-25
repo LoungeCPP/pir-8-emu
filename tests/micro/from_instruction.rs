@@ -1,5 +1,6 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionMadrDirection,
-                                  InstructionPortDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionMadrDirection, InstructionPortDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::micro::MicroOp;
 
 
@@ -15,76 +16,71 @@ const D_REGISTER_ADDRESS: u8 = 0b111;
 
 #[test]
 fn reserved_block_0() {
-    reserved_block(0b0000_0000, 0b111, Instruction::Reserved);
+    reserved_block(0b0001_0100, 0b11, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_1() {
-    reserved_block(0b0000_1000, 0b11, Instruction::Reserved);
+    reserved_block(0b0001_1000, 0b111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_2() {
-    reserved_block(0b1000_0000, 0b11_1111, Instruction::Reserved);
+    reserved_block(0b1000_0000, 0b111111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_3() {
-    reserved_block(0b1100_0000, 0b1_1111, Instruction::Reserved);
+    reserved_block(0b1100_0000, 0b1111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_4() {
-    reserved_block(0b1110_0000, 0b1111, Instruction::Reserved);
+    reserved_block(0b1101_0000, 0b111, Instruction::Reserved);
 }
 
 #[test]
 fn reserved_block_5() {
+    reserved_block(0b1101_1100, 0b11, Instruction::Reserved);
+}
+
+#[test]
+fn reserved_block_6() {
     reserved_block(0b1111_1100, 0b1, Instruction::Reserved);
 }
 
+
 #[test]
-fn madr_write() {
-    let ops = MicroOp::from_instruction(Instruction::Madr {
-        d: InstructionMadrDirection::Write,
-        r: InstructionRegisterPair::Ab,
-    });
-    let ops = &ops.0[..ops.1];
-
-    assert_eq!(ops,
-               &[MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::ReadRegister(B_REGISTER_ADDRESS), MicroOp::AdrWrite]);
-
-
-    let ops = MicroOp::from_instruction(Instruction::Madr {
-        d: InstructionMadrDirection::Write,
-        r: InstructionRegisterPair::Cd,
-    });
-    let ops = &ops.0[..ops.1];
-
-    assert_eq!(ops,
-               &[MicroOp::ReadRegister(C_REGISTER_ADDRESS), MicroOp::ReadRegister(D_REGISTER_ADDRESS), MicroOp::AdrWrite]);
+fn load_immediate_byte() {
+    single_register(|aaa| Instruction::LoadImmediateByte { aaa: aaa },
+                    |aaa| vec![MicroOp::LoadImmediate, MicroOp::WriteRegister(aaa)]);
 }
 
 #[test]
-fn madr_read() {
-    let ops = MicroOp::from_instruction(Instruction::Madr {
-        d: InstructionMadrDirection::Read,
-        r: InstructionRegisterPair::Ab,
-    });
+fn load_indirect() {
+    single_register(|aaa| Instruction::LoadIndirect { aaa: aaa },
+                    |aaa| vec![MicroOp::FetchAddress, MicroOp::WriteRegister(aaa)]);
+}
+
+#[test]
+fn load_immediate_wide_adr() {
+    let ops = MicroOp::from_instruction(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr });
     let ops = &ops.0[..ops.1];
 
-    assert_eq!(ops,
-               &[MicroOp::AdrRead, MicroOp::WriteRegister(B_REGISTER_ADDRESS), MicroOp::WriteRegister(A_REGISTER_ADDRESS)]);
+    assert_eq!(ops, &[MicroOp::LoadImmediate, MicroOp::LoadImmediate, MicroOp::AdrWrite]);
+}
 
+#[test]
+fn load_immediate_wide() {
+    for &(rr, hi, lo) in &[(InstructionLoadImmediateWideRegisterPair::Ab, A_REGISTER_ADDRESS, B_REGISTER_ADDRESS),
+                           (InstructionLoadImmediateWideRegisterPair::Cd, C_REGISTER_ADDRESS, D_REGISTER_ADDRESS),
+                           (InstructionLoadImmediateWideRegisterPair::Xy, X_REGISTER_ADDRESS, Y_REGISTER_ADDRESS)] {
+        let ops = MicroOp::from_instruction(Instruction::LoadImmediateWide { rr: rr });
+        let ops = &ops.0[..ops.1];
 
-    let ops = MicroOp::from_instruction(Instruction::Madr {
-        d: InstructionMadrDirection::Read,
-        r: InstructionRegisterPair::Cd,
-    });
-    let ops = &ops.0[..ops.1];
-
-    assert_eq!(ops,
-               &[MicroOp::AdrRead, MicroOp::WriteRegister(D_REGISTER_ADDRESS), MicroOp::WriteRegister(C_REGISTER_ADDRESS)]);
+        assert_eq!(ops,
+                   &[MicroOp::LoadImmediate, MicroOp::LoadImmediate, MicroOp::WriteRegister(lo), MicroOp::WriteRegister(hi)]);
+    }
 }
 
 #[test]
@@ -103,18 +99,6 @@ fn jump() {
         assert_eq!(ops,
                    &[MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS), MicroOp::CheckJumpCondition(cond), MicroOp::Jump]);
     }
-}
-
-#[test]
-fn load_immediate() {
-    single_register(|aaa| Instruction::LoadImmediate { aaa: aaa },
-                    |aaa| vec![MicroOp::LoadImmediate, MicroOp::WriteRegister(aaa)]);
-}
-
-#[test]
-fn load_indirect() {
-    single_register(|aaa| Instruction::LoadIndirect { aaa: aaa },
-                    |aaa| vec![MicroOp::FetchAddress, MicroOp::WriteRegister(aaa)]);
 }
 
 #[test]
@@ -162,6 +146,50 @@ fn move_() {
             assert_eq!(ops, &[MicroOp::ReadRegister(aaa), MicroOp::WriteRegister(bbb)]);
         }
     }
+}
+
+#[test]
+fn madr_write() {
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Write,
+        r: InstructionRegisterPair::Ab,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::ReadRegister(B_REGISTER_ADDRESS), MicroOp::AdrWrite]);
+
+
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Write,
+        r: InstructionRegisterPair::Cd,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::ReadRegister(C_REGISTER_ADDRESS), MicroOp::ReadRegister(D_REGISTER_ADDRESS), MicroOp::AdrWrite]);
+}
+
+#[test]
+fn madr_read() {
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Read,
+        r: InstructionRegisterPair::Ab,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::AdrRead, MicroOp::WriteRegister(B_REGISTER_ADDRESS), MicroOp::WriteRegister(A_REGISTER_ADDRESS)]);
+
+
+    let ops = MicroOp::from_instruction(Instruction::Madr {
+        d: InstructionMadrDirection::Read,
+        r: InstructionRegisterPair::Cd,
+    });
+    let ops = &ops.0[..ops.1];
+
+    assert_eq!(ops,
+               &[MicroOp::AdrRead, MicroOp::WriteRegister(D_REGISTER_ADDRESS), MicroOp::WriteRegister(C_REGISTER_ADDRESS)]);
 }
 
 #[test]
@@ -268,7 +296,7 @@ fn single_register(instr: fn(u8) -> Instruction, wops: fn(u8) -> Vec<MicroOp>) {
 }
 
 fn reserved_block(base: u8, max: u8, instr: fn(u8) -> Instruction) {
-    for i in 0..max {
+    for i in 0..=max {
         let raw = base | i;
         assert_eq!(instr(raw).data_length(), 0);
     }

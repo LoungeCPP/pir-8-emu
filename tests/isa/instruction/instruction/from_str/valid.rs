@@ -1,36 +1,35 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 use pir_8_emu::isa::GeneralPurposeRegister;
 use self::super::super::alt_gp_registers;
 use std::convert::TryFrom;
 
 
 #[test]
-fn madr() {
+fn load_immediate_byte() {
+    aaa("LOAD IMM BYTE", |aaa| Instruction::LoadImmediateByte { aaa: aaa.address() });
+}
+
+#[test]
+fn load_indirect() {
+    aaa("LOAD IND", |aaa| Instruction::LoadIndirect { aaa: aaa.address() });
+}
+
+#[test]
+fn load_immediate_wide() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        assert_eq!(Instruction::from_str("MADR WRITE A&B", regs),
-                   Ok(Instruction::Madr {
-                       d: InstructionMadrDirection::Write,
-                       r: InstructionRegisterPair::Ab,
-                   }));
+        assert_eq!(Instruction::from_str("LOAD IMM WIDE A&B", regs),
+                   Ok(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }));
 
-        assert_eq!(Instruction::from_str("MADR WRITE C&D", regs),
-                   Ok(Instruction::Madr {
-                       d: InstructionMadrDirection::Write,
-                       r: InstructionRegisterPair::Cd,
-                   }));
+        assert_eq!(Instruction::from_str("LOAD IMM WIDE C&D", regs),
+                   Ok(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Cd }));
 
-        assert_eq!(Instruction::from_str("MADR READ A&B", regs),
-                   Ok(Instruction::Madr {
-                       d: InstructionMadrDirection::Read,
-                       r: InstructionRegisterPair::Ab,
-                   }));
+        assert_eq!(Instruction::from_str("LOAD IMM WIDE X&Y", regs),
+                   Ok(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Xy }));
 
-        assert_eq!(Instruction::from_str("MADR READ C&D", regs),
-                   Ok(Instruction::Madr {
-                       d: InstructionMadrDirection::Read,
-                       r: InstructionRegisterPair::Cd,
-                   }));
+        assert_eq!(Instruction::from_str("LOAD IMM WIDE ADR", regs),
+                   Ok(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }));
     }
 }
 
@@ -59,16 +58,6 @@ fn jump() {
         assert_eq!(Instruction::from_str("JMPL", regs), Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));
         assert_eq!(Instruction::from_str("JUMP", regs), Ok(Instruction::Jump(InstructionJumpCondition::Jump)));
     }
-}
-
-#[test]
-fn load_immediate() {
-    aaa("LOAD IMM", |aaa| Instruction::LoadImmediate { aaa: aaa.address() });
-}
-
-#[test]
-fn load_indirect() {
-    aaa("LOAD IND", |aaa| Instruction::LoadIndirect { aaa: aaa.address() });
 }
 
 #[test]
@@ -165,6 +154,35 @@ fn move_() {
                            }));
             }
         }
+    }
+}
+
+#[test]
+fn madr() {
+    for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
+        assert_eq!(Instruction::from_str("MADR WRITE A&B", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Write,
+                       r: InstructionRegisterPair::Ab,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR WRITE C&D", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Write,
+                       r: InstructionRegisterPair::Cd,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR READ A&B", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Read,
+                       r: InstructionRegisterPair::Ab,
+                   }));
+
+        assert_eq!(Instruction::from_str("MADR READ C&D", regs),
+                   Ok(Instruction::Madr {
+                       d: InstructionMadrDirection::Read,
+                       r: InstructionRegisterPair::Cd,
+                   }));
     }
 }
 

@@ -1,54 +1,43 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
-fn madr() {
-    assert_eq!(Instruction::from(0b0000_1100),
-               Instruction::Madr {
-                   d: InstructionMadrDirection::Write,
-                   r: InstructionRegisterPair::Ab,
-               });
-
-    assert_eq!(Instruction::from(0b0000_1101),
-               Instruction::Madr {
-                   d: InstructionMadrDirection::Write,
-                   r: InstructionRegisterPair::Cd,
-               });
-
-    assert_eq!(Instruction::from(0b0000_1110),
-               Instruction::Madr {
-                   d: InstructionMadrDirection::Read,
-                   r: InstructionRegisterPair::Ab,
-               });
-
-    assert_eq!(Instruction::from(0b0000_1111),
-               Instruction::Madr {
-                   d: InstructionMadrDirection::Read,
-                   r: InstructionRegisterPair::Cd,
-               });
-}
-
-#[test]
-fn jump() {
-    assert_eq!(Instruction::from(0b0001_0000), Instruction::Jump(InstructionJumpCondition::Jmpz));
-    assert_eq!(Instruction::from(0b0001_0001), Instruction::Jump(InstructionJumpCondition::Jmpp));
-    assert_eq!(Instruction::from(0b0001_0010), Instruction::Jump(InstructionJumpCondition::Jmpg));
-    assert_eq!(Instruction::from(0b0001_0011), Instruction::Jump(InstructionJumpCondition::Jmpc));
-    assert_eq!(Instruction::from(0b0001_0100), Instruction::Jump(InstructionJumpCondition::Jmzg));
-    assert_eq!(Instruction::from(0b0001_0101), Instruction::Jump(InstructionJumpCondition::Jmzl));
-    assert_eq!(Instruction::from(0b0001_0110), Instruction::Jump(InstructionJumpCondition::Jmpl));
-    assert_eq!(Instruction::from(0b0001_0111), Instruction::Jump(InstructionJumpCondition::Jump));
-}
-
-#[test]
-fn load_immediate() {
-    single_register(0b0001_1000, |r| Instruction::LoadImmediate { aaa: r });
+fn load_immediate_byte() {
+    single_register(0b0000_0000 | 0b0_0000, |r| Instruction::LoadImmediateByte { aaa: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register(0b0010_0000, |r| Instruction::LoadIndirect { aaa: r });
+    single_register(0b0000_0000 | 0b0_1000, |r| Instruction::LoadIndirect { aaa: r });
+}
+
+#[test]
+fn load_indirect_wide() {
+    assert_eq!(Instruction::from(0b0000_0000 | 0b1_0000 | 0b00),
+               Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab });
+
+    assert_eq!(Instruction::from(0b0000_0000 | 0b1_0000 | 0b01),
+               Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Cd });
+
+    assert_eq!(Instruction::from(0b0000_0000 | 0b1_0000 | 0b10),
+               Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Xy });
+
+    assert_eq!(Instruction::from(0b0000_0000 | 0b1_0000 | 0b11),
+               Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr });
+}
+
+#[test]
+fn jump() {
+    assert_eq!(Instruction::from(0b0010_0000), Instruction::Jump(InstructionJumpCondition::Jmpz));
+    assert_eq!(Instruction::from(0b0010_0001), Instruction::Jump(InstructionJumpCondition::Jmpp));
+    assert_eq!(Instruction::from(0b0010_0010), Instruction::Jump(InstructionJumpCondition::Jmpg));
+    assert_eq!(Instruction::from(0b0010_0011), Instruction::Jump(InstructionJumpCondition::Jmpc));
+    assert_eq!(Instruction::from(0b0010_0100), Instruction::Jump(InstructionJumpCondition::Jmzg));
+    assert_eq!(Instruction::from(0b0010_0101), Instruction::Jump(InstructionJumpCondition::Jmzl));
+    assert_eq!(Instruction::from(0b0010_0110), Instruction::Jump(InstructionJumpCondition::Jmpl));
+    assert_eq!(Instruction::from(0b0010_0111), Instruction::Jump(InstructionJumpCondition::Jump));
 }
 
 #[test]
@@ -112,6 +101,33 @@ fn move_() {
 }
 
 #[test]
+fn madr() {
+    assert_eq!(Instruction::from(0b1101_1000),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Write,
+                   r: InstructionRegisterPair::Ab,
+               });
+
+    assert_eq!(Instruction::from(0b1101_1001),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Write,
+                   r: InstructionRegisterPair::Cd,
+               });
+
+    assert_eq!(Instruction::from(0b1101_1010),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Read,
+                   r: InstructionRegisterPair::Ab,
+               });
+
+    assert_eq!(Instruction::from(0b1101_1011),
+               Instruction::Madr {
+                   d: InstructionMadrDirection::Read,
+                   r: InstructionRegisterPair::Cd,
+               });
+}
+
+#[test]
 fn port() {
     single_register(0b1110_1000, |r| {
         Instruction::Port {
@@ -172,26 +188,36 @@ fn halt() {
 
 #[test]
 fn reserved_block_0() {
-    reserved_block(0b0000_0000, 0b111);
+    reserved_block(0b0001_0100, 0b11);
 }
 
 #[test]
 fn reserved_block_1() {
-    reserved_block(0b0000_0100, 0b11);
+    reserved_block(0b0001_1000, 0b111);
 }
 
 #[test]
 fn reserved_block_2() {
-    reserved_block(0b1000_0000, 0b11_1111);
+    reserved_block(0b1000_0000, 0b111111);
 }
 
 #[test]
 fn reserved_block_3() {
-    reserved_block(0b1100_0000, 0b1_1111);
+    reserved_block(0b1100_0000, 0b1111);
 }
 
 #[test]
 fn reserved_block_4() {
+    reserved_block(0b1101_0000, 0b111);
+}
+
+#[test]
+fn reserved_block_5() {
+    reserved_block(0b1101_1100, 0b11);
+}
+
+#[test]
+fn reserved_block_6() {
     reserved_block(0b1111_1100, 0b1);
 }
 

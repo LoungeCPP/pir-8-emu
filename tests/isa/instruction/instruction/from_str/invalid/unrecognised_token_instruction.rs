@@ -7,7 +7,7 @@ use self::super::unrecognised_token;
 
 #[test]
 fn toplevel_raw() {
-    static TOKENS_TOP: &[&str] = &["MADR",
+    static TOKENS_TOP: &[&str] = &["LOAD",
                                    "JMPZ",
                                    "JMPP",
                                    "JMPG",
@@ -16,10 +16,10 @@ fn toplevel_raw() {
                                    "JMZL",
                                    "JMPL",
                                    "JUMP",
-                                   "LOAD",
                                    "SAVE",
                                    "ALU",
                                    "MOVE",
+                                   "MADR",
                                    "PORT",
                                    "COMP",
                                    "STCK",
@@ -60,7 +60,7 @@ fn toplevel_raw() {
 
 #[test]
 fn toplevel() {
-    static TOKENS_TOP: &[&str] = &["MADR",
+    static TOKENS_TOP: &[&str] = &["LOAD",
                                    "JMPZ",
                                    "JMPP",
                                    "JMPG",
@@ -69,10 +69,10 @@ fn toplevel() {
                                    "JMZL",
                                    "JMPL",
                                    "JUMP",
-                                   "LOAD",
                                    "SAVE",
                                    "ALU",
                                    "MOVE",
+                                   "MADR",
                                    "PORT",
                                    "COMP",
                                    "STCK",
@@ -166,17 +166,6 @@ fn alu_sor_type() {
 }
 
 #[test]
-fn madr() {
-    static TOKENS_MADR: &[&str] = &["WRITE", "READ"];
-
-    unrecognised_token("MADR",
-                       TOKENS_MADR,
-                       1..10,
-                       |s, _| parse_with_prefix::<u8>(s).is_none(),
-                       |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_MADR));
-}
-
-#[test]
 fn load() {
     static TOKENS_LOAD: &[&str] = &["IMM", "IND"];
 
@@ -185,6 +174,45 @@ fn load() {
                        1..5,
                        |s, _| parse_with_prefix::<u8>(s).is_none(),
                        |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_LOAD));
+}
+
+#[test]
+fn load_imm() {
+    static TOKENS_LOAD_IMM: &[&str] = &["BYTE", "WIDE"];
+
+    for pad in 1..5 {
+        unrecognised_token(&format!("LOAD{e:w$}IMM", e = "", w = pad),
+                           TOKENS_LOAD_IMM,
+                           1..5,
+                           |s, _| parse_with_prefix::<u8>(s).is_none(),
+                           |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_LOAD_IMM));
+    }
+}
+
+#[test]
+fn load_imm_wide() {
+    static TOKENS_LOAD_IMM_BYTE: &[&str] = &["A&B", "C&D", "X&Y", "ADR"];
+
+    for pad_left in 1..5 {
+        for pad_right in 1..5 {
+            unrecognised_token(&format!("LOAD{e:wl$}IMM{e:wr$}WIDE", e = "", wl = pad_left, wr = pad_right),
+                               TOKENS_LOAD_IMM_BYTE,
+                               1..5,
+                               |s, _| parse_with_prefix::<u8>(s).is_none(),
+                               |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_LOAD_IMM_BYTE));
+        }
+    }
+}
+
+#[test]
+fn madr() {
+    static TOKENS_MADR: &[&str] = &["WRITE", "READ"];
+
+    unrecognised_token("MADR",
+                       TOKENS_MADR,
+                       1..10,
+                       |s, _| parse_with_prefix::<u8>(s).is_none(),
+                       |len, _, _| ParseInstructionError::UnrecognisedToken(len, TOKENS_MADR));
 }
 
 #[test]

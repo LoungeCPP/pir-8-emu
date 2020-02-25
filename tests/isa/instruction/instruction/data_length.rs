@@ -1,38 +1,36 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
-fn madr() {
-    for &d in &[InstructionMadrDirection::Write, InstructionMadrDirection::Read] {
-        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
-            assert_eq!(Instruction::Madr { d: d, r: r }.data_length(), 0);
-        }
-    }
-}
-
-#[test]
-fn jump() {
-    for &cond in &[InstructionJumpCondition::Jmpz,
-                   InstructionJumpCondition::Jmpp,
-                   InstructionJumpCondition::Jmpg,
-                   InstructionJumpCondition::Jmpc,
-                   InstructionJumpCondition::Jmzg,
-                   InstructionJumpCondition::Jmzl,
-                   InstructionJumpCondition::Jmpl,
-                   InstructionJumpCondition::Jump] {
-        assert_eq!(Instruction::Jump(cond).data_length(), 0);
-    }
-}
-
-#[test]
-fn load_immediate() {
-    single_register(1, |r| Instruction::LoadImmediate { aaa: r });
+fn load_immediate_byte() {
+    single_register(1, |r| Instruction::LoadImmediateByte { aaa: r });
 }
 
 #[test]
 fn load_indirect() {
     single_register(0, |r| Instruction::LoadIndirect { aaa: r });
+}
+
+#[test]
+fn load_immediate_wide() {
+    assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.data_length(), 2);
+    assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Cd }.data_length(), 2);
+    assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Xy }.data_length(), 2);
+    assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.data_length(), 2);
+}
+
+#[test]
+fn jump() {
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpz).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpp).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpg).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpc).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmzg).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmzl).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jmpl).data_length(), 0);
+    assert_eq!(Instruction::Jump(InstructionJumpCondition::Jump).data_length(), 0);
 }
 
 #[test]
@@ -74,6 +72,15 @@ fn move_() {
                            }
                            .data_length(),
                        0);
+        }
+    }
+}
+
+#[test]
+fn madr() {
+    for &d in &[InstructionMadrDirection::Write, InstructionMadrDirection::Read] {
+        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
+            assert_eq!(Instruction::Madr { d: d, r: r }.data_length(), 0);
         }
     }
 }

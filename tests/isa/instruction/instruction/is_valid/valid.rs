@@ -1,14 +1,24 @@
-use pir_8_emu::isa::instruction::{AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType, InstructionJumpCondition, InstructionPortDirection,
-                                  InstructionMadrDirection, InstructionStckDirection, InstructionRegisterPair, AluOperation, Instruction};
+use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluOperationShiftOrRotateDirection, AluOperationShiftOrRotateType,
+                                  InstructionJumpCondition, InstructionPortDirection, InstructionMadrDirection, InstructionStckDirection,
+                                  InstructionRegisterPair, AluOperation, Instruction};
 
 
 #[test]
-fn madr() {
-    for &d in &[InstructionMadrDirection::Write, InstructionMadrDirection::Read] {
-        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
-            assert!(Instruction::Madr { d: d, r: r }.is_valid());
-        }
-    }
+fn load_immediate_byte() {
+    single_register(|r| Instruction::LoadImmediateByte { aaa: r });
+}
+
+#[test]
+fn load_indirect() {
+    single_register(|r| Instruction::LoadIndirect { aaa: r });
+}
+
+#[test]
+fn load_immediate_wide() {
+    assert!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.is_valid());
+    assert!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Cd }.is_valid());
+    assert!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Xy }.is_valid());
+    assert!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.is_valid());
 }
 
 #[test]
@@ -23,16 +33,6 @@ fn jump() {
                    InstructionJumpCondition::Jump] {
         assert!(Instruction::Jump(cond).is_valid());
     }
-}
-
-#[test]
-fn load_immediate() {
-    single_register(|r| Instruction::LoadImmediate { aaa: r });
-}
-
-#[test]
-fn load_indirect() {
-    single_register(|r| Instruction::LoadIndirect { aaa: r });
 }
 
 #[test]
@@ -73,6 +73,15 @@ fn move_() {
                     bbb: bbb,
                 }
                 .is_valid());
+        }
+    }
+}
+
+#[test]
+fn madr() {
+    for &d in &[InstructionMadrDirection::Write, InstructionMadrDirection::Read] {
+        for &r in &[InstructionRegisterPair::Ab, InstructionRegisterPair::Cd] {
+            assert!(Instruction::Madr { d: d, r: r }.is_valid());
         }
     }
 }

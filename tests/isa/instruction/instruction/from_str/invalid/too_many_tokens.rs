@@ -34,15 +34,35 @@ fn raw() {
 }
 
 #[test]
-fn madr() {
-    static TOKENS_MADR_DIRECTION: &[&str] = &["WRITE", "READ"];
-    static TOKENS_MADR_REG_PAIR: &[&str] = &["A&B", "C&D"];
+fn load_immediate_byte() {
+    for pad_left in 1..3 {
+        for pad_right in 1..3 {
+            too_many_tokens_aaa(&format!("LOAD{e:wl$}IMM{e:wr$}BYTE", e = "", wl = pad_left, wr = pad_right));
+        }
+    }
+}
 
-    for d in TOKENS_MADR_DIRECTION {
-        for r in TOKENS_MADR_REG_PAIR {
-            for pad_left in 1..3 {
+#[test]
+fn load_indirect() {
+    for pad in 1..3 {
+        too_many_tokens_aaa(&format!("LOAD{e:w$}IND", e = "", w = pad));
+    }
+}
+
+#[test]
+fn load_immediate_wide() {
+    static TOKENS_LOAD_IMMEDIATE_WIDE_REGISTER_PAIR: &[&str] = &["A&B", "C&D", "X&Y", "ADR"];
+
+    for tok in TOKENS_LOAD_IMMEDIATE_WIDE_REGISTER_PAIR {
+        for pad_left in 1..3 {
+            for pad_center in 1..3 {
                 for pad_right in 1..3 {
-                    unrecognised_token(&format!("MADR{e:wl$}{}{e:wr$}{}", d, r, e = "", wl = pad_left, wr = pad_right),
+                    unrecognised_token(&format!("LOAD{e:wl$}IMM{e:wc$}WIDE{e:wr$}{}",
+                                                tok,
+                                                e = "",
+                                                wl = pad_left,
+                                                wc = pad_center,
+                                                wr = pad_right),
                                        &[],
                                        1..5,
                                        |_, _| true,
@@ -63,17 +83,6 @@ fn jump_clrf_halt() {
 }
 
 #[test]
-fn load() {
-    static TOKENS_LOAD: &[&str] = &["IMM", "IND"];
-
-    for tok in TOKENS_LOAD {
-        for pad in 1..3 {
-            too_many_tokens_aaa(&format!("LOAD{e:w$}{}", tok, e = "", w = pad));
-        }
-    }
-}
-
-#[test]
 fn save() {
     too_many_tokens_aaa("SAVE");
 }
@@ -82,7 +91,11 @@ fn save() {
 fn alu_raw() {
     for i in 0..=0b1111 {
         for pad in 1..5 {
-            unrecognised_token(&format!("ALU{e:w$}{}", i, e = "", w = pad), &[], 1..5, |_, _| true, |len, _, _| ParseInstructionError::TooManyTokens(len));
+            unrecognised_token(&format!("ALU{e:w$}{}", i, e = "", w = pad),
+                               &[],
+                               1..5,
+                               |_, _| true,
+                               |len, _, _| ParseInstructionError::TooManyTokens(len));
             unrecognised_token(&format!("ALU{e:w$}{:#0x}", i, e = "", w = pad),
                                &[],
                                1..5,
@@ -182,6 +195,26 @@ fn move_() {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn madr() {
+    static TOKENS_MADR_DIRECTION: &[&str] = &["WRITE", "READ"];
+    static TOKENS_MADR_REG_PAIR: &[&str] = &["A&B", "C&D"];
+
+    for d in TOKENS_MADR_DIRECTION {
+        for r in TOKENS_MADR_REG_PAIR {
+            for pad_left in 1..3 {
+                for pad_right in 1..3 {
+                    unrecognised_token(&format!("MADR{e:wl$}{}{e:wr$}{}", d, r, e = "", wl = pad_left, wr = pad_right),
+                                       &[],
+                                       1..5,
+                                       |_, _| true,
+                                       |len, _, _| ParseInstructionError::TooManyTokens(len));
                 }
             }
         }
