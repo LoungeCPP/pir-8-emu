@@ -70,8 +70,32 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">AluOperation</span>};
+
+
+<span class="kw">enum</span> <span class="ident">RespectCarry</span> {
+    <span class="ident">No</span>,
+    <span class="ident">YesAdd</span>,
+    <span class="ident">YesSub</span>,
+}
 
 
 <span class="kw">impl</span> <span class="ident">AluOperation</span> {
@@ -82,11 +106,14 @@
                 <span class="number">0</span>
             }
 
-            <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>),
+            <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>, <span class="ident">RespectCarry</span>::<span class="ident">No</span>),
             <span class="comment">// [11:38] Cat Plus Plus: Or basically: just do it as addition but two-complement negate the second operand</span>
             <span class="comment">// [11:38] Cat Plus Plus: So 0x02 - 0x04 is 0x02 + 0xFC</span>
             <span class="comment">// https://discordapp.com/channels/145079846832308224/411537636994449418/600259783072940044</span>
-            <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, (<span class="op">!</span><span class="ident">rhs</span>).<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>), <span class="ident">carry</span>),
+            <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, (<span class="op">!</span><span class="ident">rhs</span>).<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>), <span class="ident">carry</span>, <span class="ident">RespectCarry</span>::<span class="ident">No</span>),
+
+            <span class="ident">AluOperation</span>::<span class="ident">AddC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>, <span class="ident">carry</span>, <span class="ident">RespectCarry</span>::<span class="ident">YesAdd</span>),
+            <span class="ident">AluOperation</span>::<span class="ident">SubC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">add</span>(<span class="ident">lhs</span>, (<span class="op">!</span><span class="ident">rhs</span>).<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>), <span class="ident">carry</span>, <span class="ident">RespectCarry</span>::<span class="ident">YesSub</span>),
 
             <span class="ident">AluOperation</span>::<span class="ident">Not</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">lhs</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Or</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lhs</span> <span class="op">|</span> <span class="ident">rhs</span>,
@@ -136,8 +163,15 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-    <span class="kw">let</span> <span class="ident">sum</span> <span class="op">=</span> (<span class="ident">lhs</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">+</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">u16</span>);
+<span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">lhs</span>: <span class="ident">u8</span>, <span class="ident">rhs</span>: <span class="ident">u8</span>, <span class="ident">carry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>, <span class="ident">respect</span>: <span class="ident">RespectCarry</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> (<span class="ident">lhs</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">+</span> (<span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">u16</span>);
+
+    <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">carry</span>, <span class="ident">respect</span>) {
+        (<span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">|</span>
+        (<span class="bool-val">true</span>, <span class="ident">RespectCarry</span>::<span class="ident">No</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+        (<span class="bool-val">true</span>, <span class="ident">RespectCarry</span>::<span class="ident">YesAdd</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+        (<span class="bool-val">true</span>, <span class="ident">RespectCarry</span>::<span class="ident">YesSub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sum</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>,
+    }
 
     <span class="kw-2">*</span><span class="ident">carry</span> <span class="op">=</span> (<span class="ident">sum</span> <span class="op">&amp;</span> <span class="number">0b1_0000_0000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
 

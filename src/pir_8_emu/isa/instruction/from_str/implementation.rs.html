@@ -435,6 +435,10 @@
 <span id="435">435</span>
 <span id="436">436</span>
 <span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">AluOperationShiftOrRotateDirection</span>, <span class="ident">AluOperationShiftOrRotateType</span>, <span class="ident">InstructionJumpCondition</span>, <span class="ident">InstructionPortDirection</span>,
                          <span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>, <span class="ident">Instruction</span>};
@@ -743,7 +747,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">parse_alu_operation</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">itr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">orig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AluOperation</span>, <span class="ident">ParseInstructionError</span><span class="op">&gt;</span> {
-    <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;ADD&quot;</span>, <span class="string">&quot;SUB&quot;</span>, <span class="string">&quot;NOT&quot;</span>, <span class="string">&quot;OR&quot;</span>, <span class="string">&quot;XOR&quot;</span>, <span class="string">&quot;AND&quot;</span>, <span class="string">&quot;SOR&quot;</span>, <span class="string">&quot;[raw operation literal]&quot;</span>];
+    <span class="kw">static</span> <span class="ident">VALID_TOKENS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;ADD&quot;</span>, <span class="string">&quot;SUB&quot;</span>, <span class="string">&quot;ADDC&quot;</span>, <span class="string">&quot;SUBC&quot;</span>, <span class="string">&quot;OR&quot;</span>, <span class="string">&quot;XOR&quot;</span>, <span class="string">&quot;AND&quot;</span>, <span class="string">&quot;NOT&quot;</span>, <span class="string">&quot;SOR&quot;</span>, <span class="string">&quot;[raw operation literal]&quot;</span>];
 
     <span class="kw">match</span> <span class="ident">itr</span>.<span class="ident">next</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">tok</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -753,14 +757,18 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Add</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;SUB&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Sub</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;NOT&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Not</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;ADDC&quot;</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">AddC</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;SUBC&quot;</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">SubC</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;OR&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Or</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;XOR&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Xor</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;AND&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">And</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;NOT&quot;</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">AluOperation</span>::<span class="ident">Not</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;SOR&quot;</span>) {
                 <span class="ident">parse_alu_operation_shift_or_rotate</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">raw</span>) <span class="op">=</span> <span class="ident">parse_with_prefix</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">tok</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">limit_to_width</span>(<span class="ident">n</span>, <span class="number">4</span>)) {

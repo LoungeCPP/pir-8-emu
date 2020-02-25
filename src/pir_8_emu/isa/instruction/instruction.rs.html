@@ -696,6 +696,14 @@
 <span id="696">696</span>
 <span id="697">697</span>
 <span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -1192,18 +1200,20 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// All will set the ZERO flag if the output (register S) is `0000 0000`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// All will set the Parity flag if the number of high bits are even.</span>
+<span class="doccomment">/// All will set the PARITY flag if the number of high bits are even in the S register.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The ADD, SUB, ADDC, and SUBC operations will set the carry bit in F to carry out value from adders.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// FFFF | Name | Count | Description</span>
 <span class="doccomment">/// -----|------|-------|------------</span>
 <span class="doccomment">/// 0000 | ADD  |   1   | Addition of register X and register Y</span>
 <span class="doccomment">/// 0001 | SUB  |   1   | Subtraction of register Y from register X (X-Y)</span>
-<span class="doccomment">/// 0010 | NOT  |   1   | Bitwise NOT (unary operation)</span>
-<span class="doccomment">/// 0011 |      |   1   | Reserved</span>
+<span class="doccomment">/// 0010 | ADDC |   1   | Addition of register X and register Y, using the carry bit from F</span>
+<span class="doccomment">/// 0011 | SUBC |   1   | Subtraction of register Y from register X (X-Y), using the carry bit from F</span>
 <span class="doccomment">/// 0100 |  OR  |   1   | Bitwise OR</span>
 <span class="doccomment">/// 0101 | XOR  |   1   | Bitwise XOR</span>
 <span class="doccomment">/// 0110 | AND  |   1   | Bitwise AND</span>
-<span class="doccomment">/// 0111 |      |   1   | Reserved</span>
+<span class="doccomment">/// 0111 | NOT  |   1   | Bitwise NOT (unary operation)</span>
 <span class="doccomment">/// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AluOperation</span> {
@@ -1213,14 +1223,18 @@
     <span class="ident">Add</span>,
     <span class="doccomment">/// Subtraction of register Y from register X (X-Y)</span>
     <span class="ident">Sub</span>,
-    <span class="doccomment">/// Bitwise NOT</span>
-    <span class="ident">Not</span>,
+    <span class="doccomment">/// Addition of register X and register Y, using the carry bit from F</span>
+    <span class="ident">AddC</span>,
+    <span class="doccomment">/// Subtraction of register Y from register X (X-Y), using the carry bit from F</span>
+    <span class="ident">SubC</span>,
     <span class="doccomment">/// Bitwise OR</span>
     <span class="ident">Or</span>,
     <span class="doccomment">/// Bitwise XOR</span>
     <span class="ident">Xor</span>,
     <span class="doccomment">/// Bitwise AND</span>
     <span class="ident">And</span>,
+    <span class="doccomment">/// Bitwise NOT</span>
+    <span class="ident">Not</span>,
     <span class="doccomment">/// Shift or Rotate, see member doc</span>
     <span class="ident">ShiftOrRotate</span> {
         <span class="ident">d</span>: <span class="ident">AluOperationShiftOrRotateDirection</span>,
@@ -1283,12 +1297,12 @@
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> ((<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b1000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, (<span class="ident">nib</span> <span class="op">&amp;</span> <span class="number">0b0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Add</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Sub</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Not</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">AddC</span>,
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">SubC</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Or</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Xor</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">And</span>,
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">nib</span>),
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AluOperation</span>::<span class="ident">Not</span>,
             (<span class="bool-val">true</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">AluOperation</span>::<span class="ident">ShiftOrRotate</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
@@ -1305,10 +1319,12 @@
             <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001</span>,
-            <span class="ident">AluOperation</span>::<span class="ident">Not</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">AddC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">SubC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0011</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Or</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0100</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Xor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0101</span>,
             <span class="ident">AluOperation</span>::<span class="ident">And</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0110</span>,
+            <span class="ident">AluOperation</span>::<span class="ident">Not</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0111</span>,
             <span class="ident">AluOperation</span>::<span class="ident">ShiftOrRotate</span> { <span class="ident">d</span>, <span class="ident">tt</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">tt_b</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">tt</span>.<span class="ident">into</span>();
                 <span class="number">0b1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">tt_b</span>
