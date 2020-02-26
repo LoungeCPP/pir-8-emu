@@ -404,8 +404,8 @@
 }
 
 <span class="kw">fn</span> <span class="ident">push_address</span>(<span class="ident">stack</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">address</span>: <span class="ident">u16</span>) {
-    <span class="kw">let</span> <span class="ident">high_byte</span> <span class="op">=</span> ((<span class="ident">address</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0xFF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-    <span class="kw">let</span> <span class="ident">low_byte</span> <span class="op">=</span> ((<span class="ident">address</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0xFF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="kw">let</span> <span class="ident">high_byte</span> <span class="op">=</span> (<span class="ident">address</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="kw">let</span> <span class="ident">low_byte</span> <span class="op">=</span> (<span class="ident">address</span> <span class="op">&amp;</span> <span class="number">0xFF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
 
     <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">high_byte</span>);
     <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">low_byte</span>);
