@@ -226,11 +226,8 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">AluOperation</span>,
-                                           <span class="ident">Instruction</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::{<span class="ident">InstructionMadrDirection</span>, <span class="ident">InstructionPortDirection</span>, <span class="ident">InstructionStckDirection</span>, <span class="ident">InstructionRegisterPair</span>, <span class="ident">Instruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="ident">MicroOp</span>;
 
 
@@ -268,8 +265,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_instruction</span>(<span class="ident">instr</span>: <span class="ident">Instruction</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">MicroOpBlock</span>, <span class="ident">usize</span>) {
         <span class="kw">match</span> <span class="ident">instr</span> {
-            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">|</span>
-            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,

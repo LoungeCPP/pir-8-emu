@@ -682,28 +682,6 @@
 <span id="682">682</span>
 <span id="683">683</span>
 <span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
-<span id="690">690</span>
-<span id="691">691</span>
-<span id="692">692</span>
-<span id="693">693</span>
-<span id="694">694</span>
-<span id="695">695</span>
-<span id="696">696</span>
-<span id="697">697</span>
-<span id="698">698</span>
-<span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -900,12 +878,10 @@
     <span class="doccomment">/// assert!(Instruction::Alu(AluOperation::Or).is_valid());</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(!Instruction::Reserved(0).is_valid());</span>
-    <span class="doccomment">/// assert!(!Instruction::Alu(AluOperation::Reserved(0b0011)).is_valid());</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">op</span>.<span class="ident">is_valid</span>(),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
         }
     }
@@ -1217,8 +1193,6 @@
 <span class="doccomment">/// 1DTT |      |   8   | Shift or Rotate, see section below (unary operation)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AluOperation</span> {
-    <span class="doccomment">/// Reserved operation, contains the entire nibble</span>
-    <span class="ident">Reserved</span>(<span class="ident">u8</span>),
     <span class="doccomment">/// Addition of register X and register Y</span>
     <span class="ident">Add</span>,
     <span class="doccomment">/// Subtraction of register Y from register X (X-Y)</span>
@@ -1243,23 +1217,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AluOperation</span> {
-    <span class="doccomment">/// Check if this operation doesn&#39;t use reserved space</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pir_8_emu::isa::instruction::AluOperation;</span>
-    <span class="doccomment">/// assert!(AluOperation::Or.is_valid());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!AluOperation::Reserved(0b0011).is_valid());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-        }
-    }
-
     <span class="doccomment">/// Perform the ALU operation on the specified operands</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `0` and sets carry for reserved ops.</span>
@@ -1316,7 +1273,6 @@
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AluOperation</span> {
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AluOperation</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Add</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000</span>,
             <span class="ident">AluOperation</span>::<span class="ident">Sub</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0001</span>,
             <span class="ident">AluOperation</span>::<span class="ident">AddC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010</span>,
