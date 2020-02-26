@@ -678,10 +678,6 @@
 <span id="678">678</span>
 <span id="679">679</span>
 <span id="680">680</span>
-<span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
-<span id="684">684</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -768,10 +764,6 @@
 <span class="doccomment">/// Effectively, the stack works on 16-bit values, but due to the 8-bit data bus it requires two transfers,</span>
 <span class="doccomment">/// though this is handled via the hardware/microcode.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C</span>
-<span class="doccomment">/// registers the lesser; the more significant byte will be stored at the lower address in the stack,</span>
-<span class="doccomment">/// the pair of registers are big-endian.</span>
-<span class="doccomment">///</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The Stack manipulation operations are of pattern `1111 10DR`.</span>
 <span class="doccomment">///</span>
@@ -818,7 +810,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The registers A and B are paired, as are the registers C and D.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Although still two distinct bytes, the B and D registers should be considered the more significant byte whilst A and C</span>
+<span class="doccomment">/// Although still two distinct bytes, the A and C registers should be considered the more significant byte whilst B and D</span>
 <span class="doccomment">/// registers the lesser;</span>
 <span class="doccomment">/// the more significant byte will be stored at the lower address in the stack, the pair of registers are big-endian.</span>
 <span class="doccomment">///</span>

@@ -16,6 +16,36 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! `pir-8-as`&#39;s output and directive handling</span>
 
@@ -30,10 +60,40 @@
 <span class="doccomment">/// How to handle a label load directive</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LabelLoad</span> {
-    <span class="doccomment">/// The label is present with the specified address</span>
-    <span class="ident">HaveImmediately</span>(<span class="ident">u16</span>),
-    <span class="doccomment">/// The label isn&#39;t present and needs to be waited for under the specified name, adding the specified offset afterward</span>
-    <span class="ident">WaitFor</span>(<span class="ident">String</span>, <span class="ident">i16</span>),
+    <span class="doccomment">/// The specified fragment of the label is present with the specified address</span>
+    <span class="ident">HaveImmediately</span>(<span class="ident">u16</span>, <span class="ident">LabelFragment</span>),
+    <span class="doccomment">/// The label isn&#39;t present and needs to be waited for under the specified name, adding the specified offset afterward,</span>
+    <span class="doccomment">/// writing only the specified fragment</span>
+    <span class="ident">WaitFor</span>(<span class="ident">String</span>, <span class="ident">i16</span>, <span class="ident">LabelFragment</span>),
+}
+
+<span class="doccomment">/// Which part of the label to write</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LabelFragment</span> {
+    <span class="doccomment">/// Write both bytes of the label address</span>
+    <span class="ident">Full</span>,
+    <span class="doccomment">/// Write only the high byte of the label address</span>
+    <span class="ident">High</span>,
+    <span class="doccomment">/// Write only the low byte of the label address</span>
+    <span class="ident">Low</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">LabelFragment</span> {
+    <span class="doccomment">/// Get the amount of bytes this label fragment takes</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pir_8_emu::binutils::pir_8_as::LabelFragment;</span>
+    <span class="doccomment">/// assert_eq!(LabelFragment::Full.len(), 2);</span>
+    <span class="doccomment">/// assert_eq!(LabelFragment::High.len(), 1);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">LabelFragment</span>::<span class="ident">Full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">LabelFragment</span>::<span class="ident">High</span> <span class="op">|</span> <span class="ident">LabelFragment</span>::<span class="ident">Low</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+        }
+    }
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "pir_8_emu";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

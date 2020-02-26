@@ -222,6 +222,14 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">pir_8_emu</span>;
 
@@ -307,21 +315,28 @@
                     })<span class="question-mark">?</span> {
                     <span class="kw">match</span> <span class="ident">ob</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident">ll</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">if</span> <span class="ident">data_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
-                                <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;Error: attempted to load label data when expecting {} bytes at {}:{}:&quot;</span>,
+                            <span class="kw">let</span> <span class="ident">width_err</span> <span class="op">=</span> <span class="op">|</span><span class="ident">data_remaining</span>, <span class="ident">frag</span>: <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelFragment</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">data_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="ident">frag</span>.<span class="ident">len</span>() {
+                                <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;Error: attempted to load {}-byte label data when expecting {} bytes at {}:{}:&quot;</span>,
+                                          <span class="ident">frag</span>.<span class="ident">len</span>(),
                                           <span class="ident">data_remaining</span>,
                                           <span class="ident">input_name</span>,
                                           <span class="ident">line_number</span>);
                                 <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">line_orig</span>);
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="number">8</span>);
-                            }
+                                <span class="prelude-val">Err</span>(<span class="number">8</span>)
+                            } <span class="kw">else</span> {
+                                <span class="prelude-val">Ok</span>(())
+                            };
 
                             <span class="kw">match</span> <span class="ident">ll</span> {
-                                <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">HaveImmediately</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">label_data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>),
-                                <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">WaitFor</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                                    <span class="ident">output</span>.<span class="ident">wait_for_label</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>);
+                                <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">HaveImmediately</span>(<span class="ident">addr</span>, <span class="ident">frag</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">width_err</span>(<span class="ident">data_remaining</span>, <span class="ident">frag</span>)<span class="question-mark">?</span>;
+                                    <span class="ident">label_data</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">addr</span>, <span class="ident">frag</span>));
+                                }
+                                <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelLoad</span>::<span class="ident">WaitFor</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>, <span class="ident">frag</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">width_err</span>(<span class="ident">data_remaining</span>, <span class="ident">frag</span>)<span class="question-mark">?</span>;
+                                    <span class="ident">output</span>.<span class="ident">wait_for_label</span>(<span class="ident">lbl</span>, <span class="ident">offset</span>, <span class="ident">frag</span>);
                                     <span class="ident">data_remaining</span> <span class="op">=</span> <span class="number">0</span>;
-                                    <span class="ident">next_output_address</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next_output_address</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">+</span> <span class="number">2</span>);
+                                    <span class="ident">next_output_address</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next_output_address</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">+</span> <span class="ident">frag</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
                                     <span class="kw">continue</span>;
                                 }
                             }
@@ -366,24 +381,25 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">trim_start</span>();
 
-                <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span> <span class="ident">label_data</span> {
-                    <span class="ident">addr</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">pir_8_emu</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>(<span class="ident">line</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">pir_8_emu</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>(<span class="ident">data</span>, <span class="ident">data_remaining</span> <span class="op">*</span> <span class="number">8</span>))
-                        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:&quot;</span>,
-                                      <span class="ident">last_instruction</span>.<span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="ident">registers</span>),
-                                      <span class="ident">data_remaining</span>,
-                                      <span class="ident">input_name</span>,
-                                      <span class="ident">line_number</span>);
-                            <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">line_orig</span>);
-                            <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>,
-                                      <span class="ident">pir_8_emu</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>((<span class="ident">line</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span>
-                                                                                                            (<span class="ident">line_orig</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>),
-                                                                                                            <span class="ident">DATA_REMAINING_EXPECTEDS</span>[<span class="ident">data_remaining</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span>
-                                                                                                            <span class="number">1</span>]));
-                            <span class="number">7</span>
-                        })<span class="question-mark">?</span>
+                <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">label_data</span> {
+                    <span class="prelude-val">Some</span>((<span class="ident">addr</span>, <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelFragment</span>::<span class="ident">Full</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">addr</span>,
+                    <span class="prelude-val">Some</span>((<span class="ident">addr</span>, <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelFragment</span>::<span class="ident">High</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">addr</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>,
+                    <span class="prelude-val">Some</span>((<span class="ident">addr</span>, <span class="ident">pir_8_emu</span>::<span class="ident">binutils</span>::<span class="ident">pir_8_as</span>::<span class="ident">LabelFragment</span>::<span class="ident">Low</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">addr</span> <span class="op">&amp;</span> <span class="number">0xFF</span>,
+                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span>
+                        <span class="ident">pir_8_emu</span>::<span class="ident">util</span>::<span class="ident">parse_with_prefix</span>(<span class="ident">line</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">pir_8_emu</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>(<span class="ident">data</span>, <span class="ident">data_remaining</span> <span class="op">*</span> <span class="number">8</span>))
+                            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                                <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;Error: failed to parse instruction data for {} ({} bytes remaining) at {}:{}:&quot;</span>,
+                                          <span class="ident">last_instruction</span>.<span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="ident">registers</span>),
+                                          <span class="ident">data_remaining</span>,
+                                          <span class="ident">input_name</span>,
+                                          <span class="ident">line_number</span>);
+                                <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">line_orig</span>);
+                                <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>,
+                                          <span class="ident">pir_8_emu</span>::<span class="ident">isa</span>::<span class="ident">instruction</span>::<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>(
+                                              (<span class="ident">line</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> (<span class="ident">line_orig</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>),
+                                              <span class="ident">DATA_REMAINING_EXPECTEDS</span>[<span class="ident">data_remaining</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]));
+                                <span class="number">7</span>
+                            })<span class="question-mark">?</span>,
                 };
 
                 <span class="kw">let</span> <span class="ident">data_length</span> <span class="op">=</span> <span class="ident">data_remaining</span>; <span class="comment">// pir_8_emu::util::min_byte_width(data) doesn&#39;t handle, e.g. JUMP 0x0000</span>
