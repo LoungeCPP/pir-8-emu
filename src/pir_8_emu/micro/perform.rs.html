@@ -207,8 +207,6 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">isa</span>::{<span class="ident">GeneralPurposeRegisterBank</span>, <span class="ident">SpecialPurposeRegister</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">MicroOpPerformError</span>, <span class="ident">MicroOp</span>};
@@ -295,12 +293,10 @@
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>().<span class="ident">ok_or</span>(<span class="ident">MicroOpPerformError</span>::<span class="ident">MicrostackUnderflow</span>)<span class="question-mark">?</span>;
 
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span> <span class="op">=</span> <span class="ident">sp</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>;
-                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>] <span class="op">=</span> <span class="ident">byte</span>;
+                <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>] <span class="op">=</span> <span class="ident">byte</span>;
             }
             <span class="ident">MicroOp</span>::<span class="ident">StackPop</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">adr</span>];
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">memory</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span>];
                 <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">sp</span> <span class="op">=</span> <span class="ident">sp</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
 
                 <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">byte</span>);

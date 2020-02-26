@@ -22,8 +22,8 @@ and the S register is used to store the result.</p>
 <table><thead><tr><th>FFFF</th><th>Name</th><th>Count</th><th>Description</th></tr></thead><tbody>
 <tr><td>0000</td><td>ADD</td><td>1</td><td>Addition of register X and register Y</td></tr>
 <tr><td>0001</td><td>SUB</td><td>1</td><td>Subtraction of register Y from register X (X-Y)</td></tr>
-<tr><td>0010</td><td>ADDC</td><td>1</td><td>Addition of register X and register Y, using the carry bit from F</td></tr>
-<tr><td>0011</td><td>SUBC</td><td>1</td><td>Subtraction of register Y from register X (X-Y), using the carry bit from F</td></tr>
+<tr><td>0010</td><td>ADDC</td><td>1</td><td>Addition of register X and register Y, using the carry bit from F (X+Y+C)</td></tr>
+<tr><td>0011</td><td>SUBC</td><td>1</td><td>Subtraction of register Y from register X (X-Y), using the carry bit from F (X-Y-C)</td></tr>
 <tr><td>0100</td><td>OR</td><td>1</td><td>Bitwise OR</td></tr>
 <tr><td>0101</td><td>XOR</td><td>1</td><td>Bitwise XOR</td></tr>
 <tr><td>0110</td><td>AND</td><td>1</td><td>Bitwise AND</td></tr>

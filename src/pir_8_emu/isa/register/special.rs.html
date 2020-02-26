@@ -131,10 +131,10 @@
 <span class="doccomment">/// Memory Address  | ADR   |  16  | Address saved for use during certain instructions</span>
 <span class="doccomment">/// Instruction     | INS   |   8  | Instruction currently being executed</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The address bus is controlled by either `ADR` or `PC`.</span>
+<span class="doccomment">/// The address bus is controlled by either `PC`, `SP` or `ADR`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// As the CPU is reading an instruction from RAM, the value of the `PC` will be used, for some instructions though,</span>
-<span class="doccomment">/// such as `JUMP` it is the value used in `ADR` that is used.</span>
+<span class="doccomment">/// such as `JUMP` or `STACK`, it is value of `ADR` or `SP` respectively that is used.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpecialPurposeRegister</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Num</span> <span class="op">+</span> <span class="ident">Unsigned</span> <span class="op">+</span> <span class="ident">PrimInt</span><span class="op">&gt;</span> {
     <span class="ident">data</span>: <span class="ident">T</span>,
