@@ -84,17 +84,18 @@ Save the current output address to be recalled anywhere else in the program asse
 .IP "" 0
 .
 .P
-:label load \fINAME\fR
+:label load \fIfull|high|low\fR \fINAME\fR
 .
 .IP "" 4
 .
 .nf
 
-Substitute the output address of previously saved label called NAME in this place
+Substitute a fragment of the output address of previously saved label called NAME in this place
 
 If the NAME label wasn\'t yet specified, output will be buffered until it\'s declared
 
-Using this when the current instruction isn\'t expecting two data bytes will yield an error
+Using this with "full" when the current instruction isn\'t expecting two data bytes will yield an error, and
+using this with "high" or "low" when the current instruction isn\'t expecting one data byte will yield an error\.
 
 Having specified this with a NAME without a corresponding :label save directive will yield an error
 .
@@ -103,13 +104,13 @@ Having specified this with a NAME without a corresponding :label save directive 
 .IP "" 0
 .
 .P
-:label load\-offset \fINAME\fR \fIOFFSET\fR
+:label load\-offset \fIfull|high|low\fR \fINAME\fR \fIOFFSET\fR
 .
 .IP "" 4
 .
 .nf
 
-Like :label load NAME, but add (signed) OFFSET afterwards
+Like :label load FRAGMENT NAME, but add (signed) OFFSET afterwards
 
 The resulting address will wrap around both sides
 .
