@@ -21,17 +21,17 @@ The assembly format is as follows:
 
 And so, all of these are equivalent:
 
-    LOAD IND A
-    0x0110
+    LOAD IMM A
+    0x69
 
-    LOAD IND A
-    0b0000_0001_0001_0000
+    LOAD IMM A
+    0b0110_1001
 
-    0x24
-    0o420
+    0x1C
+    0o151
 
-    36
-    272
+    28
+    105
 
 ## DIRECTIVES
 
