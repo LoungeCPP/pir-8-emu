@@ -36,48 +36,35 @@
 //! An assembler with an… idiosyncratic syntax:
 //!
 //! ```p8a
-//! LOAD IMM C
-//! :label load high message
-//! LOAD IMM X
-//! :label load low  message
-//! LOAD IMM Y
-//! 1
-//! ALU SUB
-//! MOVE S X
-//! MOVE S D
+//! LOAD IMM WIDE C&D
+//! :label load-offset full message -1
 //!
 //! :label save loop
 //! MOVE D X
-//! LOAD IMM Y
+//! LOAD IMM BYTE Y
 //! 1
 //! ALU ADD
 //! MOVE S D
 //! MOVE C X
-//! LOAD IMM Y
+//! LOAD IMM BYTE Y
 //! 0
 //! ALU ADDC
 //! MOVE S C
 //! MADR WRITE C&D
 //!
-//! LOAD IMM A
-//! 0           ; port number
+//! LOAD IMM BYTE A
+//! 0                ; port number
 //! LOAD IND B
 //! PORT OUT B
 //!
 //! MOVE B S
 //! COMP S
 //!
-//! LOAD IMM A
-//! :label load high end
-//! LOAD IMM B
-//! :label load low  end
-//! MADR WRITE A&B
+//! LOAD IMM WIDE ADR
+//! :label load full end
 //! JMZG
-//! LOAD IMM A
-//! :label load high loop
-//! LOAD IMM B
-//! :label load low  loop
-//! MADR WRITE A&B
+//! LOAD IMM WIDE ADR
+//! :label load full loop
 //! JUMP
 //!
 //! :label save end
