@@ -203,20 +203,20 @@ use std::convert::{TryFrom, From};
 pub enum Instruction {
     /// Reserved instruction, contains the entire byte
     Reserved(u8),
-    /// Load the the next byte into register `AAA` (PC will be incremented a second time), see section above
-    LoadImmediateByte { aaa: u8, },
+    /// Load the the next byte into register `RRR` (PC will be incremented a second time), see section above
+    LoadImmediateByte { rrr: u8, },
     /// Load the the next two byte into register pair `RR` (PC will be incremented two more times), see section above
     LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair, },
-    /// Load the byte at the address specified by `ADR` into register `AAA`, see section above
-    LoadIndirect { aaa: u8, },
+    /// Load the byte at the address specified by `ADR` into register `RRR`, see section above
+    LoadIndirect { rrr: u8, },
     /// Jump, see member doc
     Jump(InstructionJumpCondition),
-    /// Store value in register `AAA` in address indicated by the next two bytes (PC will be incremented two more times)
-    Save { aaa: u8, },
+    /// Store value in register `RRR` in address indicated by the next two bytes (PC will be incremented two more times)
+    Save { rrr: u8, },
     /// ALU based operations, see member doc
     Alu(AluOperation),
-    /// Move a value from register `AAA` to register `BBB`
-    Move { aaa: u8, bbb: u8, },
+    /// Move a value from register `QQQ` to register `RRR`
+    Move { qqq: u8, rrr: u8, },
     /// Manipulate ADR, see section above
     Madr {
         d: InstructionMadrDirection,
@@ -225,16 +225,16 @@ pub enum Instruction {
     /// Perform I/O, see section above
     Port {
         d: InstructionPortDirection,
-        aaa: u8,
+        rrr: u8,
     },
-    /// Compare register S with register `AAA`, see section above
-    Comp { aaa: u8, },
+    /// Compare register S with register `RRR`, see section above
+    Comp { rrr: u8, },
     /// Stack manipulation, see member doc
     Stck {
         d: InstructionStckDirection,
         r: InstructionRegisterPair,
     },
-    /// Clear the 'F' register, by setting it to `0000 0000`
+    /// Clear the F register, by setting it to `0000 0000`
     Clrf,
     /// Stop the CPU from doing any more execution
     Halt,
@@ -268,7 +268,7 @@ impl Instruction {
     /// assert_eq!(Instruction::Clrf.data_length(), 0);
     /// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);
     ///
-    /// assert_eq!(Instruction::LoadImmediateByte { aaa: 0 }.data_length(), 1);
+    /// assert_eq!(Instruction::LoadImmediateByte { rrr: 0 }.data_length(), 1);
     /// assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.data_length(), 2);
     /// ```
     pub fn data_length(self) -> usize {
@@ -322,7 +322,7 @@ impl Instruction {
     ///            Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));
     ///
     /// assert_eq!(Instruction::from_str("LOAD IND B", &registers),
-    ///            Ok(Instruction::LoadIndirect { aaa: 0b101 }));
+    ///            Ok(Instruction::LoadIndirect { rrr: 0b101 }));
     ///
     /// assert_eq!(Instruction::from_str("ALU SOR RIGHT ASF", &registers),
     ///            Ok(Instruction::Alu(AluOperation::ShiftOrRotate {
@@ -346,8 +346,8 @@ impl From<u8> for Instruction {
                (raw & 0b0000_0100) != 0,
                (raw & 0b0000_0010) != 0,
                (raw & 0b0000_0001) != 0) {
-            (false, false, false, false, false, _, _, _) => Instruction::LoadImmediateByte { aaa: raw & 0b0000_0111 },
-            (false, false, false, false, true, _, _, _) => Instruction::LoadIndirect { aaa: raw & 0b0000_0111 },
+            (false, false, false, false, false, _, _, _) => Instruction::LoadImmediateByte { rrr: raw & 0b0000_0111 },
+            (false, false, false, false, true, _, _, _) => Instruction::LoadIndirect { rrr: raw & 0b0000_0111 },
             (false, false, false, true, false, false, _, _) => {
                 Instruction::LoadImmediateWide {
                     rr: InstructionLoadImmediateWideRegisterPair::try_from(raw & 0b0000_0011)
@@ -360,14 +360,14 @@ impl From<u8> for Instruction {
             (false, false, true, false, false, _, _, _) => {
                 Instruction::Jump(InstructionJumpCondition::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for JUMP condition parse"))
             }
-            (false, false, true, false, true, _, _, _) => Instruction::Save { aaa: raw & 0b0000_0111 },
+            (false, false, true, false, true, _, _, _) => Instruction::Save { rrr: raw & 0b0000_0111 },
             (false, false, true, true, _, _, _, _) => {
                 Instruction::Alu(AluOperation::try_from(raw & 0b0000_1111).expect("Wrong raw instruction slicing for ALU op parse"))
             }
             (false, true, _, _, _, _, _, _) => {
                 Instruction::Move {
-                    aaa: (raw & 0b0011_1000) >> 3,
-                    bbb: raw & 0b0000_0111,
+                    qqq: (raw & 0b0011_1000) >> 3,
+                    rrr: raw & 0b0000_0111,
                 }
             }
             (true, false, _, _, _, _, _, _) => Instruction::Reserved(raw),
@@ -383,10 +383,10 @@ impl From<u8> for Instruction {
             (true, true, true, false, d, _, _, _) => {
                 Instruction::Port {
                     d: d.into(),
-                    aaa: raw & 0b0000_0111,
+                    rrr: raw & 0b0000_0111,
                 }
             }
-            (true, true, true, true, false, _, _, _) => Instruction::Comp { aaa: raw & 0b0000_0111 },
+            (true, true, true, true, false, _, _, _) => Instruction::Comp { rrr: raw & 0b0000_0111 },
             (true, true, true, true, true, false, d, r) => {
                 Instruction::Stck {
                     d: d.into(),
@@ -404,19 +404,19 @@ impl Into<u8> for Instruction {
     fn into(self) -> u8 {
         match self {
             Instruction::Reserved(raw) => raw,
-            Instruction::LoadImmediateByte { aaa } => 0b0000_0000 | 0b0_0000 | aaa,
-            Instruction::LoadIndirect { aaa } => 0b0000_0000 | 0b0_1000 | aaa,
+            Instruction::LoadImmediateByte { rrr } => 0b0000_0000 | 0b0_0000 | rrr,
+            Instruction::LoadIndirect { rrr } => 0b0000_0000 | 0b0_1000 | rrr,
             Instruction::LoadImmediateWide { rr } => 0b0000_0000 | 0b1_0000 | (rr as u8),
             Instruction::Jump(cond) => 0b0010_0000 | (cond as u8),
-            Instruction::Save { aaa } => 0b0010_1000 | aaa,
+            Instruction::Save { rrr } => 0b0010_1000 | rrr,
             Instruction::Alu(op) => {
                 let op_b: u8 = op.into();
                 0b0011_0000u8 | op_b
             }
-            Instruction::Move { aaa, bbb } => 0b0100_0000 | (aaa << 3) | bbb,
+            Instruction::Move { qqq, rrr } => 0b0100_0000 | (qqq << 3) | rrr,
             Instruction::Madr { d, r } => 0b1101_1000 | (d as u8) | (r as u8),
-            Instruction::Port { d, aaa } => 0b1110_0000 | (d as u8) | aaa,
-            Instruction::Comp { aaa } => 0b1111_0000 | aaa,
+            Instruction::Port { d, rrr } => 0b1110_0000 | (d as u8) | rrr,
+            Instruction::Comp { rrr } => 0b1111_0000 | rrr,
             Instruction::Stck { d, r } => 0b1111_1000 | (d as u8) | (r as u8),
             Instruction::Clrf => 0b1111_1110,
             Instruction::Halt => 0b1111_1111,
@@ -427,7 +427,6 @@ impl Into<u8> for Instruction {
 
 /// The `D` bit indicates the direction – `0` for write-to (`MADR WRITE`) and `1` for read-from (`MADR READ`) the `ADR`
 /// register.
-`0` for A & B and `1` for C & D.
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InstructionMadrDirection {
     Write = 0b00,

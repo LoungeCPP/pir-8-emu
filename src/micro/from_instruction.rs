@@ -30,7 +30,7 @@ impl MicroOp {
     /// ```
     /// # use pir_8_emu::isa::instruction::Instruction;
     /// # use pir_8_emu::micro::MicroOp;
-    /// let ops = MicroOp::from_instruction(Instruction::Move { aaa: 0b100, bbb: 0b101 });
+    /// let ops = MicroOp::from_instruction(Instruction::Move { qqq: 0b100, rrr: 0b101 });
     /// let ops = &ops.0[..ops.1];
     ///
     /// assert_eq!(ops, &[MicroOp::ReadRegister(0b100), MicroOp::WriteRegister(0b101)]);
@@ -48,10 +48,10 @@ impl MicroOp {
                  6)
             }
 
-            Instruction::LoadImmediateByte { aaa } => {
+            Instruction::LoadImmediateByte { rrr } => {
                 ([// forcebreak
                   MicroOp::LoadImmediate,
-                  MicroOp::WriteRegister(aaa),
+                  MicroOp::WriteRegister(rrr),
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
@@ -59,10 +59,10 @@ impl MicroOp {
                  2)
             }
 
-            Instruction::LoadIndirect { aaa } => {
+            Instruction::LoadIndirect { rrr } => {
                 ([// forcebreak
                   MicroOp::FetchAddress,
-                  MicroOp::WriteRegister(aaa),
+                  MicroOp::WriteRegister(rrr),
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
@@ -104,9 +104,9 @@ impl MicroOp {
                  3)
             }
 
-            Instruction::Save { aaa } => {
+            Instruction::Save { rrr } => {
                 ([// forcebreak
-                  MicroOp::ReadRegister(aaa),
+                  MicroOp::ReadRegister(rrr),
                   MicroOp::WriteAddress,
                   MicroOp::Nop,
                   MicroOp::Nop,
@@ -126,10 +126,10 @@ impl MicroOp {
                  6)
             }
 
-            Instruction::Move { aaa, bbb } => {
+            Instruction::Move { qqq, rrr } => {
                 ([// forcebreak
-                  MicroOp::ReadRegister(aaa),
-                  MicroOp::WriteRegister(bbb),
+                  MicroOp::ReadRegister(qqq),
+                  MicroOp::WriteRegister(rrr),
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop,
@@ -162,19 +162,19 @@ impl MicroOp {
                  3)
             }
 
-            Instruction::Port { d: InstructionPortDirection::In, aaa } => {
+            Instruction::Port { d: InstructionPortDirection::In, rrr } => {
                 ([// forcebreak
                   MicroOp::ReadRegister(A_REGISTER_ADDRESS),
                   MicroOp::PortIn,
-                  MicroOp::WriteRegister(aaa),
+                  MicroOp::WriteRegister(rrr),
                   MicroOp::Nop,
                   MicroOp::Nop,
                   MicroOp::Nop],
                  3)
             }
-            Instruction::Port { d: InstructionPortDirection::Out, aaa } => {
+            Instruction::Port { d: InstructionPortDirection::Out, rrr } => {
                 ([// forcebreak
-                  MicroOp::ReadRegister(aaa),
+                  MicroOp::ReadRegister(rrr),
                   MicroOp::ReadRegister(A_REGISTER_ADDRESS),
                   MicroOp::PortOut,
                   MicroOp::Nop,
@@ -183,10 +183,10 @@ impl MicroOp {
                  3)
             }
 
-            Instruction::Comp { aaa } => {
+            Instruction::Comp { rrr } => {
                 ([// forcebreak
                   MicroOp::ReadRegister(S_REGISTER_ADDRESS),
-                  MicroOp::ReadRegister(aaa),
+                  MicroOp::ReadRegister(rrr),
                   MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
                   MicroOp::Compare,
                   MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS),

@@ -5,12 +5,12 @@ use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluO
 
 #[test]
 fn load_immediate_byte() {
-    single_register(0b0000_0000 | 0b0_0000, |r| Instruction::LoadImmediateByte { aaa: r });
+    single_register(0b0000_0000 | 0b0_0000, |r| Instruction::LoadImmediateByte { rrr: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register(0b0000_0000 | 0b0_1000, |r| Instruction::LoadIndirect { aaa: r });
+    single_register(0b0000_0000 | 0b0_1000, |r| Instruction::LoadIndirect { rrr: r });
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn jump() {
 
 #[test]
 fn save() {
-    single_register(0b0010_1000, |r| Instruction::Save { aaa: r });
+    single_register(0b0010_1000, |r| Instruction::Save { rrr: r });
 }
 
 #[test]
@@ -118,12 +118,12 @@ fn alu_valid_shift_or_rotate() {
 
 #[test]
 fn move_() {
-    for aaa in 0..=0b111 {
-        for bbb in 0..=0b111 {
-            let eraw = 0b0100_0000 | (aaa << 3) | bbb;
+    for qqq in 0..=0b111 {
+        for rrr in 0..=0b111 {
+            let eraw = 0b0100_0000 | (qqq << 3) | rrr;
             let raw: u8 = Instruction::Move {
-                    aaa: aaa,
-                    bbb: bbb,
+                    qqq: qqq,
+                    rrr: rrr,
                 }
                 .into();
             assert_eq!(raw, eraw);
@@ -167,20 +167,20 @@ fn port() {
     single_register(0b1110_1000, |r| {
         Instruction::Port {
             d: InstructionPortDirection::In,
-            aaa: r,
+            rrr: r,
         }
     });
     single_register(0b1110_0000, |r| {
         Instruction::Port {
             d: InstructionPortDirection::Out,
-            aaa: r,
+            rrr: r,
         }
     });
 }
 
 #[test]
 fn comp() {
-    single_register(0b1111_0000, |r| Instruction::Comp { aaa: r });
+    single_register(0b1111_0000, |r| Instruction::Comp { rrr: r });
 }
 
 #[test]

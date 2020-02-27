@@ -23,12 +23,12 @@
 //! let mut memory = Memory::from(&[Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.into(),
 //!                                 0x01,
 //!                                 0x10,
-//!                                 Instruction::LoadIndirect { aaa: 0b100 }.into(),
-//!                                 Instruction::LoadImmediateByte { aaa: 0b101 }.into(),
+//!                                 Instruction::LoadIndirect { rrr: 0b100 }.into(),
+//!                                 Instruction::LoadImmediateByte { rrr: 0b101 }.into(),
 //!                                 0x69,
-//!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),
-//!                                 Instruction::Move { aaa: 0b101, bbb: 0b100 }.into(),
-//!                                 Instruction::Move { aaa: 0b110, bbb: 0b101 }.into(),
+//!                                 Instruction::Move { qqq: 0b100, rrr: 0b110 }.into(),
+//!                                 Instruction::Move { qqq: 0b101, rrr: 0b100 }.into(),
+//!                                 Instruction::Move { qqq: 0b110, rrr: 0b101 }.into(),
 //!                                 Instruction::Halt.into()][..]);
 //! memory[0x0110] = 0xA1;
 //!

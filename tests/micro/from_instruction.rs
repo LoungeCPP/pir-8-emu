@@ -52,14 +52,14 @@ fn reserved_block_6() {
 
 #[test]
 fn load_immediate_byte() {
-    single_register(|aaa| Instruction::LoadImmediateByte { aaa: aaa },
-                    |aaa| vec![MicroOp::LoadImmediate, MicroOp::WriteRegister(aaa)]);
+    single_register(|rrr| Instruction::LoadImmediateByte { rrr: rrr },
+                    |rrr| vec![MicroOp::LoadImmediate, MicroOp::WriteRegister(rrr)]);
 }
 
 #[test]
 fn load_indirect() {
-    single_register(|aaa| Instruction::LoadIndirect { aaa: aaa },
-                    |aaa| vec![MicroOp::FetchAddress, MicroOp::WriteRegister(aaa)]);
+    single_register(|rrr| Instruction::LoadIndirect { rrr: rrr },
+                    |rrr| vec![MicroOp::FetchAddress, MicroOp::WriteRegister(rrr)]);
 }
 
 #[test]
@@ -103,8 +103,8 @@ fn jump() {
 
 #[test]
 fn save() {
-    single_register(|aaa| Instruction::Save { aaa: aaa },
-                    |aaa| vec![MicroOp::ReadRegister(aaa), MicroOp::WriteAddress]);
+    single_register(|rrr| Instruction::Save { rrr: rrr },
+                    |rrr| vec![MicroOp::ReadRegister(rrr), MicroOp::WriteAddress]);
 }
 
 #[test]
@@ -135,15 +135,15 @@ fn alu_sor() {
 
 #[test]
 fn move_() {
-    for aaa in 0..=0b111 {
-        for bbb in 0..=0b111 {
+    for qqq in 0..=0b111 {
+        for rrr in 0..=0b111 {
             let ops = MicroOp::from_instruction(Instruction::Move {
-                aaa: aaa,
-                bbb: bbb,
+                qqq: qqq,
+                rrr: rrr,
             });
             let ops = &ops.0[..ops.1];
 
-            assert_eq!(ops, &[MicroOp::ReadRegister(aaa), MicroOp::WriteRegister(bbb)]);
+            assert_eq!(ops, &[MicroOp::ReadRegister(qqq), MicroOp::WriteRegister(rrr)]);
         }
     }
 }
@@ -194,31 +194,31 @@ fn madr_read() {
 
 #[test]
 fn port_in() {
-    single_register(|aaa| {
+    single_register(|rrr| {
                         Instruction::Port {
                             d: InstructionPortDirection::In,
-                            aaa: aaa,
+                            rrr: rrr,
                         }
                     },
-                    |aaa| vec![MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::PortIn, MicroOp::WriteRegister(aaa)]);
+                    |rrr| vec![MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::PortIn, MicroOp::WriteRegister(rrr)]);
 }
 
 #[test]
 fn port_out() {
-    single_register(|aaa| {
+    single_register(|rrr| {
                         Instruction::Port {
                             d: InstructionPortDirection::Out,
-                            aaa: aaa,
+                            rrr: rrr,
                         }
                     },
-                    |aaa| vec![MicroOp::ReadRegister(aaa), MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::PortOut]);
+                    |rrr| vec![MicroOp::ReadRegister(rrr), MicroOp::ReadRegister(A_REGISTER_ADDRESS), MicroOp::PortOut]);
 }
 
 #[test]
 fn comp() {
-    single_register(|aaa| Instruction::Comp { aaa: aaa }, |aaa| {
+    single_register(|rrr| Instruction::Comp { rrr: rrr }, |rrr| {
         vec![MicroOp::ReadRegister(S_REGISTER_ADDRESS),
-             MicroOp::ReadRegister(aaa),
+             MicroOp::ReadRegister(rrr),
              MicroOp::ReadRegister(FLAG_REGISTER_ADDRESS),
              MicroOp::Compare,
              MicroOp::WriteRegister(FLAG_REGISTER_ADDRESS)]
@@ -287,11 +287,11 @@ fn halt() {
 
 
 fn single_register(instr: fn(u8) -> Instruction, wops: fn(u8) -> Vec<MicroOp>) {
-    for aaa in 0..=0b111 {
-        let ops = MicroOp::from_instruction(instr(aaa));
+    for rrr in 0..=0b111 {
+        let ops = MicroOp::from_instruction(instr(rrr));
         let ops = &ops.0[..ops.1];
 
-        assert_eq!(ops, &wops(aaa)[..]);
+        assert_eq!(ops, &wops(rrr)[..]);
     }
 }
 

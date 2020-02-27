@@ -7,12 +7,12 @@ use self::super::alt_gp_registers;
 
 #[test]
 fn load_immediate_byte() {
-    single_register("LOAD IMM BYTE", |r| Instruction::LoadImmediateByte { aaa: r });
+    single_register("LOAD IMM BYTE", |r| Instruction::LoadImmediateByte { rrr: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register("LOAD IND", |r| Instruction::LoadIndirect { aaa: r });
+    single_register("LOAD IND", |r| Instruction::LoadIndirect { rrr: r });
 }
 
 #[test]
@@ -45,7 +45,7 @@ fn jump() {
 
 #[test]
 fn save() {
-    single_register("SAVE", |r| Instruction::Save { aaa: r });
+    single_register("SAVE", |r| Instruction::Save { rrr: r });
 }
 
 #[test]
@@ -80,15 +80,15 @@ fn alu_valid_shift_or_rotate() {
 #[test]
 fn move_() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        for aaa in regs {
-            for bbb in regs {
+        for qqq in regs {
+            for rrr in regs {
                 assert_eq!(Instruction::Move {
-                                   aaa: aaa.address(),
-                                   bbb: bbb.address(),
+                                   qqq: qqq.address(),
+                                   rrr: rrr.address(),
                                }
                                .display(regs)
                                .to_string(),
-                           format!("MOVE {} {}", aaa.letter(), bbb.letter()));
+                           format!("MOVE {} {}", qqq.letter(), rrr.letter()));
             }
         }
     }
@@ -136,20 +136,20 @@ fn port() {
     single_register("PORT IN", |r| {
         Instruction::Port {
             d: InstructionPortDirection::In,
-            aaa: r,
+            rrr: r,
         }
     });
     single_register("PORT OUT", |r| {
         Instruction::Port {
             d: InstructionPortDirection::Out,
-            aaa: r,
+            rrr: r,
         }
     });
 }
 
 #[test]
 fn comp() {
-    single_register("COMP", |r| Instruction::Comp { aaa: r });
+    single_register("COMP", |r| Instruction::Comp { rrr: r });
 }
 
 #[test]

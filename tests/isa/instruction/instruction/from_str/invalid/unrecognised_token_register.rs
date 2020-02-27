@@ -43,7 +43,7 @@ fn save() {
 }
 
 #[test]
-fn move_aaa() {
+fn move_qqq() {
     unrecognised_token("MOVE",
                        &[],
                        2..5,
@@ -52,21 +52,21 @@ fn move_aaa() {
 }
 
 #[test]
-fn move_bbb() {
+fn move_rrr() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_center in 1..5 {
                 for pad_right in 1..5 {
                     for pad_rright in 1..5 {
-                        for aaa in regs {
+                        for qqq in regs {
                             for token_len in 2..5 {
                                 for _ in 0..10 {
-                                    let aaa = aaa.letter();
-                                    let bbb: String = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect();
+                                    let qqq = qqq.letter();
+                                    let rrr: String = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect();
 
                                     let instr = format!("{e:wl$}MOVE{e:wc$}{}{e:wr$}{}{e:wrr$}",
-                                                        aaa,
-                                                        bbb,
+                                                        qqq,
+                                                        rrr,
                                                         e = "",
                                                         wl = pad_left,
                                                         wc = pad_center,

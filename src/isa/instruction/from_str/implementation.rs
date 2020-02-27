@@ -122,7 +122,7 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
 
             // SAVE start
             else if tok.eq_ignore_ascii_case("SAVE") {
-                Ok(Instruction::Save { aaa: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
+                Ok(Instruction::Save { rrr: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
             }
             // SAVE end
 
@@ -134,10 +134,10 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
 
             // MOVE end
             else if tok.eq_ignore_ascii_case("MOVE") {
-                let (aaa_pos, aaa) = parse_register(itr, orig_str, start_pos + 4 + 1, registers)?;
+                let (qqq_pos, qqq) = parse_register(itr, orig_str, start_pos + 4 + 1, registers)?;
                 Ok(Instruction::Move {
-                    aaa: aaa,
-                    bbb: parse_register(itr, orig_str, aaa_pos + 1 + 1, registers)?.1,
+                    qqq: qqq,
+                    rrr: parse_register(itr, orig_str, qqq_pos + 1 + 1, registers)?.1,
                 })
             }
             // MOVE end
@@ -156,7 +156,7 @@ fn parse_instruction<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str: &st
 
             // COMP start
             else if tok.eq_ignore_ascii_case("COMP") {
-                Ok(Instruction::Comp { aaa: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
+                Ok(Instruction::Comp { rrr: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
             }
             // COMP end
 
@@ -216,7 +216,7 @@ fn parse_instruction_load<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
             if tok.eq_ignore_ascii_case("IMM") {
                 parse_instruction_load_immediate(itr, orig_str, start_pos + 3 + 1, registers)
             } else if tok.eq_ignore_ascii_case("IND") {
-                Ok(Instruction::LoadIndirect { aaa: parse_register(itr, orig_str, start_pos + 3 + 1, registers)?.1 })
+                Ok(Instruction::LoadIndirect { rrr: parse_register(itr, orig_str, start_pos + 3 + 1, registers)?.1 })
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))
             }
@@ -234,7 +234,7 @@ fn parse_instruction_load_immediate<'i, I: Iterator<Item = &'i str>>(itr: &mut I
             let start_pos = (tok.as_ptr() as usize) - (orig_str.as_ptr() as usize);
 
             if tok.eq_ignore_ascii_case("BYTE") {
-                Ok(Instruction::LoadImmediateByte { aaa: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
+                Ok(Instruction::LoadImmediateByte { rrr: parse_register(itr, orig_str, start_pos + 4 + 1, registers)?.1 })
             } else if tok.eq_ignore_ascii_case("WIDE") {
                 Ok(Instruction::LoadImmediateWide { rr: parse_instruction_load_immediate_wide_register_pair(itr, orig_str, start_pos + 4 + 1)? })
             } else {
@@ -256,12 +256,12 @@ fn parse_instruction_port<'i, I: Iterator<Item = &'i str>>(itr: &mut I, orig_str
             if tok.eq_ignore_ascii_case("IN") {
                 Ok(Instruction::Port {
                     d: InstructionPortDirection::In,
-                    aaa: parse_register(itr, orig_str, start_pos + 2 + 1, registers)?.1,
+                    rrr: parse_register(itr, orig_str, start_pos + 2 + 1, registers)?.1,
                 })
             } else if tok.eq_ignore_ascii_case("OUT") {
                 Ok(Instruction::Port {
                     d: InstructionPortDirection::Out,
-                    aaa: parse_register(itr, orig_str, start_pos + 3 + 1, registers)?.1,
+                    rrr: parse_register(itr, orig_str, start_pos + 3 + 1, registers)?.1,
                 })
             } else {
                 Err(ParseInstructionError::UnrecognisedToken(start_pos + 1, VALID_TOKENS))

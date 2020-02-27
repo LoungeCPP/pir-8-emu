@@ -21,9 +21,9 @@ use std::collections::BTreeSet;
 ///     Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.into(),
 ///     0x04,
 ///     0x20,
-///     Instruction::LoadImmediateByte { aaa: 0b000 }.into(),
+///     Instruction::LoadImmediateByte { rrr: 0b000 }.into(),
 ///     0x69,
-///     Instruction::Save { aaa: 0b000 }.into(),
+///     Instruction::Save { rrr: 0b000 }.into(),
 ///     Instruction::Halt.into(),
 /// ]);
 ///

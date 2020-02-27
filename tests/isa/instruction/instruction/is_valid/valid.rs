@@ -5,12 +5,12 @@ use pir_8_emu::isa::instruction::{InstructionLoadImmediateWideRegisterPair, AluO
 
 #[test]
 fn load_immediate_byte() {
-    single_register(|r| Instruction::LoadImmediateByte { aaa: r });
+    single_register(|r| Instruction::LoadImmediateByte { rrr: r });
 }
 
 #[test]
 fn load_indirect() {
-    single_register(|r| Instruction::LoadIndirect { aaa: r });
+    single_register(|r| Instruction::LoadIndirect { rrr: r });
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn jump() {
 
 #[test]
 fn save() {
-    single_register(|r| Instruction::Save { aaa: r });
+    single_register(|r| Instruction::Save { rrr: r });
 }
 
 #[test]
@@ -66,11 +66,11 @@ fn alu_shift_or_rotate() {
 
 #[test]
 fn move_() {
-    for aaa in 0..=0b111 {
-        for bbb in 0..=0b111 {
+    for qqq in 0..=0b111 {
+        for rrr in 0..=0b111 {
             assert!(Instruction::Move {
-                    aaa: aaa,
-                    bbb: bbb,
+                    qqq: qqq,
+                    rrr: rrr,
                 }
                 .is_valid());
         }
@@ -91,20 +91,20 @@ fn port() {
     single_register(|r| {
         Instruction::Port {
             d: InstructionPortDirection::In,
-            aaa: r,
+            rrr: r,
         }
     });
     single_register(|r| {
         Instruction::Port {
             d: InstructionPortDirection::Out,
-            aaa: r,
+            rrr: r,
         }
     });
 }
 
 #[test]
 fn comp() {
-    single_register(|r| Instruction::Comp { aaa: r });
+    single_register(|r| Instruction::Comp { rrr: r });
 }
 
 #[test]

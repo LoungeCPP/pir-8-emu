@@ -97,21 +97,21 @@ fn missing_token(base: &str, err: fn(usize, &GeneralPurposeRegisterBank) -> Pars
     }
 }
 
-fn too_many_tokens_aaa(base: &str) {
+fn too_many_tokens_rrr(base: &str) {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        for aaa in regs {
+        for rrr in regs {
             for pad_left in 1..5 {
                 for pad_center in 1..5 {
                     for pad_right in 1..5 {
                         for pad_rright in 1..5 {
                             for token_len in 1..5 {
                                 for _ in 0..10 {
-                                    let aaa = aaa.letter();
+                                    let rrr = rrr.letter();
                                     let token: String = Alphanumeric.sample_iter(thread_rng()).take(token_len).collect();
 
                                     let instr = format!("{e:wl$}{}{e:wc$}{}{e:wr$}{}{e:wrr$}",
                                                         base,
-                                                        aaa,
+                                                        rrr,
                                                         token,
                                                         e = "",
                                                         wl = pad_left,

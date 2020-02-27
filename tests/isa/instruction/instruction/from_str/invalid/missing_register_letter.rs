@@ -56,7 +56,7 @@ fn save() {
 }
 
 #[test]
-fn move_aaa() {
+fn move_qqq() {
     missing_token("MOVE", |len, regs| {
         ParseInstructionError::MissingRegisterLetter(len,
                                                      [regs[0].letter(),
@@ -71,15 +71,15 @@ fn move_aaa() {
 }
 
 #[test]
-fn move_bbb() {
+fn move_rrr() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
         for pad_left in 1..5 {
             for pad_center in 1..5 {
                 for pad_right in 1..5 {
-                    for aaa in regs {
-                        let aaa = aaa.letter();
+                    for qqq in regs {
+                        let qqq = qqq.letter();
 
-                        let instr = format!("{e:wl$}MOVE{e:wc$}{}{e:wr$}", aaa, e = "", wl = pad_left, wc = pad_center, wr = pad_right);
+                        let instr = format!("{e:wl$}MOVE{e:wc$}{}{e:wr$}", qqq, e = "", wl = pad_left, wc = pad_center, wr = pad_right);
 
                         assert_eq!(Instruction::from_str(&instr, regs),
                                    Err(ParseInstructionError::MissingRegisterLetter(pad_left + 4 + pad_center + 1 + 1,

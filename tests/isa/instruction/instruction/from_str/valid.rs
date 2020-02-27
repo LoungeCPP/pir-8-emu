@@ -8,12 +8,12 @@ use std::convert::TryFrom;
 
 #[test]
 fn load_immediate_byte() {
-    aaa("LOAD IMM BYTE", |aaa| Instruction::LoadImmediateByte { aaa: aaa.address() });
+    rrr("LOAD IMM BYTE", |rrr| Instruction::LoadImmediateByte { rrr: rrr.address() });
 }
 
 #[test]
 fn load_indirect() {
-    aaa("LOAD IND", |aaa| Instruction::LoadIndirect { aaa: aaa.address() });
+    rrr("LOAD IND", |rrr| Instruction::LoadIndirect { rrr: rrr.address() });
 }
 
 #[test]
@@ -62,7 +62,7 @@ fn jump() {
 
 #[test]
 fn save() {
-    aaa("SAVE", |aaa| Instruction::Save { aaa: aaa.address() });
+    rrr("SAVE", |rrr| Instruction::Save { rrr: rrr.address() });
 }
 
 #[test]
@@ -145,12 +145,12 @@ fn alu() {
 #[test]
 fn move_() {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        for aaa in regs {
-            for bbb in regs {
-                assert_eq!(Instruction::from_str(&format!("MOVE {} {}", aaa.letter(), bbb.letter()), regs),
+        for qqq in regs {
+            for rrr in regs {
+                assert_eq!(Instruction::from_str(&format!("MOVE {} {}", qqq.letter(), rrr.letter()), regs),
                            Ok(Instruction::Move {
-                               aaa: aaa.address(),
-                               bbb: bbb.address(),
+                               qqq: qqq.address(),
+                               rrr: rrr.address(),
                            }));
             }
         }
@@ -188,24 +188,24 @@ fn madr() {
 
 #[test]
 fn port() {
-    aaa("PORT IN", |aaa| {
+    rrr("PORT IN", |rrr| {
         Instruction::Port {
             d: InstructionPortDirection::In,
-            aaa: aaa.address(),
+            rrr: rrr.address(),
         }
     });
 
-    aaa("PORT OUT", |aaa| {
+    rrr("PORT OUT", |rrr| {
         Instruction::Port {
             d: InstructionPortDirection::Out,
-            aaa: aaa.address(),
+            rrr: rrr.address(),
         }
     });
 }
 
 #[test]
 fn comp() {
-    aaa("COMP", |aaa| Instruction::Comp { aaa: aaa.address() });
+    rrr("COMP", |rrr| Instruction::Comp { rrr: rrr.address() });
 }
 
 #[test]
@@ -252,10 +252,10 @@ fn halt() {
 }
 
 
-fn aaa(base: &str, ins: fn(&GeneralPurposeRegister) -> Instruction) {
+fn rrr(base: &str, ins: fn(&GeneralPurposeRegister) -> Instruction) {
     for regs in &[GeneralPurposeRegister::defaults(), alt_gp_registers()] {
-        for aaa in regs {
-            assert_eq!(Instruction::from_str(&format!("{} {}", base, aaa.letter()), regs), Ok(ins(aaa)));
+        for rrr in regs {
+            assert_eq!(Instruction::from_str(&format!("{} {}", base, rrr.letter()), regs), Ok(ins(rrr)));
         }
     }
 }
