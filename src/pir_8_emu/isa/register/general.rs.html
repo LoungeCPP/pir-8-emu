@@ -195,7 +195,6 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
-<span id="198">198</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">ReadWriteMarker</span>, <span class="ident">ReadWritable</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -205,14 +204,13 @@
 
 
 <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like</span>
-<span class="doccomment">/// &#39;MOVE&#39; and &#39;LOAD&#39; can use these addresses.</span>
+<span class="doccomment">/// MOVE and LOAD can use these addresses.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// All the registers will start with an initial value of `0`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are eight 8-bit General Purpose registers, each has an internal address for use within the CPU, instructions like</span>
-<span class="doccomment">/// &#39;MOVE&#39; and &#39;LOAD&#39; can use these addresses. The first five registers have some special functionality, as described, the last</span>
+<span class="doccomment">/// MOVE and LOAD can use these addresses. The first five registers have some special functionality, as described, the last</span>
 <span class="doccomment">/// three have no special functionality.</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// The last four registers can also be used with the stack.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Address | Letter | Description</span>

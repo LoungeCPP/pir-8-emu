@@ -106,12 +106,12 @@
 <span class="doccomment">//! let mut memory = Memory::from(&amp;[Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Adr }.into(),</span>
 <span class="doccomment">//!                                 0x01,</span>
 <span class="doccomment">//!                                 0x10,</span>
-<span class="doccomment">//!                                 Instruction::LoadIndirect { aaa: 0b100 }.into(),</span>
-<span class="doccomment">//!                                 Instruction::LoadImmediateByte { aaa: 0b101 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::LoadIndirect { rrr: 0b100 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::LoadImmediateByte { rrr: 0b101 }.into(),</span>
 <span class="doccomment">//!                                 0x69,</span>
-<span class="doccomment">//!                                 Instruction::Move { aaa: 0b100, bbb: 0b110 }.into(),</span>
-<span class="doccomment">//!                                 Instruction::Move { aaa: 0b101, bbb: 0b100 }.into(),</span>
-<span class="doccomment">//!                                 Instruction::Move { aaa: 0b110, bbb: 0b101 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Move { qqq: 0b100, rrr: 0b110 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Move { qqq: 0b101, rrr: 0b100 }.into(),</span>
+<span class="doccomment">//!                                 Instruction::Move { qqq: 0b110, rrr: 0b101 }.into(),</span>
 <span class="doccomment">//!                                 Instruction::Halt.into()][..]);</span>
 <span class="doccomment">//! memory[0x0110] = 0xA1;</span>
 <span class="doccomment">//!</span>

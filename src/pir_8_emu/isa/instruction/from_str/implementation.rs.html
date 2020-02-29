@@ -609,7 +609,7 @@
 
             <span class="comment">// SAVE start</span>
             <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;SAVE&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
+                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
             }
             <span class="comment">// SAVE end</span>
 
@@ -621,10 +621,10 @@
 
             <span class="comment">// MOVE end</span>
             <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;MOVE&quot;</span>) {
-                <span class="kw">let</span> (<span class="ident">aaa_pos</span>, <span class="ident">aaa</span>) <span class="op">=</span> <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> (<span class="ident">qqq_pos</span>, <span class="ident">qqq</span>) <span class="op">=</span> <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Move</span> {
-                    <span class="ident">aaa</span>: <span class="ident">aaa</span>,
-                    <span class="ident">bbb</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">aaa_pos</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
+                    <span class="ident">qqq</span>: <span class="ident">qqq</span>,
+                    <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">qqq_pos</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
                 })
             }
             <span class="comment">// MOVE end</span>
@@ -643,7 +643,7 @@
 
             <span class="comment">// COMP start</span>
             <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;COMP&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
+                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
             }
             <span class="comment">// COMP end</span>
 
@@ -703,7 +703,7 @@
             <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;IMM&quot;</span>) {
                 <span class="ident">parse_instruction_load_immediate</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;IND&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
+                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>(<span class="ident">start_pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">VALID_TOKENS</span>))
             }
@@ -721,7 +721,7 @@
             <span class="kw">let</span> <span class="ident">start_pos</span> <span class="op">=</span> (<span class="ident">tok</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> (<span class="ident">orig_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>);
 
             <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;BYTE&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
+                <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span> })
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;WIDE&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">LoadImmediateWide</span> { <span class="ident">rr</span>: <span class="ident">parse_instruction_load_immediate_wide_register_pair</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span> })
             } <span class="kw">else</span> {
@@ -743,12 +743,12 @@
             <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;IN&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Port</span> {
                     <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>,
-                    <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
+                    <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
                 })
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tok</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;OUT&quot;</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>::<span class="ident">Port</span> {
                     <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>,
-                    <span class="ident">aaa</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
+                    <span class="ident">rrr</span>: <span class="ident">parse_register</span>(<span class="ident">itr</span>, <span class="ident">orig_str</span>, <span class="ident">start_pos</span> <span class="op">+</span> <span class="number">3</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">registers</span>)<span class="question-mark">?</span>.<span class="number">1</span>,
                 })
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">ParseInstructionError</span>::<span class="ident">UnrecognisedToken</span>(<span class="ident">start_pos</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">VALID_TOKENS</span>))

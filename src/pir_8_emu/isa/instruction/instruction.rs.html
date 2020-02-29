@@ -772,6 +772,19 @@
 <span id="772">772</span>
 <span id="773">773</span>
 <span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::{<span class="ident">ParseInstructionError</span>, <span class="ident">DisplayInstruction</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">util</span>::<span class="ident">limit_to_width</span>;
@@ -799,42 +812,42 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The &#39;name&#39; is for either a group or single instruction.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// &#39;Count&#39; is how many of the 256 possible instructions are used by that bit pattern; HALT for example is exactly one</span>
-<span class="doccomment">/// instruction, whilst MOVE is effectively 64 possible combinations [this was added to help me keep track of how many</span>
-<span class="doccomment">/// operations I&#39;ve defined, it should add up to 256].</span>
+<span class="doccomment">/// &#39;Count&#39; is how many of the 256 possible instructions are used by that bit pattern;</span>
+<span class="doccomment">/// HALT for example is exactly one instruction, whilst MOVE is effectively 64 possible combinations</span>
+<span class="doccomment">/// [this was added to help me keep track of how many operations I&#39;ve defined, it should add up to 256].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Bit Mask  | Name | Count | Description</span>
 <span class="doccomment">/// ----------|------|-------|------------</span>
 <span class="doccomment">/// 000X XXXX | LOAD |    32 | Load, see section below</span>
 <span class="doccomment">/// 0010 0XXX | JUMP |     8 | Jump, see section below</span>
-<span class="doccomment">/// 0010 1AAA | SAVE |     8 | Store value in register `AAA` in address indicated by `ADR`</span>
+<span class="doccomment">/// 0010 1RRR | SAVE |     8 | Store value in register `RRR` in address indicated by `ADR`</span>
 <span class="doccomment">/// 0011 XXXX | ALU  |    16 | ALU based operations, see section below</span>
-<span class="doccomment">/// 01AA ABBB | MOVE |    64 | Move a value from register `AAA` to register `BBB`</span>
+<span class="doccomment">/// 01QQ QRRR | MOVE |    64 | Move a value from register `QQQ` to register `RRR`</span>
 <span class="doccomment">/// 10XX XXXX |      |    64 | Reserved</span>
 <span class="doccomment">/// 1100 XXXX |      |    16 | Reserved</span>
 <span class="doccomment">/// 1101 0XXX |      |     8 | Reserved</span>
 <span class="doccomment">/// 1101 10XX | MADR |     4 | Move a value to/from the ADR register, see section below</span>
 <span class="doccomment">/// 1101 11XX |      |     4 | Reserved</span>
 <span class="doccomment">/// 1110 XXXX | PORT |    16 | Perform I/O, see section below</span>
-<span class="doccomment">/// 1111 0AAA | COMP |     8 | Compare register S with register `AAA`, see section below</span>
+<span class="doccomment">/// 1111 0RRR | COMP |     8 | Compare register S with register `RRR`, see section below</span>
 <span class="doccomment">/// 1111 10XX | STCK |     4 | Stack manipulation, see section below</span>
 <span class="doccomment">/// 1111 110X |      |     2 | Reserved</span>
-<span class="doccomment">/// 1111 1110 | CLRF |     1 | Clear the &#39;F&#39; register, by setting it to `0000 0000`</span>
+<span class="doccomment">/// 1111 1110 | CLRF |     1 | Clear the F register, by setting it to `0000 0000`</span>
 <span class="doccomment">/// 1111 1111 | HALT |     1 | Stop the CPU from doing any more execution</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## LOAD</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are various types of load instruction, all under the same `000X XXXX` pattern.</span>
-<span class="doccomment">/// They may further increment that PC, as described in their relevant sub-sections.</span>
-<span class="doccomment">/// Some of the potential &#39;LOAD&#39; instruction patterns are actually reserved instruction codes.</span>
+<span class="doccomment">/// They may further increment the PC, as described in their relevant sub-sections.</span>
+<span class="doccomment">/// Some of the potential instruction patterns are simply reserved.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The following table is a break down of possible LOAD instructions.</span>
-<span class="doccomment">/// If you consider load instruction pattern as `000M XXXX`, the M bit is 0 for single byte loads and 1 for multi-byte loads.</span>
+<span class="doccomment">/// If you consider load instruction pattern as `000M XXXX`, the `M` bit is `0` for single byte loads and `1` for multi-byte loads.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Bit Mask | Load Type      | Description</span>
 <span class="doccomment">/// ---------|----------------|------------</span>
-<span class="doccomment">///   0 0AAA | Byte immediate | Load the the next byte into register `AAA`</span>
-<span class="doccomment">///   0 1AAA | From memory    | Load the byte address by `ADR` into register `AAA`</span>
+<span class="doccomment">///   0 0RRR | Byte immediate | Load the the next byte into register `RRR`</span>
+<span class="doccomment">///   0 1RRR | From memory    | Load the byte address by `ADR` into register `RRR`</span>
 <span class="doccomment">///   1 00XX | Wide immediate | Load the the next two bytes into a register pair</span>
 <span class="doccomment">///   1 01XX |                | Reserved</span>
 <span class="doccomment">///   1 1XXX |                | Reserved</span>
@@ -859,9 +872,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ### Byte Immediate</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// When performing a byte immediate load, the next byte (after this instruction) is read from memory into a register, as</span>
-<span class="doccomment">/// indicated by the bits `AAA`.</span>
-<span class="doccomment">/// The register line up with the previously defined table for one of FSXYABCD.</span>
+<span class="doccomment">/// When performing a byte immediate load, the next byte (after this instruction) is read from memory into a register,</span>
+<span class="doccomment">/// as indicated by the bits `RRR`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The PC is incremented once more.</span>
 <span class="doccomment">///</span>
@@ -874,17 +886,26 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## PORT - I/O</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The PORT instruction in the form `1110 DAAA` will perform I/O on the port specified in register A.</span>
+<span class="doccomment">/// The PORT instruction in the form `1110 DRRR` will perform I/O on the port specified in register A.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The `D` bit specifies the direction; `1` for reading in from the port (`PORT IN`) and `0` for writing out to the port</span>
-<span class="doccomment">/// (`PORT OUT`).</span>
-<span class="doccomment">/// The `AAA` bits specify the register to write to (D=1) or read from (D=0).</span>
+<span class="doccomment">/// The `D` bit specifies the direction;</span>
+<span class="doccomment">/// `1` for reading in from the port (PORT IN) and `0` for writing out to the port (PORT OUT).</span>
+<span class="doccomment">/// The `RRR` bits specify the register to write to (IN from the selected device) or read from (OUT to the selected device).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It is possible to read a value form a selected device to the A register, via `1110 1100`, which then changes the selected device.</span>
+<span class="doccomment">/// This will be stable though, and would require a further such operation in order to for the device selection to change once more.</span>
+<span class="doccomment">/// The value is latched on the clock edge.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **NB:** It is currently planned the data is be latched on the rising edge.</span>
+<span class="doccomment">/// The clock signal will also be exposed out for I/O device, though it may only be done so when the CPU is expecting to read/write.</span>
+<span class="doccomment">/// The control line to signify to I/O devices that they should read/write would also be exposed, but under what timings is not yet determined.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## COMP - Compare</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The compare instruction will compare the S register with a selected register.</span>
+<span class="doccomment">/// The compare instruction will compare the S register with a register selected by bits `RRR`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// It will set the Zero and Parity flag based on the value of the S register; the Zero flag if all the bits are zero,</span>
+<span class="doccomment">/// It will set the Zero and Parity flag based on the value of the S register;</span>
+<span class="doccomment">/// the Zero flag if all the bits are zero, Parity if the number of set bits is even.</span>
 <span class="doccomment">/// Parity if the number of set bits is even.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Compare will set the Equal flag if the two registers have the same bit pattern.</span>
@@ -896,7 +917,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** This might change to instead compare just the X and Y register.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ## Stack Manipulation</span>
+<span class="doccomment">/// ## STCK - Stack Manipulation</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// When dealing with the stack, a pair of registers will be moved to or from &#39;the stack&#39; and the SP updated to reflect the</span>
 <span class="doccomment">/// changed address.</span>
@@ -909,9 +930,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The Stack manipulation operations are of pattern `1111 10DR`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The D bit indicates the direction; 0 for PUSH and 1 for POP.</span>
+<span class="doccomment">/// The `D` bit indicates the direction;</span>
+<span class="doccomment">/// `0` for PUSH and `1` for POP.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
+<span class="doccomment">/// The `R` bit indicates the register pair;</span>
+<span class="doccomment">/// `0` for A &amp; B and `1` for C &amp; D.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// When PUSHing B/D will go to the address one less than the current SP, whilst A/C will go to address two less than the SP.</span>
@@ -959,27 +982,29 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// These ADR manipulation operations are of pattern `0000 10DR`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The D bit indicates the direction; 0 for write-to and 1 for read-from the ADR register.</span>
+<span class="doccomment">/// The `D` bit indicates the direction;</span>
+<span class="doccomment">/// `0` for write-to and `1` for read-from the ADR register.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
+<span class="doccomment">/// The `R` bit indicates the register pair;</span>
+<span class="doccomment">/// `0` for A &amp; B and `1` for C &amp; D.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Instruction</span> {
     <span class="doccomment">/// Reserved instruction, contains the entire byte</span>
     <span class="ident">Reserved</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// Load the the next byte into register `AAA` (PC will be incremented a second time), see section above</span>
-    <span class="ident">LoadImmediateByte</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Load the the next byte into register `RRR` (PC will be incremented a second time), see section above</span>
+    <span class="ident">LoadImmediateByte</span> { <span class="ident">rrr</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Load the the next two byte into register pair `RR` (PC will be incremented two more times), see section above</span>
     <span class="ident">LoadImmediateWide</span> { <span class="ident">rr</span>: <span class="ident">InstructionLoadImmediateWideRegisterPair</span>, },
-    <span class="doccomment">/// Load the byte at the address specified by `ADR` into register `AAA`, see section above</span>
-    <span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Load the byte at the address specified by `ADR` into register `RRR`, see section above</span>
+    <span class="ident">LoadIndirect</span> { <span class="ident">rrr</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Jump, see member doc</span>
     <span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>),
-    <span class="doccomment">/// Store value in register `AAA` in address indicated by the next two bytes (PC will be incremented two more times)</span>
-    <span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Store value in register `RRR` in address indicated by the next two bytes (PC will be incremented two more times)</span>
+    <span class="ident">Save</span> { <span class="ident">rrr</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// ALU based operations, see member doc</span>
     <span class="ident">Alu</span>(<span class="ident">AluOperation</span>),
-    <span class="doccomment">/// Move a value from register `AAA` to register `BBB`</span>
-    <span class="ident">Move</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, <span class="ident">bbb</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Move a value from register `QQQ` to register `RRR`</span>
+    <span class="ident">Move</span> { <span class="ident">qqq</span>: <span class="ident">u8</span>, <span class="ident">rrr</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Manipulate ADR, see section above</span>
     <span class="ident">Madr</span> {
         <span class="ident">d</span>: <span class="ident">InstructionMadrDirection</span>,
@@ -988,16 +1013,16 @@
     <span class="doccomment">/// Perform I/O, see section above</span>
     <span class="ident">Port</span> {
         <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>,
-        <span class="ident">aaa</span>: <span class="ident">u8</span>,
+        <span class="ident">rrr</span>: <span class="ident">u8</span>,
     },
-    <span class="doccomment">/// Compare register S with register `AAA`, see section above</span>
-    <span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">u8</span>, },
+    <span class="doccomment">/// Compare register S with register `RRR`, see section above</span>
+    <span class="ident">Comp</span> { <span class="ident">rrr</span>: <span class="ident">u8</span>, },
     <span class="doccomment">/// Stack manipulation, see member doc</span>
     <span class="ident">Stck</span> {
         <span class="ident">d</span>: <span class="ident">InstructionStckDirection</span>,
         <span class="ident">r</span>: <span class="ident">InstructionRegisterPair</span>,
     },
-    <span class="doccomment">/// Clear the &#39;F&#39; register, by setting it to `0000 0000`</span>
+    <span class="doccomment">/// Clear the F register, by setting it to `0000 0000`</span>
     <span class="ident">Clrf</span>,
     <span class="doccomment">/// Stop the CPU from doing any more execution</span>
     <span class="ident">Halt</span>,
@@ -1031,7 +1056,7 @@
     <span class="doccomment">/// assert_eq!(Instruction::Clrf.data_length(), 0);</span>
     <span class="doccomment">/// assert_eq!(Instruction::Alu(AluOperation::Or).data_length(), 0);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Instruction::LoadImmediateByte { aaa: 0 }.data_length(), 1);</span>
+    <span class="doccomment">/// assert_eq!(Instruction::LoadImmediateByte { rrr: 0 }.data_length(), 1);</span>
     <span class="doccomment">/// assert_eq!(Instruction::LoadImmediateWide { rr: InstructionLoadImmediateWideRegisterPair::Ab }.data_length(), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_length</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
@@ -1085,7 +1110,7 @@
     <span class="doccomment">///            Ok(Instruction::Jump(InstructionJumpCondition::Jmpl)));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(Instruction::from_str(&quot;LOAD IND B&quot;, &amp;registers),</span>
-    <span class="doccomment">///            Ok(Instruction::LoadIndirect { aaa: 0b101 }));</span>
+    <span class="doccomment">///            Ok(Instruction::LoadIndirect { rrr: 0b101 }));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(Instruction::from_str(&quot;ALU SOR RIGHT ASF&quot;, &amp;registers),</span>
     <span class="doccomment">///            Ok(Instruction::Alu(AluOperation::ShiftOrRotate {</span>
@@ -1109,8 +1134,8 @@
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0100</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
                (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">LoadImmediateWide</span> {
                     <span class="ident">rr</span>: <span class="ident">InstructionLoadImmediateWideRegisterPair</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0011</span>)
@@ -1123,14 +1148,14 @@
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">InstructionJumpCondition</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for JUMP condition parse&quot;</span>))
             }
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">AluOperation</span>::<span class="ident">try_from</span>(<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_1111</span>).<span class="ident">expect</span>(<span class="string">&quot;Wrong raw instruction slicing for ALU op parse&quot;</span>))
             }
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Move</span> {
-                    <span class="ident">aaa</span>: (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0011_1000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>,
-                    <span class="ident">bbb</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
+                    <span class="ident">qqq</span>: (<span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0011_1000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>,
+                    <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
                 }
             }
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>),
@@ -1146,10 +1171,10 @@
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Port</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
-                    <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
+                    <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span>,
                 }
             }
-            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">rrr</span>: <span class="ident">raw</span> <span class="op">&amp;</span> <span class="number">0b0000_0111</span> },
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">d</span>, <span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">Instruction</span>::<span class="ident">Stck</span> {
                     <span class="ident">d</span>: <span class="ident">d</span>.<span class="ident">into</span>(),
@@ -1167,19 +1192,19 @@
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Instruction</span>::<span class="ident">Reserved</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw</span>,
-            <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_0000</span> <span class="op">|</span> <span class="number">0b0_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_0000</span> <span class="op">|</span> <span class="number">0b0_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_0000</span> <span class="op">|</span> <span class="number">0b0_0000</span> <span class="op">|</span> <span class="ident">rrr</span>,
+            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_0000</span> <span class="op">|</span> <span class="number">0b0_1000</span> <span class="op">|</span> <span class="ident">rrr</span>,
             <span class="ident">Instruction</span>::<span class="ident">LoadImmediateWide</span> { <span class="ident">rr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0000_0000</span> <span class="op">|</span> <span class="number">0b1_0000</span> <span class="op">|</span> (<span class="ident">rr</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">Jump</span>(<span class="ident">cond</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_0000</span> <span class="op">|</span> (<span class="ident">cond</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_1000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0010_1000</span> <span class="op">|</span> <span class="ident">rrr</span>,
             <span class="ident">Instruction</span>::<span class="ident">Alu</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">op_b</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">into</span>();
                 <span class="number">0b0011_0000u8</span> <span class="op">|</span> <span class="ident">op_b</span>
             }
-            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">aaa</span>, <span class="ident">bbb</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0100_0000</span> <span class="op">|</span> (<span class="ident">aaa</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">|</span> <span class="ident">bbb</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">qqq</span>, <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b0100_0000</span> <span class="op">|</span> (<span class="ident">qqq</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">|</span> <span class="ident">rrr</span>,
             <span class="ident">Instruction</span>::<span class="ident">Madr</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1101_1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>, <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1110_0000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">aaa</span>,
-            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_0000</span> <span class="op">|</span> <span class="ident">aaa</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>, <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1110_0000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">rrr</span>,
+            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_0000</span> <span class="op">|</span> <span class="ident">rrr</span>,
             <span class="ident">Instruction</span>::<span class="ident">Stck</span> { <span class="ident">d</span>, <span class="ident">r</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1000</span> <span class="op">|</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> (<span class="ident">r</span> <span class="kw">as</span> <span class="ident">u8</span>),
             <span class="ident">Instruction</span>::<span class="ident">Clrf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1110</span>,
             <span class="ident">Instruction</span>::<span class="ident">Halt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0b1111_1111</span>,
@@ -1210,8 +1235,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the condition is met, the value of ADR is loaded into the PC.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the condition is not met, no further special action is taken; the PC would have already been incremented as part of</span>
-<span class="doccomment">/// loading the instruction.</span>
+<span class="doccomment">/// If the condition is not met, no further special action is taken;</span>
+<span class="doccomment">/// the PC would have already been incremented as part of loading the instruction.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** The value of ADR must have been set with the desired target location prior to the JUMP instruction being performed.</span>
 <span class="doccomment">///</span>
@@ -1278,7 +1303,7 @@
 }
 
 
-<span class="doccomment">/// The D bit indicates the direction; 0 for PUSH and 1 for POP.</span>
+<span class="doccomment">/// The `D` bit indicates the direction; `0` for PUSH and `1` for POP.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionStckDirection</span> {
     <span class="ident">Push</span> <span class="op">=</span> <span class="number">0b00</span>,
@@ -1327,7 +1352,7 @@
 }
 
 
-<span class="doccomment">/// The R bit indicates the register pair; 0 for A &amp; B and 1 for C &amp; D.</span>
+<span class="doccomment">/// The `R` bit indicates the register pair; `0` for A &amp; B and `1` for C &amp; D.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InstructionRegisterPair</span> {
     <span class="ident">Ab</span> <span class="op">=</span> <span class="number">0b0</span>,
@@ -1358,7 +1383,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// All will set the PARITY flag if the number of high bits are even in the S register.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The ADD, SUB, ADDC, and SUBC operations will set the carry bit in F to carry out value from adders.</span>
+<span class="doccomment">/// The ADD, SUB, ADDC, and SUBC operations will set the carry bit in F to carry out value from the adders.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// FFFF | Name | Count | Description</span>
 <span class="doccomment">/// -----|------|-------|------------</span>
@@ -1488,10 +1513,10 @@
 }
 
 
-<span class="doccomment">/// All shifts can be performed left or right, as designated by the D bit of the instruction.</span>
+<span class="doccomment">/// All shifts can be performed left or right, as designated by the `D` bit of the instruction.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If D is a `1`, the shift is to the left, all bits will move to a higher value, if D is `0`, it&#39;s a right shift,</span>
-<span class="doccomment">/// moving bits to lower values.</span>
+<span class="doccomment">/// If `D` is a `1`, the shift is to the left, all bits will move to a higher value, if `D` is `0`,</span>
+<span class="doccomment">/// it&#39;s a right shift, moving bits to lower values.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are then four types of shift that can be performed designated by the final two bits of the ALU</span>
 <span class="doccomment">/// instruction.</span>
@@ -1507,7 +1532,8 @@
 <span class="doccomment">/// 10 | RTC  | Rotate with carry - the Carry flag is inserted (Carry flag value before it is updated is used)</span>
 <span class="doccomment">/// 11 | RTW  | Rotate without carry - the bit shifted out is inserted</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// An example of a Arithmetic shift right; `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.</span>
+<span class="doccomment">/// An example of a Arithmetic shift right;</span>
+<span class="doccomment">/// `AXXX XXXB` would become `AAXX XXXX`, with `B` copied to the Carry bit.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **NB:** An &#39;Arithmetic shift left&#39; is the same as performing a &#39;Logical shift left&#39;, they _can_ be used interchangeably, but</span>
 <span class="doccomment">/// &#39;Arithmetic shift left&#39; should be avoided.</span>

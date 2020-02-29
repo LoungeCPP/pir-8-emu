@@ -292,7 +292,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use pir_8_emu::isa::instruction::Instruction;</span>
     <span class="doccomment">/// # use pir_8_emu::micro::MicroOp;</span>
-    <span class="doccomment">/// let ops = MicroOp::from_instruction(Instruction::Move { aaa: 0b100, bbb: 0b101 });</span>
+    <span class="doccomment">/// let ops = MicroOp::from_instruction(Instruction::Move { qqq: 0b100, rrr: 0b101 });</span>
     <span class="doccomment">/// let ops = &amp;ops.0[..ops.1];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(ops, &amp;[MicroOp::ReadRegister(0b100), MicroOp::WriteRegister(0b101)]);</span>
@@ -310,10 +310,10 @@
                  <span class="number">6</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">LoadImmediateByte</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">LoadImmediate</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
@@ -321,10 +321,10 @@
                  <span class="number">2</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">LoadIndirect</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">FetchAddress</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
@@ -366,9 +366,9 @@
                  <span class="number">3</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Save</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
-                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">WriteAddress</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
@@ -388,10 +388,10 @@
                  <span class="number">6</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">aaa</span>, <span class="ident">bbb</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Move</span> { <span class="ident">qqq</span>, <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
-                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>),
-                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">bbb</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">qqq</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
@@ -424,19 +424,19 @@
                  <span class="number">3</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>, <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">In</span>, <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">A_REGISTER_ADDRESS</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">PortIn</span>,
-                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>],
                  <span class="number">3</span>)
             }
-            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>, <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Port</span> { <span class="ident">d</span>: <span class="ident">InstructionPortDirection</span>::<span class="ident">Out</span>, <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
-                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">A_REGISTER_ADDRESS</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">PortOut</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">Nop</span>,
@@ -445,10 +445,10 @@
                  <span class="number">3</span>)
             }
 
-            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">aaa</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Instruction</span>::<span class="ident">Comp</span> { <span class="ident">rrr</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 ([<span class="comment">// forcebreak</span>
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">S_REGISTER_ADDRESS</span>),
-                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">aaa</span>),
+                  <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">rrr</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">ReadRegister</span>(<span class="ident">FLAG_REGISTER_ADDRESS</span>),
                   <span class="ident">MicroOp</span>::<span class="ident">Compare</span>,
                   <span class="ident">MicroOp</span>::<span class="ident">WriteRegister</span>(<span class="ident">FLAG_REGISTER_ADDRESS</span>),
