@@ -21,16 +21,16 @@ The assembly format is as follows:
 
 And so, all of these are equivalent:
 
-    LOAD IMM A
+    LOAD IMM BYTE A
     0x69
 
-    LOAD IMM A
+    LOAD IMM BYTE A
     0b0110_1001
 
-    0x1C
+    0x04
     0o151
 
-    28
+    4
     105
 
 ## DIRECTIVES
