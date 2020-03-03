@@ -9,7 +9,7 @@ keywords = ["isa", "emulation", "cpu"]
 categories = ["emulators"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "2.0.0"
+version = "2.0.1"
 # Remember to also update in man/*.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
