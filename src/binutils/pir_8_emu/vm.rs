@@ -59,7 +59,7 @@ pub struct Vm {
     /// Any instruction successfully loaded will be added to the front of this queue
     pub instruction_history: ArrayDeque<[(u16, Instruction, u16); 10], ArrayDequeBehaviourWrapping>,
 
-    /// Pause execution when ADR is contained herein until the flag is cleared
+    /// Pause execution when PC is contained herein until the flag is cleared
     pub breakpoints: BTreeSet<u16>,
     pub active_breakpoint: Option<u16>,
 }
@@ -164,8 +164,8 @@ impl Vm {
         self.curr_op += 1;
 
 
-        let (adr_r, adr_w) = (self.adr.was_read(), self.adr.was_written());
-        let adr = *self.adr;
+        let (pc_r, pc_w) = (self.pc.was_read(), self.pc.was_written());
+        let pc = self.pc.wrapping_sub(1);
 
         if self.curr_op >= self.ops.1 {
             if self.ins.was_written() {
@@ -175,9 +175,9 @@ impl Vm {
 
                 let mut data = 0u16;
                 for i in 1..=(self.instruction.data_length() as u16) {
-                    data = (data << 8) | (self.memory[..][adr.wrapping_add(i) as usize] as u16);
+                    data = (data << 8) | (self.memory[..][pc.wrapping_add(i) as usize] as u16);
                 }
-                self.instruction_history.push_front((adr, self.instruction, data));
+                self.instruction_history.push_front((pc, self.instruction, data));
             } else {
                 self.ops = NEXT_INSTRUCTION;
                 self.instruction_valid = false;
@@ -187,12 +187,12 @@ impl Vm {
             new_ops = true;
         }
 
-        self.active_breakpoint = self.breakpoints.get(&adr).copied();
+        self.active_breakpoint = self.breakpoints.get(&pc).copied();
 
-        if !adr_r {
-            self.adr.reset_rw();
-            if adr_w {
-                *self.adr = adr;
+        if !pc_r {
+            self.pc.reset_rw();
+            if pc_w {
+                *self.pc = pc.wrapping_add(1);
             }
         }
 
