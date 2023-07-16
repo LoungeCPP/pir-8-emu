@@ -16,7 +16,7 @@ pub mod display;
 
 /// Contents of the icon to use for the `pir-8-emu` window
 ///
-/// Cropped and scaled down version of [this](https://twitter.com/nabijaczleweli/status/1154176483730100224)
+/// Cropped and scaled down version of [this](https://lfs.nabijaczleweli.xyz/0017-twitter-export#1154176483730100224)
 pub static ICON: &[u8] = include_bytes!("../../../assets/pir-8-emu.ico");
 
 /// Contents of the help text to display after pressing F1 in the `pir-8-emu` window, paginated by Form Feeds
